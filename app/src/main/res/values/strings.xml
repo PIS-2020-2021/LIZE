@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Lize</string>
+    <string name="ambito_default_name">Personal</string>
+    <string name="search">find note</string>
+    <string name="more">change view</string>
+    <string name="sandwich">change view</string>
 </resources>
