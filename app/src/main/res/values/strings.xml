@@ -5,6 +5,13 @@
     <string name="error_invalid_pwd">La contraseña debe tener 8 caracteres mínimo.</string>
     <string name="LOGIN" >Login</string>
     <string name="create_new"></string>
-    <string name="prompt_password">Sign up</string>
+    <string name="prompt_password">Contraseña</string>
     <string name="prompt_email">Email</string>
+    <string name="log_in">Log in</string>
+    <string name="Sing_up">Sing up</string>
+    <string name="demasiados_caracteres">Demasiados caracteres introducidos.</string>
+    <string name="register">Regístrate</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="apellidos">Apellidos</string>
+    <string name="nombre">Nombre</string>
 </resources>
