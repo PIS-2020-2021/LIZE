@@ -1,7 +1,37 @@
 <resources>
     <string name="app_name">Lize</string>
-    <string name="ambito_default_name">Personal</string>
     <string name="search">find note</string>
     <string name="more">change view</string>
     <string name="sandwich">change view</string>
+    <string name="ambit_default_name">Personal</string>
+    <string name="note_default_name">Nueva Nota</string>
+    <string name="note_default_body">
+        Cards are surfaces that display content and actions on a single topic.
+        They should be easy to scan for relevant and actionable information.
+        Elements, like text and images, should be placed on them in a way that clearly indicates hierarchy.
+    </string>
+
+    <!-- MOCKUP NOTE DATA -->
+    <string-array name="notes_title">
+        <item>TODO</item>
+        <item>Lista compra</item>
+        <item>Mails</item>
+        <item>Important</item>
+        <item>13/04/2020</item>
+        <item>Nueva Nota</item>
+        <item>Nueva Nota 1</item>
+        <item>Cumples</item>
+    </string-array>
+
+    <string-array name="notes_body">
+        <item> @string/note_default_body </item>
+        <item> @string/note_default_body </item>
+        <item> @string/note_default_body </item>
+        <item> @string/note_default_body </item>
+        <item> @string/note_default_body </item>
+        <item> @string/note_default_body </item>
+        <item> @string/note_default_body </item>
+        <item> @string/note_default_body </item>
+    </string-array>
+
 </resources>

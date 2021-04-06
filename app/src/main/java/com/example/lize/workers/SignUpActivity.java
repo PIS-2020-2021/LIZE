@@ -1,9 +1,12 @@
-package com.example.lize;
+package com.example.lize.workers;
 
 import android.app.Activity;
 import android.os.Bundle;
 
-public class NotasActivity extends Activity {
+import com.example.lize.R;
+
+public class SignUpActivity extends Activity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

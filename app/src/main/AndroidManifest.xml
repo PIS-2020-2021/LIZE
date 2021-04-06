@@ -10,19 +10,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Lize">
 
-        <activity android:name=".LogInActivity"></activity>
-        <activity android:name=".SignUpActivity"></activity>
+        <activity android:name=".workers.LogInActivity"></activity>
+        <activity android:name=".workers.SignUpActivity"></activity>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".workers.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".EditarAmbitoActivity"></activity>
-        <activity android:name=".AjustesActivity"></activity>
-        <activity android:name=".NotasActivity"></activity>
+        <activity android:name=".workers.EditarAmbitoActivity"></activity>
+        <activity android:name=".workers.AjustesActivity"></activity>
+        <activity android:name=".workers.NotasActivity"></activity>
     </application>
 
 </manifest>

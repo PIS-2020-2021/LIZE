@@ -1,10 +1,11 @@
-package com.example.lize;
+package com.example.lize.workers;
 
 import android.app.Activity;
 import android.os.Bundle;
 
-public class AjustesActivity extends Activity {
+import com.example.lize.R;
 
+public class NotasActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
