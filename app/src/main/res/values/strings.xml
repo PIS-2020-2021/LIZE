@@ -10,9 +10,10 @@
         They should be easy to scan for relevant and actionable information.
         Elements, like text and images, should be placed on them in a way that clearly indicates hierarchy.
     </string>
+    <string name="folder_default_name">General</string>
 
     <!-- MOCKUP NOTE DATA -->
-    <string-array name="notes_title">
+    <string-array name="notes_names">
         <item>TODO</item>
         <item>Lista compra</item>
         <item>Mails</item>
@@ -21,9 +22,11 @@
         <item>Nueva Nota</item>
         <item>Nueva Nota 1</item>
         <item>Cumples</item>
+        <item>Android</item>
     </string-array>
 
     <string-array name="notes_body">
+        <item>  </item>
         <item> @string/note_default_body </item>
         <item> @string/note_default_body </item>
         <item> @string/note_default_body </item>

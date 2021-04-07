@@ -16,9 +16,9 @@ import java.util.ArrayList;
 
 /**
  * Adaptador del RecyclerView de Notas, en la actividad principal. Enlaza los datos del dataSet
- * de Notas, con el correspondiente Card,
+ * de Notas, con el correspondiente CardNote (ViewHolder).
  */
-public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.CardNote>{
+public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
 
     private ArrayList<Note> mNotesData;
     private Context mContext;
@@ -28,7 +28,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.CardNote>{
      * @param context contexto de la app
      * @param notesData ArrayList conteniendo la información de las notas.
      */
-    public NotesAdapter(Context context, ArrayList<Note> notesData) {
+    public NoteAdapter(Context context, ArrayList<Note> notesData) {
         this.mNotesData = notesData;
         this.mContext = context;
     }

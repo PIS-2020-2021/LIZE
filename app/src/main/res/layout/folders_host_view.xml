@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:maxHeight="50dp"
+    android:orientation="horizontal">
+        
+    <com.google.android.material.chip.Chip
+        android:id="@+id/folder_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/folder_default_name"
+        android:layout_margin="5dp"
+        android:backgroundTint="?attr/colorPrimaryDark"
+        android:textColor="?attr/colorOnSurface"/>
+
+    <View style="@style/Divider"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/folder_recycler_view"
+            android:scrollbars="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <View style="@style/Divider"></View>
+
+    </LinearLayout>
+    
+</LinearLayout>

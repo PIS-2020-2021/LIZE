@@ -7,24 +7,23 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="8dp">
 
         <TextView
+            android:id="@+id/note_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/note_name"
             android:text="@string/note_default_name"
-            android:padding="8dp"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             android:textColor="?attr/colorOnPrimary"/>
 
         <TextView
+            android:id="@+id/note_body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/note_body"
-            android:text="@string/note_default_body"
-            android:padding="8dp"
             android:layout_below="@id/note_name"
+            android:text="@string/note_default_body"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
             android:textColor="?attr/colorOnPrimary"/>
 
