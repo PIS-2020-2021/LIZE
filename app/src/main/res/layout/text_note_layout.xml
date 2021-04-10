@@ -1,0 +1,24 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_example"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+<EditText
+               android:id="@+id/inputNota"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginStart="@dimen/_12sdp"
+               android:layout_marginTop="@dimen/_12sdp"
+               android:layout_marginEnd="@dimen/_12sdp"
+               android:background="@null"
+               android:fontFamily="@font/ubuntu"
+               android:imeOptions="actionDone"
+               android:hint="|"
+               android:importantForAutofill="no"
+               android:includeFontPadding="false"
+               android:inputType="textMultiLine"
+               android:textColor="@color/black"
+               android:textColorHint="@color/colorTextHint"
+               android:textSize="@dimen/_13ssp"
+ />
+</LinearLayout>
