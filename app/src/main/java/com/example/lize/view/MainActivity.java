@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.example.lize.view.NotasActivity;
 import com.example.lize.R;
 import com.example.lize.adapters.NotaAdapter;
 import com.example.lize.model.Nota;
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivityForResult(
-                        new Intent(getApplicationContext(),CreateNoteActivity.class),
+                        new Intent(getApplicationContext(), NotasActivity.class),
                         REQUEST_CODE_ADD_NOTE
                 );
             }

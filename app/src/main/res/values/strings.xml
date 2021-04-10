@@ -3,6 +3,9 @@
     <string name="note_title">Título de la nota</string>
     <string name="escribe_aqui">Escribe aquí</string>
     <string name="underline"><u>S</u></string>
+    <string name="n">N</string>
+    <string name="s">s</string>
+    <string name="todo">TODO</string>
     <string name="search">find note</string>
     <string name="more">change view</string>
     <string name="sandwich">change view</string>

@@ -6,14 +6,20 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,11 +33,12 @@ import com.example.lize.R;
 import java.io.InputStream;
 
 
-public class CreateNoteActivity extends AppCompatActivity {
+public class NotasActivity extends AppCompatActivity {
 
     private EditText inputNoteTitulo, inputNoteTexto;
     private String defaultTitle;
     private FrameLayout layoutNota;
+    private ImageView imagenNota;
 
     public static int countId = 0;
     public static final int REQUEST_CODE_STORAGE_PERMISSION = 1;
@@ -41,11 +48,12 @@ public class CreateNoteActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_note);
+        setContentView(R.layout.activity_notas);
         /*inputNoteTitulo = findViewById(R.id.inputNoteTitulo);*/
-        layoutNota = (FrameLayout) findViewById(R.id.layoutNota);
-        addEditText();
-        //inputNoteTexto = findViewById(R.id.inputNota);
+        //layoutNota = (FrameLayout) findViewById(R.id.layoutNota);
+        inputNoteTexto = findViewById(R.id.inputNota);
+
+
 
         ImageView imagenAtras = findViewById(R.id.imagenAtras);
         imagenAtras.setOnClickListener(new View.OnClickListener() {
@@ -60,12 +68,11 @@ public class CreateNoteActivity extends AppCompatActivity {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectImage();
                 if(ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE
                 ) != PackageManager.PERMISSION_GRANTED){
                     ActivityCompat.requestPermissions(
-                            CreateNoteActivity.this,
+                            NotasActivity.this,
                             new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                             REQUEST_CODE_STORAGE_PERMISSION
                     );
@@ -74,43 +81,14 @@ public class CreateNoteActivity extends AppCompatActivity {
                 }
             }
         });
+        imagenNota = findViewById(R.id.imageNote);
+        registerForContextMenu(imagenNota);
+        registerForContextMenu(inputNoteTexto);
+
 
 
     }
-/*
-    private void saveNota(){
-        if(inputNoteTitulo.getText().toString().trim().isEmpty()){
-           onBackPressed();
-        }else if(inputNoteTexto.getText().toString().trim().isEmpty()){
-            Toast.makeText(this,"La nota no puede estar vacía", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        // Creando el objeto nota para la base de datos
-        final Nota nota = new Nota();
 
-        nota.setTitulo(inputNoteTitulo.getText().toString());
-        nota.setTexto(inputNoteTexto.getText().toString());
-        nota.setFecha(new SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm", Locale.getDefault()).format(new Date()));
-
-        // La clase room no acpeta operaciones sobre la base de datos en el hilo principal de ejecución, de ahí que creamos una tarea asíncrona
-        class SaveNoteTask extends AsyncTask<Void, Void, Void> {
-
-            @Override
-            protected Void doInBackground(Void... voids) {
-                NotasBBDD.getDatabase(getApplicationContext()).notaDao().inserNota(nota);
-                return null;
-            }
-            @Override
-            protected void onPostExecute(Void aVoid){
-                super.onPostExecute(aVoid);
-                Intent intent = new Intent();
-                setResult(RESULT_OK,intent);
-                finish();
-            }
-        }
-        new SaveNoteTask().execute();
-    }
-*/
     private void selectImage() {
 
 
@@ -118,7 +96,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         pickIntent.setType("image/*");
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         getIntent.setType("image/*");
-        Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+        Intent chooserIntent = Intent.createChooser(getIntent, "Selecciona una imagen");
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
 
         startActivityForResult(chooserIntent, PICK_IMAGE);
@@ -138,22 +116,6 @@ public class CreateNoteActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode,int resultCode, @Nullable Intent data){
         super.onActivityResult(requestCode,resultCode,data);
-/*		if(requestCode == REQUEST_CODE_SELECT_IMAGE && resultCode == RESULT_OK){
-			if(data != null){
-				Uri selectedImageUri = data.getData();
-				if(selectedImageUri != null){
-					try{
-						InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
-						Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-						addImageView(bitmap);
-					} catch (Exception e) {
-						Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-
-					}
-				}
-			}
-		}*/
-
         if (requestCode == PICK_IMAGE) {
             if (data != null) {
                 Uri selectedImageUri = data.getData();
@@ -161,7 +123,11 @@ public class CreateNoteActivity extends AppCompatActivity {
                     try {
                         InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        addImageView(bitmap);
+
+
+                        imagenNota.setImageBitmap(bitmap);
+                        imagenNota.setVisibility(View.VISIBLE);
+
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
 
@@ -172,15 +138,38 @@ public class CreateNoteActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if(v.getId() == R.id.inputNota){
+            menu.add(0, v.getId(), 0, "Negrita");
+            menu.add(0, v.getId(), 1, "Subrayado");
+            menu.add(0, v.getId(), 2, "Subtitulo");
+        }else if(v.getId() == R.id.imageNote){
+            menu.add(0, v.getId(), 0, "Eliminar");
+        }
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if(item.getTitle().equals("Eliminar")){
+            imagenNota.setImageDrawable(null);
+        }
+        return true;
+    }
+
+
+
+    /*
     private void addEditText(){
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.text_note_layout, null);
         FrameLayout container = (FrameLayout) findViewById(R.id.layoutNota);
         container.addView(view);
-    }
+    }*/
 
-    private void addImageView(Bitmap bitmap){
+   /* private void addImageView(Bitmap bitmap){
 
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
@@ -192,7 +181,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
 
     }
-
+*/
 
 
 }
