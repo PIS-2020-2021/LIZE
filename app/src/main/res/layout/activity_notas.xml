@@ -63,7 +63,11 @@
                 android:orientation="horizontal"/>
         </HorizontalScrollView>
 
-
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/fileAttachView"
+            >
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -103,7 +107,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/imageNote" />
 
             </LinearLayout>
-
+</ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

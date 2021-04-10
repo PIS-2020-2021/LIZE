@@ -3,7 +3,7 @@
 
     <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/_44sdp"
         android:background="@drawable/editor_control_bg"
         android:orientation="horizontal"
@@ -16,18 +16,16 @@
             android:layout_height="match_parent">
 
 
-            <TextView
-                android:id="@+id/headingBtn"
+            <ImageView
+                android:id="@+id/checkBtn"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:fontFamily="sans-serif"
-                android:gravity="center"
-                android:text="@string/n"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:padding="10dp"
+                android:src="@drawable/checkbox_uncheked"
+                android:contentDescription="@string/app_name" />
         </FrameLayout>
 
         <RelativeLayout
@@ -37,18 +35,16 @@
             android:layout_toEndOf="@+id/container1"
             android:layout_toRightOf="@+id/container1">
 
-            <TextView
-                android:id="@+id/underlinedTextBtn"
+            <ImageView
+                android:id="@+id/documentBtn"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:fontFamily="sans-serif"
-                android:gravity="center"
-                android:text="@string/underline"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:padding="10dp"
+                android:src="@drawable/document_icon"
+                android:contentDescription="@string/app_name" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -58,65 +54,27 @@
             android:layout_toEndOf="@+id/container2"
             android:layout_toRightOf="@+id/container2">
 
-            <TextView
-                android:id="@+id/SubtitleTextBtn"
+            <ImageView
+                android:id="@+id/AudioBtn"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:fontFamily="sans-serif"
-                android:gravity="center"
-                android:text="@string/s"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:padding="10dp"
+                android:src="@drawable/audio_icon"
+                android:contentDescription="@string/todo" />
         </RelativeLayout>
+
+
 
         <FrameLayout
             android:id="@+id/container4"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="match_parent"
-            android:layout_toEndOf="@+id/container3"
-            android:layout_toRightOf="@+id/container3">
-
-            <ImageView
-                android:id="@+id/bulletBtn"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="10dp"
-                android:src="@drawable/ul"
-                android:contentDescription="@string/todo" />
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/container5"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="match_parent"
-            android:layout_toEndOf="@+id/container4"
-            android:layout_toRightOf="@+id/container4">
-
-            <ImageView
-                android:id="@+id/insertLinkBtn"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="10dp"
-                android:src="@drawable/link"
-                android:contentDescription="TODO" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/container7"
             android:layout_width="@dimen/_44sdp"
             android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true">
+            android:layout_toEndOf="@+id/container3"
+            android:layout_toRightOf="@+id/container3"
+            >
 
             <ImageView
                 android:id="@+id/insertImageBtn"
