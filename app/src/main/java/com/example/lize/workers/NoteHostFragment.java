@@ -17,26 +17,48 @@ import com.example.lize.data.Note;
 
 public class NoteHostFragment extends Fragment {
 
-    private Folder mFolder;                     // Model data
-    private RecyclerView mNotesRecyclerView;    // Recycle View of Card-Notes
-    private NoteAdapter mNoteAdapter;           // NoteAdapter for the RecycleView
+    private Folder mFolder;                             // Model data
+    private RecyclerView mNotesRecyclerView;            // Recycle View of Card-Notes
+    private GridLayoutManager mNotesManager;            // Recycle View Layout Manager
+    private NoteAdapter mNoteAdapter;                   // NoteAdapter for the RecycleView
+    private boolean cardViewType;                       // boolean CardView type
 
     /**
-     * Inflates the RecyclerView for the Notes.
+     * Incha el RecyclerView de las Notas.
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mNotesRecyclerView = (RecyclerView) inflater.inflate(R.layout.notes_host_view, container, false);
+        View root = inflater.inflate(R.layout.notes_host_view, container, false);
         mFolder = new Folder("General");
 
-        mNotesRecyclerView.setLayoutManager(new GridLayoutManager(mNotesRecyclerView.getContext(), 2));
+        // Recycle View initiallization. By default, cardView enabled.
+        mNotesRecyclerView = root.findViewById(R.id.note_recycler_view);
+        mNotesManager = new GridLayoutManager(mNotesRecyclerView.getContext(), 2);
+        mNotesRecyclerView.setLayoutManager(mNotesManager);
+        this.cardViewType = true;
 
-        // Sets a NoteAdapter for the Recycle
+        // Sets the NoteAdapter for the Recycle
         mNoteAdapter = new NoteAdapter(mNotesRecyclerView.getContext(), mFolder.getFolderNotes());
         mNotesRecyclerView.setAdapter(mNoteAdapter);
 
         //Get the data
         initializeData();
-        return mNotesRecyclerView;
+        return root;
+    }
+
+    /**
+     * Método para cambiar el tipo de los CardNotes:
+     * Si cardView = true; 2 columnas con cards de alto height {@link R.dimen#cardnote_layout_height_high}
+     * Si cardView = false; 1 columna con cards de bajo height {@link R.dimen#cardnote_layout_height_low}
+     */
+    public void changeNotesView(){
+        this.cardViewType = !cardViewType;
+
+        // Modificamos el num de columnas, a partir del LayoutManager.
+        if (cardViewType) mNotesManager.setSpanCount(2);
+        else mNotesManager.setSpanCount(1);
+
+        // Modificamos el 'type' de los CardViews de las notas, a partir del Adaptador.
+        mNoteAdapter.changeCardViewType();
     }
 
     /**

@@ -16,12 +16,18 @@ import java.util.ArrayList;
 
 /**
  * Adaptador del RecyclerView de Notas, en la actividad principal. Enlaza los datos del dataSet
- * de Notas, con el correspondiente CardNote (ViewHolder).
+ * de Notas, con el correspondiente CardNote (ViewHolder). Podemos distinguir dos tipos de ViewHolders;
+ * <ul>
+ *      <li>cardNotes con alto height {@link R.dimen#cardnote_layout_height_high} (cardViewType = true)</li>
+ *      <li>cardNotes con bajo height {@link R.dimen#cardnote_layout_height_high} (cardViewType = false) </li>
+ * </ul>
+ * Puesto que solo el height es modificado, nos basta con un único tipo de ViewHolder {@link CardNote}.
  */
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
 
     private ArrayList<Note> mNotesData;
     private Context mContext;
+    private boolean cardViewType;
 
     /**
      * Constructor que pasa el listado de notas i el contexto.
@@ -31,6 +37,15 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
     public NoteAdapter(Context context, ArrayList<Note> notesData) {
         this.mNotesData = notesData;
         this.mContext = context;
+        this.cardViewType = true;
+    }
+
+    /**
+     * Modificamos el CardViewType, y actualizamos el RecicleView llamando a {@link #notifyDataSetChanged()}
+     */
+    public void changeCardViewType(){
+        this.cardViewType = !cardViewType;
+        super.notifyDataSetChanged();
     }
 
     /**
@@ -47,13 +62,20 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
 
     /**
      * Método requerido que permite enlazar los datos de la nota con el correspondiente ViewHolder.
+     * Modificamos la altura del Holder según el valor de cardViewType.
      * @param holder ViewHolder a quien pasar los datos.
      * @param position Position del adaptador.
      */
     @Override
     public void onBindViewHolder(@NonNull CardNote holder, int position) {
-        Note currentNote = mNotesData.get(position); // Obtenemos la nota de la posición
-        holder.bindTo(currentNote); // Enlazamos la nota con el ViewHolder
+        // Obtenemos los parámetros del Layout correspondiente al holder y modificamos el height
+        ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+        params.height = holder.itemView.getResources().getDimensionPixelSize((cardViewType) ?
+                R.dimen.cardnote_layout_height_high : R.dimen.cardnote_layout_height_low);
+
+        holder.itemView.setLayoutParams(params);        // Seteamos el nuevo Layout
+        Note currentNote = mNotesData.get(position);    // Obtenemos la nota de la posición
+        holder.bindTo(currentNote);                     // Enlazamos la nota con el ViewHolder
     }
 
     /**
@@ -84,6 +106,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
             mTextNote = (TextView) itemView.findViewById(R.id.note_body);
         }
 
+
         /**
          * Método para <b>enlazar</b> los datos de la nota con el Card de este objeto ViewHolder.
          * @param currentNote nota actual
@@ -92,5 +115,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
             mTitleNote.setText(currentNote.getTitle());
             mTextNote.setText(currentNote.getText());
         }
+
     }
 }
