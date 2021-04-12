@@ -1,8 +1,12 @@
 package com.example.lize.workers;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.view.MenuItem;
@@ -10,6 +14,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.lize.R;
+import com.example.lize.adapters.AmbitosAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -18,6 +23,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 /** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener{
 
+
+
+
     private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
     private NoteHostFragment noteHostFragment;               // Contenedor de Notas
     private FolderHostFragment folderHostFragment;           // Contenedor de Folders
@@ -25,14 +33,91 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
     public static final int REQUEST_CODE_ADD_NOTE = 1;
 
+
+    //Declaramos el toolBar Object
+    private Toolbar toolbar;
+
+    //Declaramos RecyclerView
+    RecyclerView mRecyclerView;
+    //Declaramos un Adapter par el Recycler View
+    RecyclerView.Adapter mAdapter;
+    //Declaramos un LayoutManager como Linear Layout Manager
+    RecyclerView.LayoutManager mLayoutManager;
+    //Declaramos un DrawerLayout
+    DrawerLayout drawerLayout;
+
+    //Declaramos un Action Bar Drawer Toggle
+    ActionBarDrawerToggle mDrawerToggle;
+
+
+    /*Mock-Up de Adrián */
+    //Declaramos Títulos para nuestro Navigation Drawer List View
+    String[] AMBITOS = {"Home", "Eventos", "Trabajo", "Universidad"};
+
+    //Creamos un recurso String para el nombre y el eMail para el HeaderView
+    //También creamos un recurso para la imagen de perfil del HeaderView
+    String NAME = "Adrian Saiz";
+    String EMAIL = "adrian.saizdepedro@soyunemail.com";
+    int IMG_PROFILE = R.drawable.adrian_image;
+
+
     /** Main constructor */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Obtenemos los componentes y registramos Listeners
+
+        /*Asignamos el objeto toolBar de la view
+        y después configuramos la Action Bar a nuestro ToolBar
+        toolbar = findViewById(R.id.ambito_material_toolbar);
+        setSupportActionBar(toolbar);*/
         this.topAppBar = findViewById(R.id.ambito_material_toolbar);
+
+        //Asignamos el RecyclerView Object al xmlView
+        mRecyclerView = findViewById(R.id.recyclerView);
+        //Hacemos saber al sistema que la lista de objetos es fija
+        //mRecyclerView.setHasFixedSize(true);
+
+        //Creamos el Adaptador de MyAdapter class
+        //Le pasamos los ambitos, iconos (si hubiera), nombre/mail del header e imagen del header
+        mAdapter = new AmbitosAdapter(AMBITOS, NAME, EMAIL, IMG_PROFILE);
+
+        //Configuramos el adapter al RecyclerView
+        mRecyclerView.setAdapter(mAdapter);
+
+        //Creamos un LayoutManager
+        mLayoutManager = new LinearLayoutManager(this);
+        //Configuramos el LinearLayoutManager
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+
+        //Asignamos el Drawer Object a la view
+        drawerLayout = findViewById(R.id.drawerLayout);
+        //Creamos el DrawerToggle Object
+        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, topAppBar, R.string.openDrawer, R.string.closeDrawer){
+            @Override
+            public void onDrawerOpened(View drawerView){
+                super.onDrawerOpened(drawerView);
+                //Si quisieramos que pasase algo cuando abramos el drawer, esta es la función
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView){
+                super.onDrawerClosed(drawerView);
+                //Si quisieramos que pasase algo cuando cerremos el drawer, esta es la función
+            }
+        };
+
+        //Asignamos el Drawer Listener a Drawer Toggle
+        drawerLayout.setDrawerListener(mDrawerToggle);
+        //Configuramos el DrawerToggle par que sincronice con el Estado
+        mDrawerToggle.syncState();
+
+
+
+        // Obtenemos los componentes y registramos Listeners
+
         this.addFAB = findViewById(R.id.add_note_button);
         this.noteHostFragment = (NoteHostFragment) getFragmentManager().findFragmentById(R.id.notes_host_fragment);
         this.folderHostFragment = (FolderHostFragment) getFragmentManager().findFragmentById(R.id.folders_host_fragment);
