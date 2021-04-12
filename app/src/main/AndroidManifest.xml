@@ -20,14 +20,15 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".workers.LogInActivity"></activity>
-        <activity android:name=".workers.SignUpActivity"></activity>
-
-        <activity android:name=".workers.MainActivity">
+        <activity android:name=".workers.LogInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".workers.SignUpActivity"></activity>
+
+        <activity android:name=".workers.MainActivity">
         </activity>
 
 
