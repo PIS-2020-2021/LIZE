@@ -18,7 +18,7 @@
                android:includeFontPadding="false"
                android:inputType="textMultiLine"
                android:textColor="@color/black"
-               android:textColorHint="@color/colorTextHint"
+               android:textColorHint="?attr/colorPrimaryDark"
                android:textSize="@dimen/_13ssp"
  />
 </LinearLayout>
