@@ -16,6 +16,8 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.ViewHold
 
     private String mNavTitles[]; // String Array to store the passed titles Value from MainActivity.java
 
+    private int nada;
+
     private String name;        //String Resource for header View Name
     private int profile;        //int Resource for header view profile picture
     private String email;       //String Resource for header view email
