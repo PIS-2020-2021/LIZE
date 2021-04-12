@@ -37,4 +37,10 @@
         <item> @string/note_default_body </item>
     </string-array>
 
+    <string name="note_title">Título de la nota</string>
+    <string name="escribe_aqui">Escribe aquí</string>
+    <string name="underline"><u>S</u></string>
+    <string name="n">N</string>
+    <string name="s">s</string>
+    <string name="todo">TODO</string>
 </resources>

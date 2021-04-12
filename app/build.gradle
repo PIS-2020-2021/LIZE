@@ -37,4 +37,18 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    //RecyclerView
+
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+
+    //Escala de tamaños (soporte para varios tipos de pantalla)
+
+    implementation "com.intuit.sdp:sdp-android:1.0.6"
+    implementation "com.intuit.ssp:ssp-android:1.0.6"
+
+    // ImageView redondeado
+
+    implementation "com.makeramen:roundedimageview:2.3.0"
+
 }
