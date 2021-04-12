@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Lize</string>
+
+    <string name="openDrawer">Open Drawer </string>
+    <string name="closeDrawer">Close Drawer </string>
+
 </resources>
