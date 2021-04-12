@@ -13,13 +13,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 public class MainActivity extends AppCompatActivity {
 
     //Declaramos Títulos para nuestro Navigation Drawer List View
-    String AMBITOS[] = {"Home", "Eventos", "Trabajo", "Universidad"};
+    String[] AMBITOS = {"Home", "Eventos", "Trabajo", "Universidad"};
 
     //Creamos un recurso String para el nombre y el eMail para el HeaderView
     //También creamos un recurso para la imagen de perfil del HeaderView
@@ -61,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Creamos el Adaptador de MyAdapter class
         //Le pasamos los ambitos, iconos (si hubiera), nombre/mail del header e imagen del header
-        mAdapter = new MyAdapter(AMBITOS, NAME, EMAIL, IMG_PROFILE);
+        mAdapter = new AmbitosAdapter(AMBITOS, NAME, EMAIL, IMG_PROFILE);
 
         //Configuramos el adapter al RecyclerView
         mRecyclerView.setAdapter(mAdapter);
