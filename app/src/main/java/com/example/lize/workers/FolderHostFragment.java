@@ -8,34 +8,31 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import com.example.lize.R;
 import com.example.lize.adapters.FolderAdapter;
-import com.example.lize.adapters.NoteAdapter;
 import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
+import com.google.android.material.chip.Chip;
 
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
+import android.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-/**
- * Folder View Host fragment. Contains the RecycleView of the ambit folders.
- */
-public class FolderHostFragment extends Fragment {
+/** Folder View Host fragment. Contiene el RecycleView de las carpetas del Ámbito. */
+public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFolderListener{
 
-    private ArrayList<Folder> mFoldersData;     // Model Data
-    private View root;                          // Main Activity
-    private RecyclerView mFoldersRecyclerView;  // Recycle View of folders
-    private FolderAdapter mFolderAdapter;           // FolderAdapter for the RecycleView
+    private ArrayList<Folder> mFoldersData;      // Model Data
+    private View root;                           // Main Activity
+    private RecyclerView mFoldersRecyclerView;   // Recycle View of folders
+    private FolderAdapter mFolderAdapter;        // FolderAdapter for the RecycleView
+    private Chip rootFolder;                     // General folder selected
 
+    /** Inicializa el fragment contenedor de folders. */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.folders_host_view, container, false);
 
-        //Initialize the RecyclerViews
-        mFoldersRecyclerView = (RecyclerView) root.findViewById(R.id.folder_recycler_view);
-
-        //Set the Layout Manager for both Recyclers
+        // Inicializamos el RecycleView con su Manager y su Adapter.
+        mFoldersRecyclerView = root.findViewById(R.id.folder_recycler_view);
         mFoldersRecyclerView.setLayoutManager(new LinearLayoutManager(root.getContext(),
                 LinearLayoutManager.HORIZONTAL, false));
 
@@ -44,17 +41,18 @@ public class FolderHostFragment extends Fragment {
 
         //Initialize the adapters and sets them to the RecyclerViews
         mFolderAdapter = new FolderAdapter(root.getContext(), mFoldersData);
-
+        mFolderAdapter.registerChipFolderListener(this);
         mFoldersRecyclerView.setAdapter(mFolderAdapter);
+
+        // General Chip Folder
+        rootFolder = root.findViewById(R.id.root_folder);
 
         //Get the data
         initializeData();
         return root;
     }
 
-    /**
-     * Método para inicializar los DataSets a partir de los MOCKUPS definidos en strings.xml
-     */
+    /** Método para inicializar los DataSets a partir de los MOCKUPS definidos en strings.xml */
     private void initializeData() {
         //Get the resources from the XML file
         String[] notesNames = getResources().getStringArray(R.array.notes_names);
@@ -73,7 +71,6 @@ public class FolderHostFragment extends Fragment {
 
         //Create the ArrayList of Folder objects with their names and notes
         ArrayList<Folder> folders = new ArrayList<>();
-        mFoldersData.add(general);
         mFoldersData.add(folder1);
         mFoldersData.add(folder2);
         mFoldersData.add(folder2);
@@ -81,5 +78,23 @@ public class FolderHostFragment extends Fragment {
 
         //Notify the adapters of the changes
         mFolderAdapter.notifyDataSetChanged();
+    }
+
+    /** Método 'bypass' para registrar otras vistas como ChipFolderListeners del Adaptador de esta clase */
+    public void registerChipListener(FolderAdapter.ChipFolderListener listener){
+        mFolderAdapter.registerChipFolderListener(listener);
+    }
+
+    /**
+     * Cuando un folder chip sea clickeado, cambia el root folder.
+     * @param folder el chipFolder que ha sido clickeado.
+     */
+    @Override
+    public void onChipClick(Chip folder) {
+        // Change folder chips: the root is the chip clicked, and the clicked will be the root.
+        String rootFolderText = (String) rootFolder.getText();
+        String chipFolderText = (String) folder.getText();
+        rootFolder.setText(chipFolderText);
+        folder.setText(rootFolderText);
     }
 }

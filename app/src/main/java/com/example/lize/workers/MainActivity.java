@@ -2,29 +2,23 @@ package com.example.lize.workers;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.os.Bundle;
 import android.view.MenuItem;
+import android.os.Bundle;
 
 import com.example.lize.R;
-import com.example.lize.adapters.FolderAdapter;
-import com.example.lize.adapters.NoteAdapter;
-import com.example.lize.data.Folder;
-import com.example.lize.data.Note;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
+/** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
+public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener{
 
-public class MainActivity extends AppCompatActivity {
+    private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
+    private NoteHostFragment noteHostFragment;               // Contenedor de Notas
+    private FolderHostFragment folderHostFragment;           // Contenedor de Folders
+    private FloatingActionButton addFAB;                     // Floating Action Button de añadir
+    private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
 
-    private MaterialToolbar topAppBar;
-    private NoteHostFragment noteHostFragment;
-    private boolean cardViewType = true;
-
-    // Constructor actividad principal
+    /** Main constructor */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,27 +26,45 @@ public class MainActivity extends AppCompatActivity {
 
         // Obtenemos los componentes y registramos Listeners
         this.topAppBar = findViewById(R.id.ambito_material_toolbar);
+        this.addFAB = findViewById(R.id.add_note_button);
         this.noteHostFragment = (NoteHostFragment) getFragmentManager().findFragmentById(R.id.notes_host_fragment);
+        this.folderHostFragment = (FolderHostFragment) getFragmentManager().findFragmentById(R.id.folders_host_fragment);
 
-        // TopAppBar menu Item (search, sandwich) Listener
-        topAppBar.setOnMenuItemClickListener((item) -> {
-            switch (item.getItemId()) {
-
-                case R.id.search:
-                    break;
-
-                case R.id.sandwich:
-                    cardViewType = !cardViewType;
-                    item.setIcon((cardViewType) ? R.drawable.ic_baseline_table_rows_24 :
-                            R.drawable.ic_baseline_view_module_24);
-                    noteHostFragment.changeNotesView();
-                    break;
-
-                default:
-                    return false;
-            }
-            return true;
-        });
+        topAppBar.setOnMenuItemClickListener(this);
+        folderHostFragment.registerChipListener(noteHostFragment);
     }
 
+    /**
+     * Implementación del método OnMenuItemClick para definir las acciones de los items del Toolbar.
+     * @param item item del Toolbar: search, sandwich
+     */
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.search:
+                searchNote();
+                break;
+            case R.id.sandwich:
+                changeCardNoteType(item);
+                noteHostFragment.changeCardNoteType();
+                break;
+            default: return false;
+        }
+        return true;
+    }
+
+    /**
+     * Método para buscar una Nota en el Ámbito en el que estamos. TODO
+     */
+    private void searchNote() {}
+
+    /**
+     * Método para modificar el icono del MenuItem de cambiar vista de Notas
+     * @param item menú item de cambiar vista de notas (sandwich)
+     */
+    private void changeCardNoteType(MenuItem item){
+        cardNoteType = !cardNoteType;
+        item.setIcon((cardNoteType) ? R.drawable.ic_baseline_table_rows_24 :
+                R.drawable.ic_baseline_view_module_24);
+    }
 }

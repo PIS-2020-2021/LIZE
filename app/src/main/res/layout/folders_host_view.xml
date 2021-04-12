@@ -6,7 +6,7 @@
     android:orientation="horizontal">
         
     <com.google.android.material.chip.Chip
-        android:id="@+id/folder_name"
+        android:id="@+id/root_folder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/folder_default_name"
