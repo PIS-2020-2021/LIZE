@@ -14,7 +14,7 @@
         <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
 
         <!-- Actual Base Ambit Theme -->
-        <item name="android:theme">@style/Theme.Lize.Ambit.Red</item>
+        <item name="android:theme">@style/Theme.Lize.Ambit.Purple</item>
 
         <!-- Material Component filters -->
         <item name="materialCardViewStyle">@style/Widget.Lize.CardView</item>
