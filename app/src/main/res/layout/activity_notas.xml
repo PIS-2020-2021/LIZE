@@ -13,7 +13,7 @@
         android:animateLayoutChanges="true">
 
         <ImageView
-            android:id="@+id/imagenAtras"
+            android:id="@+id/backBtn"
             android:layout_width="@dimen/_30sdp"
             android:layout_height="@dimen/_30sdp"
             android:layout_marginStart="@dimen/_16sdp"
@@ -23,9 +23,25 @@
             android:layout_marginRight="@dimen/_12sdp"
             android:contentDescription="@string/app_name"
             android:src="@drawable/ic_back"
-
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/black"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <ImageView
+            android:id="@+id/shareBtn"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginLeft="@dimen/_260sdp"
+            android:layout_marginRight="@dimen/_12sdp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_baseline_share_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:clickable="true"
+            android:focusable="true"
             app:tint="@color/black" />
 
         <EditText
@@ -45,23 +61,19 @@
             android:textColor="@color/black"
             android:textColorHint="@color/black"
             android:textSize="@dimen/_16ssp"
-            app:layout_constraintTop_toBottomOf="@+id/imagenAtras" />
+            app:layout_constraintTop_toBottomOf="@+id/backBtn" />
 
 
-        <HorizontalScrollView
+
+        <include layout="@layout/document_recyle_view"
             android:id="@+id/fileAttachView"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_55sdp"
-            app:layout_constraintBottom_toBottomOf="@id/inputNoteTitulo"
-            app:layout_constraintTop_toTopOf="@id/inputNoteTitulo"
             android:layout_marginTop="@dimen/_100sdp"
-            >
-            <LinearLayout
-                android:id="@+id/gallery"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"/>
-        </HorizontalScrollView>
+            app:layout_constraintTop_toTopOf="@id/inputNoteTitulo"
+            app:layout_constraintBottom_toBottomOf="@id/inputNoteTitulo"
+            android:visibility="gone"
+            android:layout_height="@dimen/_55sdp"
+            android:layout_width="match_parent" />
+
 
         <ScrollView
             android:layout_width="match_parent"
@@ -74,19 +86,37 @@
                 android:orientation="vertical"
                 app:layout_constraintTop_toBottomOf="@id/fileAttachView">
 
-                <ImageView
-                android:id="@+id/imageNote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_12sdp"
-                android:layout_marginEnd="@dimen/_12sdp"
-                android:layout_marginTop="@dimen/_15sdp"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/app_name"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/fileAttachView"
 
-                />
+
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:id="@+id/imageNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_12sdp"
+                    android:layout_marginEnd="@dimen/_12sdp"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    tools:context="com.lobothijau.carouselsederhana.MainActivity"
+                    tools:showIn="@layout/activity_notas"
+                    app:layout_constraintTop_toBottomOf="@id/fileAttachView"
+                    >
+
+                    <com.synnapps.carouselview.CarouselView
+                        android:id="@+id/carouselView"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        app:fillColor="#FFFFFFFF"
+                        app:pageColor="#00000000"
+                        app:radius="6dp"
+                        app:slideInterval="10000"
+                        app:strokeColor="#FF777777"
+                        app:strokeWidth="1dp"
+                        android:visibility="gone"/>
+
+                </RelativeLayout>
+
             <EditText
                 android:id="@+id/inputNota"
                 android:layout_width="match_parent"
@@ -108,10 +138,9 @@
 
             </LinearLayout>
 </ScrollView>
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
     <include layout="@layout/bottom_menu_note"/>
 
 
