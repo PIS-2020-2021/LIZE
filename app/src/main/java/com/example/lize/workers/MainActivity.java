@@ -12,16 +12,29 @@ import android.content.Intent;
 import android.view.MenuItem;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.lize.R;
 import com.example.lize.adapters.AmbitosAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-;
+;import de.hdodenhof.circleimageview.CircleImageView;
 
 /** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener{
+
+    /*Mock-Up de Adrián */
+    //Declaramos Títulos para nuestro Navigation Drawer List View
+    String[] AMBITOS = {"Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más"};
+
+    //Creamos un recurso String para el nombre y el eMail para el HeaderView
+    //También creamos un recurso para la imagen de perfil del HeaderView
+    String NAME = "Maribel Gonzalez";
+    String EMAIL = "mabel@gmail.com";
+    int IMG_PROFILE = R.drawable.fondo_inicio_app;
+
 
 
 
@@ -33,9 +46,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
     public static final int REQUEST_CODE_ADD_NOTE = 1;
 
-
-    //Declaramos el toolBar Object
-    private Toolbar toolbar;
 
     //Declaramos RecyclerView
     RecyclerView mRecyclerView;
@@ -49,24 +59,19 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     //Declaramos un Action Bar Drawer Toggle
     ActionBarDrawerToggle mDrawerToggle;
 
-
-    /*Mock-Up de Adrián */
-    //Declaramos Títulos para nuestro Navigation Drawer List View
-    String[] AMBITOS = {"Home", "Eventos", "Trabajo", "Universidad"};
-
-    //Creamos un recurso String para el nombre y el eMail para el HeaderView
-    //También creamos un recurso para la imagen de perfil del HeaderView
-    String NAME = "Adrian Saiz";
-    String EMAIL = "adrian.saizdepedro@soyunemail.com";
-    int IMG_PROFILE = R.drawable.adrian_image;
+    //Declaramos Los Botones
+    Button addAmbito;
+    Button signOut;
 
 
     /** Main constructor */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_drawable_nav);
 
+        /*Configuramos el Header con la info proporcionada*/
+        initHeaderNavigationView(NAME, EMAIL, IMG_PROFILE);
 
         /*Asignamos el objeto toolBar de la view
         y después configuramos la Action Bar a nuestro ToolBar
@@ -114,6 +119,23 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         //Configuramos el DrawerToggle par que sincronice con el Estado
         mDrawerToggle.syncState();
 
+        this.addAmbito = findViewById(R.id.addAmbitoButton);
+        addAmbito.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NewAmbito.class);
+                startActivity(intent);
+            }
+        });
+
+        this.signOut = findViewById(R.id.sign_out);
+        signOut.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
         // Obtenemos los componentes y registramos Listeners
@@ -176,6 +198,19 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         if(requestCode == REQUEST_CODE_ADD_NOTE && resultCode == RESULT_OK){
 
         }
+    }
+
+    public void initHeaderNavigationView(String name, String eMail, int imgProfile){
+
+        View header = (View) findViewById(R.id.headerView);
+
+        TextView headerName = (TextView) header.findViewById(R.id.name);
+        TextView headerEMail = (TextView) header.findViewById(R.id.email);
+        CircleImageView headerImgProfile = header.findViewById(R.id.circleImageView);
+
+        headerName.setText(name);
+        headerEMail.setText(eMail);
+        headerImgProfile.setImageResource(imgProfile);
     }
 
 }

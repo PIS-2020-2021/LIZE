@@ -52,6 +52,7 @@
                         android:autofillHints=""
                         android:background="#22FFFFFF"
                         android:hint="@string/prompt_email"
+                        android:textColorHint="@color/black"
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
                         android:paddingStart="5dp"

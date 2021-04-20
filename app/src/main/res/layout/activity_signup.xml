@@ -10,6 +10,7 @@
     android:scrollbarThumbVertical="@null"
     tools:context=".workers.SignUpActivity">
 
+
     <androidx.cardview.widget.CardView
 
         android:layout_width="300dp"
