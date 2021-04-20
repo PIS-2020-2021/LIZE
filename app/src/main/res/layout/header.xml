@@ -5,7 +5,7 @@
     android:id="@+id/headerView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/side_nav_bar"
+    style="@style/Header"
     android:orientation="vertical"
     android:paddingLeft="16dp"
     android:paddingTop="16dp"

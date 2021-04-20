@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
     /*Mock-Up de Adrián */
     //Declaramos Títulos para nuestro Navigation Drawer List View
-    String[] AMBITOS = {"Home", "Eventos", "Trabajo", "Universidad", "Otra Más"};
+    String[] AMBITOS = {"Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más"};
 
     //Creamos un recurso String para el nombre y el eMail para el HeaderView
     //También creamos un recurso para la imagen de perfil del HeaderView
@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     //Declaramos un Action Bar Drawer Toggle
     ActionBarDrawerToggle mDrawerToggle;
 
-    //Declaramos el botón para añadir Ambitos
+    //Declaramos Los Botones
+    Button addAmbito;
     Button signOut;
 
 
@@ -117,6 +118,15 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         drawerLayout.setDrawerListener(mDrawerToggle);
         //Configuramos el DrawerToggle par que sincronice con el Estado
         mDrawerToggle.syncState();
+
+        this.addAmbito = findViewById(R.id.addAmbitoButton);
+        addAmbito.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NewAmbito.class);
+                startActivity(intent);
+            }
+        });
 
         this.signOut = findViewById(R.id.sign_out);
         signOut.setOnClickListener(new View.OnClickListener(){
