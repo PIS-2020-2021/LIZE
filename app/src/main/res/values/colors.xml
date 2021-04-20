@@ -42,14 +42,23 @@
     <color name="yellow_700">#FBC02D</color>
     <color name="yellow_A400">#FFEA00</color>
 
-    <color name="orange_100">#FFE0B2</color>
-    <color name="orange_200">#FFCC80</color>
-    <color name="orange_400">#FFA726</color>
-    <color name="orange_700">#F57C00</color>
-    <color name="orange_A400">#FF9100</color>
+    <color name="orange_100">#ffccbc</color>
+    <color name="orange_200">#ffab91</color>
+    <color name="orange_400">#ff7043</color>
+    <color name="orange_700">#e64a19</color>
+    <color name="orange_A400">#ff3d00</color>
+
+    <color name="brown_100">#d7ccc8</color>
+    <color name="brown_200">#bcaaa4</color>
+    <color name="brown_400">#8d6e63</color>
+    <color name="brown_700">#5d4037</color>
+    <color name="brown_A400">#3e2723</color>
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+
+
 
 
 

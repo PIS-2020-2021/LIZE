@@ -8,7 +8,8 @@
     android:gravity="center"
     android:padding="16dp"
     android:scrollbarThumbVertical="@null"
-    tools:context=".workers.SignUpActivity">
+    tools:context=".workers.SignUpActivity" >
+
 
     <androidx.cardview.widget.CardView
 
@@ -59,12 +60,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="5dp"
+            android:background="@android:color/transparent"
             android:orientation="vertical">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/nameError"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:theme="@style/Theme.hint"
+                android:background="@android:color/transparent"
                 android:layout_marginTop="5dp">
 
                 <EditText
@@ -88,6 +92,7 @@
                 android:id="@+id/surnameError"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:theme="@style/Theme.hint"
                 android:layout_marginTop="5dp">
 
                 <EditText
@@ -111,6 +116,7 @@
                 android:id="@+id/emailError"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:theme="@style/Theme.hint"
                 android:layout_marginTop="5dp">
 
                 <EditText
@@ -135,6 +141,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
+                android:theme="@style/Theme.hint"
                 app:passwordToggleEnabled="true">
 
                 <EditText
@@ -162,6 +169,7 @@
                 android:background="@drawable/round_button"
                 android:text="@string/register"
                 android:textColor="@android:color/white"
+                app:backgroundTint="@color/design_default_color_primary_variant"
                 android:textSize="16sp" />
 
         </LinearLayout>

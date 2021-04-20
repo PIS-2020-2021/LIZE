@@ -25,7 +25,8 @@
             android:layout_below="@id/note_name"
             android:text="@string/note_default_body"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-            android:textColor="?attr/colorOnPrimary"/>
+            android:textColor="?attr/colorOnPrimary"
+            />
 
     </RelativeLayout>
 

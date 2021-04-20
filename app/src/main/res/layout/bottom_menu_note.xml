@@ -62,7 +62,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="10dp"
-                android:src="@drawable/audio_icon"
+                android:src="@drawable/ic_baseline_mic_24"
                 android:contentDescription="@string/todo" />
         </RelativeLayout>
 
