@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.os.Bundle;
 import android.view.View;
@@ -20,7 +21,10 @@ import com.example.lize.adapters.AmbitosAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-;import de.hdodenhof.circleimageview.CircleImageView;
+;import java.util.Timer;
+import java.util.TimerTask;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener{
@@ -42,10 +46,13 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
     private NoteHostFragment noteHostFragment;               // Contenedor de Notas
     private FolderHostFragment folderHostFragment;           // Contenedor de Folders
-    private FloatingActionButton addFAB;                     // Floating Action Button de añadir
     private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
     public static final int REQUEST_CODE_ADD_NOTE = 1;
 
+    private FloatingActionButton addFAB, addNoteFAB, addFolderFAB;  // Floating Action Buttons
+    private boolean isFABGroupExpanded = false;
+    private Handler handler = new Handler();        // Methods to create a simple animation
+    private Timer t = new Timer();                  //
 
     //Declaramos RecyclerView
     RecyclerView mRecyclerView;
@@ -138,24 +145,20 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
 
 
+
+
+
         // Obtenemos los componentes y registramos Listeners
 
-        this.addFAB = findViewById(R.id.add_note_button);
         this.noteHostFragment = (NoteHostFragment) getFragmentManager().findFragmentById(R.id.notes_host_fragment);
         this.folderHostFragment = (FolderHostFragment) getFragmentManager().findFragmentById(R.id.folders_host_fragment);
 
         topAppBar.setOnMenuItemClickListener(this);
         folderHostFragment.registerChipListener(noteHostFragment);
 
-        addFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(
-                        new Intent(getApplicationContext(), NotasActivity.class),
-                        REQUEST_CODE_ADD_NOTE
-                );
-            }
-        });
+        // Inicializamos los FABS
+        initFABGroup();
+
     }
 
     /**
@@ -211,6 +214,53 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         headerName.setText(name);
         headerEMail.setText(eMail);
         headerImgProfile.setImageResource(imgProfile);
+    }
+
+    private void initFABGroup() {
+        this.addFAB = findViewById(R.id.add_button);
+        this.addNoteFAB = findViewById(R.id.add_note_button);
+        this.addFolderFAB = findViewById(R.id.add_folder_button);
+        addFAB.setOnClickListener((v)->{
+            if (!isFABGroupExpanded){
+                expandFABGroup();
+            } else{
+                closeFABGroup();
+            }
+            isFABGroupExpanded = !isFABGroupExpanded;
+        });
+
+        addNoteFAB.setOnClickListener((v)->{
+            startActivityForResult(new Intent(getApplicationContext(), NotasActivity.class), REQUEST_CODE_ADD_NOTE);
+        });
+
+        addFolderFAB.setOnClickListener((v)->{ showFolderMenu(v); });
+    }
+
+    private void expandFABGroup() {
+        addFAB.animate().rotationBy(- getResources().getInteger(R.integer.fab_rotation));
+        addNoteFAB.animate().translationY(- getResources().getDimension(R.dimen.fab_translation_1));
+        addFolderFAB.animate().translationY(- getResources().getDimension(R.dimen.fab_translation_2));
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() { handler.post(()->{
+                addNoteFAB.setVisibility(View.VISIBLE);
+                addFolderFAB.setVisibility(View.VISIBLE);
+            }); }}, 120);
+    }
+
+    private void closeFABGroup() {
+        addFAB.animate().rotation(0);
+        addNoteFAB.animate().translationY(0);
+        addFolderFAB.animate().translationY(0);
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() { handler.post(()->{
+                addNoteFAB.setVisibility(View.INVISIBLE);
+                addFolderFAB.setVisibility(View.INVISIBLE);
+            });}}, 200);
+    }
+
+    private void showFolderMenu(View v) {
     }
 
 }
