@@ -8,31 +8,41 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.graphics.drawable.RotateDrawable;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 
 import com.example.lize.R;
 import com.example.lize.adapters.AmbitosAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener{
 
-
-
-
     private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
     private NoteHostFragment noteHostFragment;               // Contenedor de Notas
     private FolderHostFragment folderHostFragment;           // Contenedor de Folders
-    private FloatingActionButton addFAB;                     // Floating Action Button de añadir
     private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
     public static final int REQUEST_CODE_ADD_NOTE = 1;
 
+    private FloatingActionButton addFAB, addNoteFAB, addFolderFAB;  // Floating Action Buttons
+    private boolean isFABGroupExpanded = false;
+    private Handler handler = new Handler();        // Methods to create a simple animation
+    private Timer t = new Timer();                  //
 
     //Declaramos el toolBar Object
     private Toolbar toolbar;
@@ -66,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         /*Asignamos el objeto toolBar de la view
         y después configuramos la Action Bar a nuestro ToolBar
@@ -117,24 +126,64 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
 
         // Obtenemos los componentes y registramos Listeners
-
-        this.addFAB = findViewById(R.id.add_note_button);
         this.noteHostFragment = (NoteHostFragment) getFragmentManager().findFragmentById(R.id.notes_host_fragment);
         this.folderHostFragment = (FolderHostFragment) getFragmentManager().findFragmentById(R.id.folders_host_fragment);
 
         topAppBar.setOnMenuItemClickListener(this);
         folderHostFragment.registerChipListener(noteHostFragment);
 
-        addFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(
-                        new Intent(getApplicationContext(), NotasActivity.class),
-                        REQUEST_CODE_ADD_NOTE
-                );
-            }
-        });
+        // Inicializamos los FABS
+        initFABGroup();
     }
+
+    private void initFABGroup() {
+        this.addFAB = findViewById(R.id.add_button);
+        this.addNoteFAB = findViewById(R.id.add_note_button);
+        this.addFolderFAB = findViewById(R.id.add_folder_button);
+        addFAB.setOnClickListener((v)->{
+            if (!isFABGroupExpanded){
+                expandFABGroup();
+            } else{
+                closeFABGroup();
+            }
+            isFABGroupExpanded = !isFABGroupExpanded;
+        });
+
+        addNoteFAB.setOnClickListener((v)->{
+            startActivityForResult(new Intent(getApplicationContext(), NotasActivity.class), REQUEST_CODE_ADD_NOTE);
+        });
+
+        addFolderFAB.setOnClickListener((v)->{ showFolderMenu(v); });
+    }
+
+    private void expandFABGroup() {
+        addFAB.animate().rotationBy(- getResources().getInteger(R.integer.fab_rotation));
+        addNoteFAB.animate().translationY(- getResources().getDimension(R.dimen.fab_translation_1));
+        addFolderFAB.animate().translationY(- getResources().getDimension(R.dimen.fab_translation_2));
+        t.schedule(new TimerTask() {
+                   @Override
+                   public void run() { handler.post(()->{
+                       addNoteFAB.setVisibility(View.VISIBLE);
+                       addFolderFAB.setVisibility(View.VISIBLE);
+                   }); }}, 120);
+    }
+
+    private void closeFABGroup() {
+        addFAB.animate().rotation(0);
+        addNoteFAB.animate().translationY(0);
+        addFolderFAB.animate().translationY(0);
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() { handler.post(()->{
+                    addNoteFAB.setVisibility(View.INVISIBLE);
+                    addFolderFAB.setVisibility(View.INVISIBLE);
+            });}}, 200);
+    }
+
+    private void showFolderMenu(View v) {
+    }
+
+
 
     /**
      * Implementación del método OnMenuItemClick para definir las acciones de los items del Toolbar.
