@@ -13,9 +13,11 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
 
+
+
         <!-- Actual Base Ambit Theme -->
         <item name="android:theme">@style/Theme.Lize.Ambit.Teal</item>
-
+        <item name="hintTextColor">@style/Theme.hint</item>
         <!-- Material Component filters -->
         <item name="materialCardViewStyle">@style/Widget.Lize.CardView</item>
         <item name="toolbarStyle">@style/Widget.Lize.Toolbar</item>
@@ -26,6 +28,8 @@
 
     <!-- CardView Style -->
     <style name="Widget.Lize.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="colorSurface">@color/md_black_1000_50</item>
+        <item name="colorOnSurface">@color/black</item>
         <item name="cardBackgroundColor">?attr/colorPrimary</item>
         <item name="cornerFamily">cut</item>
         <item name="cornerSize">8dp</item>
@@ -62,6 +66,16 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:background">@drawable/side_nav_bar</item>
+    </style>
+
+    <!-- Ambit Color Themes -->
+    <style name="Theme.hint" parent="">
+        <item name="colorPrimary">@color/light_blue_400</item>
+        <item name="colorPrimaryDark">@color/light_blue_700</item>
+        <item name="colorSurface">@color/light_blue_A400</item>
+        <item name="colorOnPrimary">@color/md_black_1000_50</item>
+        <item name="colorOnSurface">@color/black</item>
+        <item name="colorAccent">@color/teal_A400</item>
     </style>
 
     <!-- Ambit Color Themes -->

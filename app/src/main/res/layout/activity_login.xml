@@ -16,7 +16,7 @@
         android:layout_height="570dp"
         android:layout_gravity="center">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardView_login"
             android:layout_width="374dp"
             android:layout_height="560dp"
@@ -36,12 +36,15 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_margin="5dp"
+                android:background="@android:color/transparent"
                 android:orientation="vertical">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/emailError"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:theme="@style/Theme.hint"
+                    android:background="@android:color/transparent"
                     android:layout_marginTop="5dp">
 
                     <EditText
@@ -50,15 +53,16 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:autofillHints=""
-                        android:background="#22FFFFFF"
                         android:hint="@string/prompt_email"
                         android:textColorHint="@color/black"
+                        android:background="@android:color/transparent"
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
                         android:paddingStart="5dp"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        android:theme="@style/Theme.hint"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -67,6 +71,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
+                    android:theme="@style/Theme.hint"
                     app:passwordToggleEnabled="true">
 
                     <EditText
@@ -74,7 +79,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:autofillHints=""
+                        android:autofillHints="Password"
                         android:background="#46FFFFFF"
                         android:hint="@string/prompt_password"
                         android:inputType="textPassword"
@@ -82,7 +87,8 @@
                         android:paddingStart="5dp"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        android:theme="@style/Theme.hint"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -128,7 +134,7 @@
                     android:textSize="16sp" />
 
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <ImageView
             android:id="@+id/slogan"
