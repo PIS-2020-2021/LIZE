@@ -3,7 +3,7 @@
     <string name="error_campo_vacio">Rellene todos los campos.</string>
     <string name="error_invalid_email">Introduzca un email válido.</string>
     <string name="error_invalid_pwd">La contraseña debe tener 8 caracteres mínimo.</string>
-    <string name="LOGIN" >Login</string>
+    <string name="LOGIN">Login</string>
     <string name="create_new"></string>
     <string name="prompt_password">Contraseña</string>
     <string name="prompt_email">Email</string>
@@ -14,6 +14,8 @@
     <string name="cancelar">Cancelar</string>
     <string name="apellidos">Apellidos</string>
     <string name="nombre">Nombre</string>
+    <string name="errorColorAmbito">No ha seleccionado ningún color</string>
+
     <string name="search">find note</string>
     <string name="more">change view</string>
     <string name="sandwich">change view</string>
@@ -57,6 +59,7 @@
     <string name="n">N</string>
     <string name="s">s</string>
     <string name="todo">TODO</string>
+
 
     <string name="openDrawer">Open Drawer </string>
     <string name="closeDrawer">Close Drawer </string>

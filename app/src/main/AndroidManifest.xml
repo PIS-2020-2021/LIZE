@@ -7,19 +7,20 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/icon_app"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
         android:theme="@style/Theme.Lize">
-
-
-        <activity android:name=".workers.NotasActivity"
-
+        <activity android:name=".workers.NewAmbito" />
+        <activity
+            android:name=".workers.NotasActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden">
+        </activity>
+        <activity android:name=".workers.LogInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <action android:name="android.intent.action.MAIN" />
@@ -27,18 +28,10 @@
                 <category android:name="android.intent.category.OPENABLE" />
             </intent-filter>
         </activity>
-        <activity android:name=".workers.LogInActivity">
-
-        </activity>
-        <activity android:name=".workers.SignUpActivity"></activity>
-
-        <activity android:name=".workers.MainActivity">
-        </activity>
-
-
-
-        <activity android:name=".workers.EditarAmbitoActivity"></activity>
-        <activity android:name=".workers.AjustesActivity"></activity>
+        <activity android:name=".workers.SignUpActivity" />
+        <activity android:name=".workers.MainActivity"></activity>
+        <activity android:name=".workers.EditarAmbitoActivity" />
+        <activity android:name=".workers.AjustesActivity" />
     </application>
 
 </manifest>
