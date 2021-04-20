@@ -6,4 +6,8 @@
 
     <!-- ChipFolder layout_margin value -->
     <dimen name="chipfolder_layout_margin">5dp</dimen>
+
+
+
+
 </resources>

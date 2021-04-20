@@ -17,14 +17,18 @@
 
 
         <activity android:name=".workers.NotasActivity"
+
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden">
-        </activity>
-        <activity android:name=".workers.LogInActivity">
             <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.OPENABLE" />
             </intent-filter>
+        </activity>
+        <activity android:name=".workers.LogInActivity">
+
         </activity>
         <activity android:name=".workers.SignUpActivity"></activity>
 
