@@ -305,7 +305,7 @@ public class NotasActivity extends AppCompatActivity {
             SpannableStringBuilder stringBuilder = (SpannableStringBuilder) inputNoteTexto.getText();
             int selectionStart = inputNoteTexto.getSelectionStart();
             int selectionEnd = inputNoteTexto.getSelectionEnd();
-            stringBuilder.setSpan(new RelativeSizeSpan(2f), selectionStart, selectionEnd, 0);
+            stringBuilder.setSpan(new RelativeSizeSpan(1.35f), selectionStart, selectionEnd, 0);
             stringBuilder.setSpan(new StyleSpan(Typeface.BOLD_ITALIC), selectionStart, selectionEnd, 0);
 
         }
