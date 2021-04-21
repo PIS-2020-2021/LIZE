@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
+import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
 
 import java.util.ArrayList;
@@ -25,9 +26,19 @@ import java.util.ArrayList;
  */
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
 
-    private ArrayList<Note> mNotesData;
-    private Context mContext;
+    private final Context mContext;
+    private final ArrayList<Note> mNotesData;
+    private final ArrayList<NoteAdapter.CardNoteListener> cardListeners;
     private boolean cardNoteType;
+
+    /* Custom CardNote onClick Listener */
+    public interface CardNoteListener{ void onNoteSelected(Note n); }
+
+    /**
+     * Method for registering a CardNote onClick listener
+     * @param listener Observer which knows when the chip is clicked.
+     */
+    public void registerCardNoteListener(NoteAdapter.CardNoteListener listener){ cardListeners.add(listener); }
 
     /**
      * Constructor que pasa el listado de notas i el contexto.
@@ -38,6 +49,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
         this.mNotesData = notesData;
         this.mContext = context;
         this.cardNoteType = true;
+        cardListeners = new ArrayList<>();
     }
 
     /**
@@ -94,6 +106,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
 
         private TextView mTitleNote;
         private TextView mTextNote;
+        private Note mNote;
 
         /**
          * Constructor del ViewHolder correspondiente al layout de note_card
@@ -104,6 +117,12 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
             // Inicializamos los componentes del layout
             mTitleNote = (TextView) itemView.findViewById(R.id.note_name);
             mTextNote = (TextView) itemView.findViewById(R.id.note_body);
+            itemView.setOnClickListener((v)->{
+                if (mNote != null) {
+                    for (NoteAdapter.CardNoteListener listener : cardListeners)
+                        listener.onNoteSelected(mNote);
+                }
+            });
         }
 
 

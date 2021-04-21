@@ -8,81 +8,77 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import com.example.lize.R;
 import com.example.lize.adapters.FolderAdapter;
+import com.example.lize.data.Ambito;
+import com.example.lize.models.AmbitoViewModel;
+import com.example.lize.models.FolderViewModel;
 import com.example.lize.data.Folder;
-import com.example.lize.data.Note;
 import com.google.android.material.chip.Chip;
 
-import android.app.Fragment;
+import androidx.fragment.app.Fragment;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-/** Folder View Host fragment. Contiene el RecycleView de las carpetas del Ámbito. */
+/**
+ * Folder View Host fragment. Tiene las siguientes responsabilidades: <ol>
+ * <li> Contener la parte de la UI del RecycleView de carpetas de un Ámbito {@link #mFoldersRecyclerView} </li>
+ * <li> Definir su lógica mediante un {@link FolderAdapter}, y escucha al ChipFolder seleccionado. </li>
+ * <li> Conectar el DataSet de Folders con el adaptador mediante la clase {@link FolderViewModel} </li> </ol> */
+
 public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFolderListener{
 
-    private ArrayList<Folder> mFoldersData;      // Model Data
-    private View root;                           // Main Activity
+    private Chip rootFolder;                     // General folder selected
     private RecyclerView mFoldersRecyclerView;   // Recycle View of folders
     private FolderAdapter mFolderAdapter;        // FolderAdapter for the RecycleView
-    private Chip rootFolder;                     // General folder selected
 
-    /** Inicializa el fragment contenedor de folders. */
+    private AmbitoViewModel mAmbitoViewModel;    // Selected Ambito Observation
+    private FolderViewModel mFolderViewModel;    // Folder selection
+
+    /** Inicializa el Fragment contenedor de Folders */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        root = inflater.inflate(R.layout.folders_host_view, container, false);
-
-        // Inicializamos el RecycleView con su Manager y su Adapter.
-        mFoldersRecyclerView = root.findViewById(R.id.folder_recycler_view);
+        View root = inflater.inflate(R.layout.folders_host_view, container, false);
+        this.rootFolder = root.findViewById(R.id.root_folder);
+        this.mFoldersRecyclerView = root.findViewById(R.id.folder_recycler_view);
         mFoldersRecyclerView.setLayoutManager(new LinearLayoutManager(root.getContext(),
                 LinearLayoutManager.HORIZONTAL, false));
-
-        //Initialize the ArrayLists containing the data
-        mFoldersData = new ArrayList<>();
-
-        //Initialize the adapters and sets them to the RecyclerViews
-        mFolderAdapter = new FolderAdapter(root.getContext(), mFoldersData);
-        mFolderAdapter.registerChipFolderListener(this);
-        mFoldersRecyclerView.setAdapter(mFolderAdapter);
-
-        // General Chip Folder
-        rootFolder = root.findViewById(R.id.root_folder);
-
-        //Get the data
-        initializeData();
         return root;
     }
 
-    /** Método para inicializar los DataSets a partir de los MOCKUPS definidos en strings.xml */
-    private void initializeData() {
-        //Get the resources from the XML file
-        String[] notesNames = getResources().getStringArray(R.array.notes_names);
-        String[] notesBody = getResources().getStringArray(R.array.notes_body);
-        Folder general = new Folder("General");
-        Folder folder1 = new Folder("Folder1");
-        Folder folder2 = new Folder("Folder2");
+    /** Recuperamos la actividad que contiene este Fragmento para poder enlazarlo al FolderViewModel */
+    @Override
+    public void onViewCreated(@NonNull View root, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(root, savedInstanceState);
 
-        //Create the ArrayList of Notes objects with the titles and text data
-        for(int i=0; i < notesNames.length; i++){
-            Note newNote = new Note(notesNames[i], notesBody[i]);
-            general.add(newNote);
-            if(i < 5) folder1.add(newNote);
-            else folder2.add(newNote);
-        }
+        mAmbitoViewModel = new ViewModelProvider(requireActivity()).get(AmbitoViewModel.class);
+        mFolderViewModel = new ViewModelProvider(requireActivity()).get(FolderViewModel.class);
 
-        //Create the ArrayList of Folder objects with their names and notes
-        ArrayList<Folder> folders = new ArrayList<>();
-        mFoldersData.add(folder1);
-        mFoldersData.add(folder2);
-        mFoldersData.add(folder2);
-        mFoldersData.add(folder2);
+        // Implementación del Observador del Ambito Seleccionado
+        mAmbitoViewModel.getAmbitoSelected().observe(getViewLifecycleOwner(), (Ambito ambito)->{
+            mFolderAdapter = new FolderAdapter(root.getContext(), ambito.getAmbitoFolders());
+            mFolderAdapter.registerChipFolderListener(this);
+            onFolderSelected(ambito.getAmbitoFolders().get(0));
+            mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
+            mFolderAdapter.notifyDataSetChanged();
+        });
 
-        //Notify the adapters of the changes
-        mFolderAdapter.notifyDataSetChanged();
+        // Implementación del Observador del String del Toast
+        mFolderViewModel.getToast().observe(getViewLifecycleOwner(), (String t)->{
+            Toast.makeText(root.getContext(), t, Toast.LENGTH_SHORT).show();
+        });
     }
 
-    /** Método 'bypass' para registrar otras vistas como ChipFolderListeners del Adaptador de esta clase */
-    public void registerChipListener(FolderAdapter.ChipFolderListener listener){
-        mFolderAdapter.registerChipFolderListener(listener);
+    /**
+     * Añadimos una nueva carpeta al DataSet del AmbitoViewModel.
+     * @param folderName Nombre de la nueva carpeta a crear
+     */
+    public void addFolderChip(String folderName) {
+        mAmbitoViewModel.addFolder(folderName);
     }
 
     /**
@@ -90,11 +86,12 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
      * @param folder el chipFolder que ha sido clickeado.
      */
     @Override
-    public void onChipClick(Chip folder) {
-        // Change folder chips: the root is the chip clicked, and the clicked will be the root.
-        String rootFolderText = (String) rootFolder.getText();
-        String chipFolderText = (String) folder.getText();
-        rootFolder.setText(chipFolderText);
-        folder.setText(rootFolderText);
+    public void onFolderSelected(Folder folder) {
+        // TODO: Change folder chips!
+        rootFolder.setText(folder.getFolderName());
+        mFolderViewModel.setFolderSelected(folder);
     }
+
+
+
 }

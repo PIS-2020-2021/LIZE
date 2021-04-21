@@ -20,18 +20,18 @@ import java.util.ArrayList;
  */
 public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder>{
 
-    private ArrayList<Folder> mFoldersData;
-    private Context mContext;
-    private ArrayList<ChipFolderListener> mListener;
+    private final Context mContext;
+    private final ArrayList<Folder> mFoldersData;
+    private final ArrayList<ChipFolderListener> chipListeners;
 
     /* Custom ChipFolder onClick Listener */
-    public interface ChipFolderListener{ void onChipClick(Chip w);}
+    public interface ChipFolderListener{ void onFolderSelected(Folder f);}
 
     /**
      * Method for registering a ChipFolder onClick listener
      * @param listener Observer which knows when the chip is clicked.
      */
-    public void registerChipFolderListener(ChipFolderListener listener){ mListener.add(listener); }
+    public void registerChipFolderListener(ChipFolderListener listener){ chipListeners.add(listener); }
 
     /**
      * Constructor que pasa el listado de carpetas i el contexto.
@@ -41,7 +41,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
     public FolderAdapter(Context context, ArrayList<Folder> foldersData) {
         this.mFoldersData = foldersData;
         this.mContext = context;
-        this.mListener = new ArrayList<>();
+        this.chipListeners = new ArrayList<>();
     }
 
     /**
@@ -79,7 +79,8 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
      */
     public class ChipFolder extends RecyclerView.ViewHolder{
 
-        private Chip folder;
+        private Chip folderChip;
+        private Folder mFolder;
 
         /**
          * Constructor del ViewHolder correspondiente al layout de folder_chip
@@ -87,9 +88,12 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
          */
         public ChipFolder(View itemView) {
             super(itemView);
-            this.folder = (Chip) itemView;
-            folder.setOnClickListener((v)->{
-                for(ChipFolderListener listener: mListener) listener.onChipClick(folder);
+            this.folderChip = (Chip) itemView;
+            folderChip.setOnClickListener((v)->{
+                if (mFolder != null) {
+                    for (ChipFolderListener listener : chipListeners)
+                        listener.onFolderSelected(mFolder);
+                }
             });
         }
 
@@ -98,7 +102,8 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
          * @param currentFolder carpeta actual
          */
         public void bindTo(Folder currentFolder) {
-            folder.setText(currentFolder.getFolderName());
+            mFolder = currentFolder;
+            folderChip.setText(currentFolder.getFolderName());
         }
     }
 }

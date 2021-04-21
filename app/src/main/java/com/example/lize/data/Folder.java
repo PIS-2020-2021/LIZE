@@ -19,7 +19,8 @@ public class Folder {
         return mFolderNotes;
     }
 
-    public boolean add(Note note){
+    public boolean addNote(Note note){
         return mFolderNotes.add(note);
     }
 }
+

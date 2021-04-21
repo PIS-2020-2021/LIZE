@@ -9,17 +9,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.example.lize.R;
 import com.example.lize.adapters.AmbitosAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputLayout;
 
 ;import java.util.Timer;
 import java.util.TimerTask;
@@ -38,10 +42,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     String NAME = "Maribel Gonzalez";
     String EMAIL = "mabel@gmail.com";
     int IMG_PROFILE = R.drawable.fondo_inicio_app;
-
-
-
-
 
     private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
     private NoteHostFragment noteHostFragment;               // Contenedor de Notas
@@ -144,17 +144,11 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             }
         });
 
-
-
-
-
         // Obtenemos los componentes y registramos Listeners
-
-        this.noteHostFragment = (NoteHostFragment) getFragmentManager().findFragmentById(R.id.notes_host_fragment);
-        this.folderHostFragment = (FolderHostFragment) getFragmentManager().findFragmentById(R.id.folders_host_fragment);
+        this.noteHostFragment = (NoteHostFragment) getSupportFragmentManager().findFragmentById(R.id.notes_host_fragment);
+        this.folderHostFragment = (FolderHostFragment) getSupportFragmentManager().findFragmentById(R.id.folders_host_fragment);
 
         topAppBar.setOnMenuItemClickListener(this);
-        folderHostFragment.registerChipListener(noteHostFragment);
 
         // Inicializamos los FABS
         initFABGroup();
@@ -199,12 +193,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_CODE_ADD_NOTE && resultCode == RESULT_OK){
-
         }
     }
 
     public void initHeaderNavigationView(String name, String eMail, int imgProfile){
-
         View header = (View) findViewById(R.id.headerView);
 
         TextView headerName = (TextView) header.findViewById(R.id.name);
@@ -261,6 +253,18 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     }
 
     private void showFolderMenu(View v) {
+        View popupView = getLayoutInflater().inflate(R.layout.popup_layout, null);
+        PopupWindow popupWindow = new PopupWindow(popupView, 800, 600);
+        popupWindow.setFocusable(true);
+        popupWindow.setBackgroundDrawable(new ColorDrawable());
+        popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
+        TextInputLayout saveDescr = popupView.findViewById(R.id.note_description);
+        Button saveButton = popupView.findViewById(R.id.save_button);
+        saveButton.setOnClickListener((w)->{
+            String folderName = saveDescr.getEditText().getText().toString();
+            folderHostFragment.addFolderChip(folderName);
+            popupWindow.dismiss();
+        });
     }
 
 }
