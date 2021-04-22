@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
 
     package="com.example.lize">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -12,7 +13,21 @@
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
-        android:theme="@style/Theme.Lize">
+        android:theme="@style/Theme.Lize"
+        >
+<!--        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+           >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+
+        </provider>-->
+
+
         <activity android:name=".workers.NewAmbito" />
         <activity
             android:name=".workers.NotasActivity"
@@ -37,6 +52,14 @@
         <activity android:name=".workers.MainActivity" />
         <activity android:name=".workers.EditarAmbitoActivity" />
         <activity android:name=".workers.AjustesActivity" />
+
+        <activity
+            android:name="com.onegravity.rteditor.media.choose.MediaChooserActivity"/>
+
+        <activity
+            android:name="com.onegravity.rteditor.media.crop.CropImageActivity"/>
+
+
     </application>
 
 </manifest>

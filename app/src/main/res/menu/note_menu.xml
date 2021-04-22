@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/add_document"
+        android:icon="@drawable/document_icon"
+        android:title="@string/insert_document" />
+    <item android:id="@+id/add_audio"
+        android:icon="@drawable/ic_baseline_mic_24"
+        android:title="@string/add_audio" />
+    <item android:id="@+id/add_reminder"
+        android:icon="@drawable/ic_baseline_add_alarm_24"
+        android:title="@string/add_reminder" />
+    <item android:id="@+id/share"
+        android:icon="@drawable/ic_baseline_share_24"
+        android:title="@string/share" />
+</menu>

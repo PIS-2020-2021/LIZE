@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="Gradle: com.izettle:html2bitmap:1.9@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a2b24c9da4d3dd59492a7b915f29f849/jetified-html2bitmap-1.9/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a2b24c9da4d3dd59492a7b915f29f849/jetified-html2bitmap-1.9/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a2b24c9da4d3dd59492a7b915f29f849/jetified-html2bitmap-1.9/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.izettle/html2bitmap/1.9/9a77ea4e528c503b89fb5597fddd2dbc6465bfde/html2bitmap-1.9-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.izettle/html2bitmap/1.9/990cc9306af26919aa68be0d9519d09e81e93350/html2bitmap-1.9-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
