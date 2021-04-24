@@ -36,10 +36,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener{
 
-    /*Mock-Up de Adrián */
-    //Declaramos Títulos para nuestro Navigation Drawer List View
-    String[] AMBITOS = {"Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más"};
-
     //Creamos un recurso String para el nombre y el eMail para el HeaderView
     //También creamos un recurso para la imagen de perfil del HeaderView
     String NAME = "Maribel Gonzalez";
@@ -49,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
     private NoteHostFragment noteHostFragment;               // Contenedor de Notas
     private FolderHostFragment folderHostFragment;           // Contenedor de Folders
+    private AmbitoHostFragment ambitoHostFragment;           // Contenedor de Ambitos
     private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
     public static final int REQUEST_CODE_ADD_NOTE = 1;
 
@@ -57,12 +54,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private Handler handler = new Handler();        // Methods to create a simple animation
     private Timer t = new Timer();                  //
 
-    //Declaramos RecyclerView
-    RecyclerView mRecyclerView;
-    //Declaramos un Adapter par el Recycler View
-    RecyclerView.Adapter mAdapter;
-    //Declaramos un LayoutManager como Linear Layout Manager
-    RecyclerView.LayoutManager mLayoutManager;
+
     //Declaramos un DrawerLayout
     DrawerLayout drawerLayout;
 
@@ -88,24 +80,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         toolbar = findViewById(R.id.ambito_material_toolbar);
         setSupportActionBar(toolbar);*/
         this.topAppBar = findViewById(R.id.ambito_material_toolbar);
-
-        //Asignamos el RecyclerView Object al xmlView
-        mRecyclerView = findViewById(R.id.recyclerView);
-        //Hacemos saber al sistema que la lista de objetos es fija
-        //mRecyclerView.setHasFixedSize(true);
-
-        //Creamos el Adaptador de MyAdapter class
-        //Le pasamos los ambitos, iconos (si hubiera), nombre/mail del header e imagen del header
-        mAdapter = new AmbitosAdapter(AMBITOS, NAME, EMAIL, IMG_PROFILE);
-
-        //Configuramos el adapter al RecyclerView
-        mRecyclerView.setAdapter(mAdapter);
-
-        //Creamos un LayoutManager
-        mLayoutManager = new LinearLayoutManager(this);
-        //Configuramos el LinearLayoutManager
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
 
         //Asignamos el Drawer Object a la view
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -150,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         // Obtenemos los componentes y registramos Listeners
         this.noteHostFragment = (NoteHostFragment) getSupportFragmentManager().findFragmentById(R.id.notes_host_fragment);
         this.folderHostFragment = (FolderHostFragment) getSupportFragmentManager().findFragmentById(R.id.folders_host_fragment);
-
+        this.ambitoHostFragment = (AmbitoHostFragment) getSupportFragmentManager().findFragmentById(R.id.ambitos_host_fragment);
         topAppBar.setOnMenuItemClickListener(this);
 
         // Inicializamos los FABS
