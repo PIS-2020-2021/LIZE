@@ -33,4 +33,9 @@ public class Note {
     public void setImages(ArrayList<ImageView> images) {
         this.images = images;
     }
+
+    // TODO: Note ID implementation
+    public String getID() {
+        return getText();
+    }
 }

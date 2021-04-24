@@ -5,6 +5,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,9 +19,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.lize.R;
 import com.example.lize.adapters.AmbitosAdapter;
+import com.example.lize.models.MainViewModel;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
@@ -153,6 +156,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         // Inicializamos los FABS
         initFABGroup();
 
+        MainViewModel model = new ViewModelProvider(this).get(MainViewModel.class);
+        model.getToast().observe(this, (t) -> {
+            Toast.makeText(this.getBaseContext(), t, Toast.LENGTH_SHORT).show();
+        });
     }
 
     /**

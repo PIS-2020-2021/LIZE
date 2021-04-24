@@ -25,7 +25,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
     private final ArrayList<ChipFolderListener> chipListeners;
 
     /* Custom ChipFolder onClick Listener */
-    public interface ChipFolderListener{ void onFolderSelected(Folder f);}
+    public interface ChipFolderListener{ void onChipSelected(Chip folderChip);}
 
     /**
      * Method for registering a ChipFolder onClick listener
@@ -80,7 +80,6 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
     public class ChipFolder extends RecyclerView.ViewHolder{
 
         private Chip folderChip;
-        private Folder mFolder;
 
         /**
          * Constructor del ViewHolder correspondiente al layout de folder_chip
@@ -90,10 +89,8 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
             super(itemView);
             this.folderChip = (Chip) itemView;
             folderChip.setOnClickListener((v)->{
-                if (mFolder != null) {
                     for (ChipFolderListener listener : chipListeners)
-                        listener.onFolderSelected(mFolder);
-                }
+                        listener.onChipSelected(folderChip);
             });
         }
 
@@ -102,7 +99,6 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
          * @param currentFolder carpeta actual
          */
         public void bindTo(Folder currentFolder) {
-            mFolder = currentFolder;
             folderChip.setText(currentFolder.getFolderName());
         }
     }

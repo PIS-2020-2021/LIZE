@@ -13,16 +13,15 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
 
-
-
         <!-- Actual Base Ambit Theme -->
         <item name="android:theme">@style/Theme.Lize.Ambit.Teal</item>
-        <item name="hintTextColor">@style/Theme.hint</item>
+
         <!-- Material Component filters -->
         <item name="materialCardViewStyle">@style/Widget.Lize.CardView</item>
         <item name="toolbarStyle">@style/Widget.Lize.Toolbar</item>
         <item name="chipStyle">@style/Widget.Lize.Chip</item>
         <item name="floatingActionButtonStyle">@style/Widget.Lize.FAB</item>
+        <item name="hintTextColor">@style/Theme.hint</item>
     </style>
 
     <!-- CardView Style -->
@@ -44,7 +43,7 @@
 
     <!-- Chip Style -->
     <style name="Widget.Lize.Chip" parent="Widget.MaterialComponents.Chip.Choice">
-        <item name="chipBackgroundColor">?attr/color</item>
+        <item name="chipBackgroundColor">?attr/colorPrimary</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 
