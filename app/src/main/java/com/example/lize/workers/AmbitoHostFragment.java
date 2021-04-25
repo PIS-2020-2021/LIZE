@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lize.R;
 import com.example.lize.adapters.AmbitosAdapter;
 import com.example.lize.data.Ambito;
+import com.example.lize.data.User;
 import com.example.lize.models.MainViewModel;
 
 public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.AmbitoListener {
@@ -63,6 +64,6 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
 
     @Override
     public void onAmbitoSelected(Ambito a) {
-        //TODO
+        dataViewModel.selectAmbito(a.getAmbitoName());
     }
 }

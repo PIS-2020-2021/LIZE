@@ -122,9 +122,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
 
         // Obtenemos los componentes y registramos Listeners
-        this.noteHostFragment = (NoteHostFragment) getSupportFragmentManager().findFragmentById(R.id.notes_host_fragment);
-        this.folderHostFragment = (FolderHostFragment) getSupportFragmentManager().findFragmentById(R.id.folders_host_fragment);
         this.ambitoHostFragment = (AmbitoHostFragment) getSupportFragmentManager().findFragmentById(R.id.ambitos_host_fragment);
+        this.folderHostFragment = (FolderHostFragment) getSupportFragmentManager().findFragmentById(R.id.folders_host_fragment);
+        this.noteHostFragment = (NoteHostFragment) getSupportFragmentManager().findFragmentById(R.id.notes_host_fragment);
         topAppBar.setOnMenuItemClickListener(this);
 
         // Inicializamos los FABS

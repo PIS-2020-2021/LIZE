@@ -52,7 +52,7 @@
 
                 <fragment
                     android:id="@+id/ambitos_host_fragment"
-                    android:name="com.example.lize.workers.NoteHostFragment"
+                    android:name="com.example.lize.workers.AmbitoHostFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
