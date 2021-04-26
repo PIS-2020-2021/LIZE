@@ -22,7 +22,6 @@ public class SignUpActivity extends AppCompatActivity {
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_drawable_nav);
             setContentView(R.layout.activity_signup);
 
             nombre = findViewById(R.id.nombre);

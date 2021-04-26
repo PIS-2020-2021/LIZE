@@ -2,14 +2,18 @@ package com.example.lize.workers;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.lize.R;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 public class NewAmbito extends AppCompatActivity {
@@ -17,10 +21,10 @@ public class NewAmbito extends AppCompatActivity {
     private EditText nombre;
     private String colorAmbito;
     private TextInputLayout nombreError, colorAmbitoError;
-    private Button newAambito;
     boolean isNameValid, isColorAmbitoValid;
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,14 +35,14 @@ public class NewAmbito extends AppCompatActivity {
         colorAmbitoError = findViewById(R.id.colorAmbitoError);
         nombreError = findViewById(R.id.nameError);
 
-        this.newAambito = findViewById(R.id.newAmbitoButton);
-        newAambito.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                if (validarDatos()){
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
-                }
+        MaterialToolbar topAppBar = findViewById(R.id.ambito_material_toolbar);
+        topAppBar.setOnMenuItemClickListener(this::onMenuItemClick);
+
+        Button newAmbito = findViewById(R.id.newAmbitoButton);
+        newAmbito.setOnClickListener(v -> {
+            if (validarDatos()){
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -76,6 +80,7 @@ public class NewAmbito extends AppCompatActivity {
     }
 
 
+    @SuppressLint("NonConstantResourceId")
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.cardRojo:         colorAmbito = "Red";  break;
@@ -90,6 +95,19 @@ public class NewAmbito extends AppCompatActivity {
 
             //case R.id.btnIcoAtras:      finish();                                           break;
         }
+    }
+
+    /**
+     * Implementación del método OnMenuItemClick para definir las acciones de los items del Toolbar.
+     * @param item item del Toolbar: go back(arrow)
+     */
+    public boolean onMenuItemClick(MenuItem item) {
+        if (item.getItemId() == R.id.arrow) {
+            onBackPressed();
+        } else {
+            return false;
+        }
+        return true;
     }
 
 
