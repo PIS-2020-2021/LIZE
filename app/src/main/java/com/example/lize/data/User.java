@@ -9,6 +9,8 @@ public class User {
     private String last;
     private ArrayList<Ambito> userAmbitos;
 
+    public User(){};
+
     public User(String mail, String password, String first, String last){
         this.mail = mail;
         this.password = password;
@@ -57,5 +59,5 @@ public class User {
         return userAmbitos.add(ambito);
     }
 
-
+    public void setUserAmbitos(ArrayList<Ambito> ambitos) { userAmbitos = ambitos; }
 }

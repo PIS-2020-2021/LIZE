@@ -5,12 +5,17 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.lize.data.Ambito;
+import com.example.lize.data.Folder;
+import com.example.lize.data.Note;
 import com.example.lize.data.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -39,8 +44,9 @@ public class DatabaseAdapter {
     }
 
     public interface vmInterface {
-        void setCollection(User ac);
-
+        void setUser(User user);
+        void setUserAmbitos(String userID, ArrayList<Ambito> userAmbitos);
+        void setAmbitoNotes(String userID, String ambitoID, ArrayList<Note> ambitoNotes);
         void setToast(String s);
     }
 
@@ -72,29 +78,58 @@ public class DatabaseAdapter {
         }
     }
 
-    public void getCollection(String userID) {
-        Log.d(TAG, "update user " + userID);
-        DatabaseAdapter.db.collection("users/" + userID + "/ambitos").get()
-                // OnCompleteListener for the get() process: setCollection of the retrieved Data
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
+    // Method for getting a base User from the 'users' collection
+    public void getUser(String userID) {
+        DocumentReference userRef = DatabaseAdapter.db.collection("users").document(userID);
+        Log.d(TAG, "Getting current user document...");
+        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    Log.d(TAG, document.getId() + " => " + document.getData());
+                    listener.setUser(document.toObject(User.class));
+                } else Log.d(TAG, "Error getting documents: ", task.getException());
+            }
+        });
+    }
 
-                            ArrayList<Ambito> retrieved_ambitos = new ArrayList<Ambito>();
-
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.getData());
-
-                                // Get the notes subcollection for each document
-                                db.collection("users/" + userID + "/ambitos/" + document.getId() + "/notes").get();
-                            }
-                            listener.setCollection(new User(userID, "0000000", "Pep", "Guardiola"));
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
-                        }
+    // Method for getting an Ambito from the 'ambitos' collection
+    public void getAmbitos(String userID) {
+        CollectionReference ambitosRef = DatabaseAdapter.db.collection("users/" + userID + "/ambitos");
+        Log.d(TAG, "Getting user " + userID + "'s ambitos collection...");
+        ambitosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    ArrayList<Ambito> userAmbitos = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d(TAG, document.getId() + " => " + document.getData());
+                        userAmbitos.add(document.toObject(Ambito.class));
                     }
-                });
+                    listener.setUserAmbitos(userID, userAmbitos);
+                } else Log.d(TAG, "Error getting documents: ", task.getException());
+            }
+        });
+    }
+
+    // Method for getting a Note from the 'notes' collection
+    public void getNotes(String userID, String ambitoID){
+        CollectionReference notasRef = DatabaseAdapter.db.collection("users/" + userID + "/ambitos/" + ambitoID + "/notes");
+        Log.d(TAG, "Getting user " + userID + "'s ambito " + ambitoID + "'s notes collection...");
+        notasRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    ArrayList<Note> ambitoNotes = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d(TAG, document.getId() + " => " + document.getData());
+                        ambitoNotes.add(document.toObject(Note.class));
+                    }
+                    listener.setAmbitoNotes(userID, ambitoID, ambitoNotes);
+                } else Log.d(TAG, "Error getting documents: ", task.getException());
+            }
+        });
     }
 
     /* TODO: Métodos para guardar Ámbitos, Carpetas y Notas, respectivamente */
@@ -122,7 +157,7 @@ public class DatabaseAdapter {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
+                        Log.d(TAG, "Error adding document", e);
                     }
                 });
        */

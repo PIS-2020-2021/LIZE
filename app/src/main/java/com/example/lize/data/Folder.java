@@ -6,6 +6,8 @@ public class Folder {
     private String folderName;
     private ArrayList<Note> mFolderNotes;
 
+    public Folder(){};
+
     public Folder(String name) {
         this.folderName = name;
         this.mFolderNotes = new ArrayList<>();

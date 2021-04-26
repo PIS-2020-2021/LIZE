@@ -91,8 +91,8 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
      * @param noteName Nombre de la nueva nota a crear
      * @param noteText Texto de la nueva nota a crear
      */
-    public void addCardNote(String noteName, String noteText) {
-        dataViewModel.addNote(noteName, noteText);
+    public void addCardNote(String noteName, String noteText, String folderID) {
+        dataViewModel.addNote(noteName, noteText, folderID);
     }
 
     /**

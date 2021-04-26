@@ -10,12 +10,17 @@ public class Note {
 
     private String title;
     private String text;
+    private String folderID;
 
     private ArrayList<ImageView> images;
     private ArrayList<File> files;
-    public Note(String title, String text) {
+
+    public Note(){};
+
+    public Note(String title, String text, String folderID) {
         this.title = title;
         this.text = text;
+        this.folderID = folderID;
     }
 
     public String getTitle() {
@@ -25,6 +30,8 @@ public class Note {
     public String getText() {
         return text;
     }
+
+    public String getFolderID() { return folderID; }
 
     public ArrayList<ImageView> getImages() {
         return images;
@@ -38,4 +45,5 @@ public class Note {
     public String getID() {
         return getText();
     }
+
 }

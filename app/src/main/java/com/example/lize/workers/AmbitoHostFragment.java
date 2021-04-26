@@ -49,7 +49,7 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
             mAmbitosAdapter = new AmbitosAdapter(mContext, user.getUserAmbitos());
             mAmbitosAdapter.registerAmbitoListener(this);
             dataViewModel.selectAmbito(mContext.getResources().getString(R.string.ambit_default_name));
-            mAmbitosRecyclerView.swapAdapter(mAmbitosAdapter,false);
+            mAmbitosRecyclerView.swapAdapter(mAmbitosAdapter, false);
             mAmbitosAdapter.notifyDataSetChanged();
         });
 
@@ -59,7 +59,7 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
      * Añadimos un nuevo ambito al DataSet del MainViewModel
      * @param ambitoName Nombre del nuevo ambito a crear
      */
-    public void addAmbito(String ambitoName){ dataViewModel.addAmbito(ambitoName); }
+    public void addAmbito(String ambitoName, int ambitoColor){ dataViewModel.addAmbito(ambitoName, ambitoColor); }
 
 
     @Override

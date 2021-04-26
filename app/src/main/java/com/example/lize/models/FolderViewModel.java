@@ -27,7 +27,7 @@ public class FolderViewModel extends ViewModel{ //implements DatabaseAdapter.vmI
     }
 
     public void addNote(String noteName){
-        Note note = new Note(noteName, "");
+        Note note = new Note(noteName, "", "");
         mFolderSelected.getValue().addNote(note);
         mFolderSelected.setValue(mFolderSelected.getValue());
         // TODO: note database connection: note.saveNote();
