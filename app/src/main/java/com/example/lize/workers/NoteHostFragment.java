@@ -4,12 +4,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
@@ -19,13 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lize.R;
 import com.example.lize.adapters.NoteAdapter;
 import com.example.lize.data.Folder;
-import com.example.lize.data.Note;
-import com.example.lize.models.FolderViewModel;
 import com.example.lize.models.MainViewModel;
-import com.example.lize.models.NoteViewModel;
-import com.google.android.material.chip.Chip;
-
-import java.util.ArrayList;
 
 /** Notes View Host fragment. Responsabilidades:
  * <ol><li> Gestionar la parte de la UI correspondiente con el RecycleView de CardNotes </li>
@@ -62,7 +54,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         dataViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         dataViewModel.getFolderSelected().observe(getViewLifecycleOwner(), (Folder folder)->{
-            mNoteAdapter = new NoteAdapter(root.getContext(), folder.getFolderNotes());
+            mNoteAdapter = new NoteAdapter(root.getContext(), folder.getNotes(), cardNoteType);
             mNoteAdapter.registerCardNoteListener(this);
             mNotesRecyclerView.swapAdapter(mNoteAdapter, false);
             mNoteAdapter.notifyDataSetChanged();
@@ -87,20 +79,20 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
     }
 
     /**
-     * Añadimos una nueva nota al DataSet del FolderViewModel.
+     * Añadimos una nueva nota al DataSet del MainViewModel.
      * @param noteName Nombre de la nueva nota a crear
      * @param noteText Texto de la nueva nota a crear
      */
-    public void addCardNote(String noteName, String noteText, String folderID) {
-        dataViewModel.addNote(noteName, noteText, folderID);
+    public void addCardNote(String noteName, String noteText) {
+        dataViewModel.addNote(noteName, noteText);
     }
 
     /**
      * Cuando un card note sea clickeado, inicia la actividad NotasActivity.class mediante un Intent
-     * @param note el cardNote que ha sido clickeado.
+     * @param noteID ID de la nota correspondiente al cardNote clickeado.
      */
     @Override
-    public void onNoteSelected(Note note) {
+    public void onNoteSelected(String noteID) {
         //TODO: startActivityForResult(new Intent(getApplicationContext(), NotasActivity.class), REQUEST_CODE_ADD_NOTE);
     }
 }

@@ -134,6 +134,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         model.getToast().observe(this, (t) -> {
             Toast.makeText(this.getBaseContext(), t, Toast.LENGTH_SHORT).show();
         });
+
+        model.getAmbitoSelected().observe(this, (ambito) -> {
+            topAppBar.setTitle(ambito.getName());
+        });
     }
 
     /**

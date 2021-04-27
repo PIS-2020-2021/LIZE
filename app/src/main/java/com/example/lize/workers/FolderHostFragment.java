@@ -1,6 +1,7 @@
 package com.example.lize.workers;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,20 +11,21 @@ import androidx.annotation.NonNull;
 import com.example.lize.R;
 import com.example.lize.adapters.FolderAdapter;
 import com.example.lize.data.Ambito;
-import com.example.lize.models.AmbitoViewModel;
-import com.example.lize.models.FolderViewModel;
 import com.example.lize.data.Folder;
 import com.example.lize.models.MainViewModel;
 import com.google.android.material.chip.Chip;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.function.Predicate;
 
 /**
  * Folder View Host fragment. Tiene las siguientes responsabilidades: <ol>
@@ -60,16 +62,15 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
         this.dataViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         dataViewModel.getAmbitoSelected().observe(getViewLifecycleOwner(), (Ambito ambito) ->{
-            mFolderAdapter = new FolderAdapter(mContext, ambito.getAmbitoFolders());
+            mFolderAdapter = new FolderAdapter(mContext, ambito.getFolders());
             mFolderAdapter.registerChipFolderListener(this);
-            dataViewModel.selectFolder(mContext.getResources().getString(R.string.folder_default_name));
             mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
             mFolderAdapter.notifyDataSetChanged();
         });
     }
 
     /**
-     * Añadimos una nueva carpeta al DataSet del AmbitoViewModel.
+     * Añadimos una nueva carpeta al DataSet del MainViewModel.
      * @param folderName Nombre de la nueva carpeta a crear
      */
     public void addFolderChip(String folderName) {

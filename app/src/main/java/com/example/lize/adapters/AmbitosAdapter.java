@@ -21,7 +21,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
     private final ArrayList<AmbitosAdapter.AmbitoListener> ambitoListeners;
 
     /* Custom Ambito onClick Listener */
-    public interface AmbitoListener{ void onAmbitoSelected(Ambito a); }
+    public interface AmbitoListener{ void onAmbitoSelected(String ambitoName); }
 
     /**
      * Method for registering a Ambito onClick listener
@@ -86,7 +86,6 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
     public class AmbitoHolder extends RecyclerView.ViewHolder {
 
         private TextView mTitleAmbito;
-        private Ambito mAmbito;
 
         /**
          * Constructor del ViewHolder correspondiete al layout de ambito_card
@@ -97,10 +96,8 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
             //Inicializamos los componentes del Layout
             mTitleAmbito = (TextView) itemView.findViewById(R.id.ambito_name);
             itemView.setOnClickListener((a)->{
-                if (mAmbito != null){
-                    for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
-                        listener.onAmbitoSelected(mAmbito);
-                }
+                for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
+                    listener.onAmbitoSelected(mTitleAmbito.getText().toString());
             });
         }
 
@@ -113,7 +110,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
          * @param currentAmbito
          */
         public void bindTo(Ambito currentAmbito){
-            mTitleAmbito.setText(currentAmbito.getAmbitoName());
+            mTitleAmbito.setText(currentAmbito.getName());
         }
 
     }

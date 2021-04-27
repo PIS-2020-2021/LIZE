@@ -89,8 +89,8 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
             super(itemView);
             this.folderChip = (Chip) itemView;
             folderChip.setOnClickListener((v)->{
-                    for (ChipFolderListener listener : chipListeners)
-                        listener.onChipSelected(folderChip);
+                for (ChipFolderListener listener : chipListeners)
+                    listener.onChipSelected(folderChip);
             });
         }
 
@@ -99,7 +99,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
          * @param currentFolder carpeta actual
          */
         public void bindTo(Folder currentFolder) {
-            folderChip.setText(currentFolder.getFolderName());
+            folderChip.setText(currentFolder.getName());
         }
     }
 }

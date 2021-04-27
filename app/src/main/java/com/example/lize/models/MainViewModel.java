@@ -32,7 +32,7 @@ public class MainViewModel extends ViewModel {
         mNoteSelected = new MutableLiveData<>();
         mToast = new MutableLiveData<>();
         DatabaseAdapter da = new DatabaseAdapter(new UserBuilder());
-        da.getUser("user_002@gmail.com");
+        da.getUser();           // Build User process
     }
 
     public MutableLiveData<User> getUserSelected() { return mUserSelected; }
@@ -53,49 +53,55 @@ public class MainViewModel extends ViewModel {
         return mToast;
     }
 
+    /* Selects the application user mUserSelected*/
     public void selectUser(User user){
         setToast("User " + user.getMail() + " selected.");
         mUserSelected.setValue(user);
+        selectAmbito(Ambito.BASE_AMBITO_NAME);
     }
 
-    public void selectAmbito(String ambitoID) {
+    /* Selects an Ambito of the current user mUserSelected */
+    public void selectAmbito(String ambitoName) {
         try {
-            for (Ambito ambito : mUserSelected.getValue().getUserAmbitos()) {
-                if (ambito.getAmbitoName().equals(ambitoID)) {
-                    setToast("Ambito " + ambitoID + " selected.");
+            for (Ambito ambito : mUserSelected.getValue().getAmbitos()) {
+                if (ambito.getName().equals(ambitoName)) {
+                    setToast("Ambito " + ambitoName + " selected.");
                     mAmbitoSelected.setValue(ambito);
+                    selectFolder(Folder.BASE_FOLDER_NAME);
                     return;
                 }
             }
-            Log.w(TAG, "Failed to select ambito " + ambitoID + ": invalid ID.");
+            Log.w(TAG, "Failed to select ambito " + ambitoName + ": invalid ID.");
 
         }catch(NullPointerException exception){
-            Log.w(TAG, "Failed to select ambito " + ambitoID + ": null pointer exception.");
+            Log.w(TAG, "Failed to select ambito " + ambitoName + ": null pointer exception.");
             Log.w(TAG, "Exception message: " + exception.getMessage());
         }
     }
 
-    public void selectFolder(String folderID) {
+    /* Selects a Folder of the current Ambito mAmbitoSelected */
+    public void selectFolder(String folderName) {
         try{
-            for (Folder folder : mAmbitoSelected.getValue().getAmbitoFolders()) {
-                if (folder.getFolderName().equals(folderID)) {
-                    setToast("Folder " + folderID + " selected.");
+            for (Folder folder : mAmbitoSelected.getValue().getFolders()) {
+                if (folder.getName().equals(folderName)) {
+                    setToast("Folder " + folderName + " selected.");
                     mFolderSelected.setValue(folder);
                     return;
                 }
             }
-            Log.w(TAG, "Failed to select folder " + folderID + ": invalid ID.");
+            Log.w(TAG, "Failed to select folder " + folderName + ": invalid ID.");
 
         }catch(NullPointerException exception){
-            Log.w(TAG, "Failed to select folder " + folderID + ": null pointer exception.");
+            Log.w(TAG, "Failed to select folder " + folderName + ": null pointer exception.");
             Log.w(TAG, "Exception message: " + exception.getMessage());
         }
     }
 
+    /* Selects a Note of the current Folder mFolderSelected. */
     public void selectNote(String noteID) {
         try{
-            for (Note note : mFolderSelected.getValue().getFolderNotes()) {
-                if (note.getID().equals(noteID)) {
+            for (Note note : mFolderSelected.getValue().getNotes()) {
+                if (note.getSelfID().equals(noteID)) {
                     setToast("Note " + noteID + " selected.");
                     // TODO: Note Selection implementation (call DB?)
                     return;
@@ -110,24 +116,42 @@ public class MainViewModel extends ViewModel {
     }
 
     public void addAmbito(String ambitoName, int ambitoColor) {
-        Ambito ambito = new Ambito(ambitoName, ambitoColor);
-        mUserSelected.getValue().addAmbito(ambito);
+        for (Ambito ambito: mUserSelected.getValue().getAmbitos())
+            if (ambito.getName().equals(ambitoName)) {
+                Log.w(TAG, "Failed to create ambito " + ambitoName + ": ambito already exists. ");
+                return;
+            }
+        Ambito newAmbito = new Ambito(ambitoName, ambitoColor, mUserSelected.getValue().getSelfID());
+        DatabaseAdapter.databaseAdapter.saveAmbito(newAmbito);
+        newAmbito.addFolder(new Folder(Folder.BASE_FOLDER_NAME, newAmbito.getSelfID()));
+        mUserSelected.getValue().addAmbito(newAmbito);
         mUserSelected.setValue(mUserSelected.getValue());
-        // TODO: note database connection: ambito.saveAmbito();
+        setToast("Ambito " + ambitoName + " correctly created.");
+        mAmbitoSelected.setValue(newAmbito);
     }
 
     public void addFolder(String folderName) {
-        Folder folder = new Folder(folderName);
+        for (Folder folder: mAmbitoSelected.getValue().getFolders())
+            if (folder.getName().equals(folderName)) {
+                Log.w(TAG, "Failed to create folder " + folderName + ": folder already exists. ");
+                return;
+            }
+        Folder folder = new Folder(folderName, mAmbitoSelected.getValue().getSelfID());
         mAmbitoSelected.getValue().addFolder(folder);
         mAmbitoSelected.setValue(mAmbitoSelected.getValue());
-        // TODO: note database connection: folder.saveFolder();
+        setToast("Folder " + folderName + " correctly created.");
     }
 
-    public void addNote(String noteName, String noteText, String noteFolder) {
-        Note note = new Note(noteName, noteText, noteFolder);
-        mFolderSelected.getValue().addNote(note);
+    public void addNote(String noteName, String noteText) {
+        if (noteText == null) {
+            Log.w(TAG, "Failed to create note " + noteName + ": empty note. ");
+            return;
+        }
+        Note newNote = new Note(noteName, noteText, mAmbitoSelected.getValue().getSelfID(), mFolderSelected.getValue().getName());
+        DatabaseAdapter.databaseAdapter.saveNote(newNote);
+        mFolderSelected.getValue().addNote(newNote);
         mFolderSelected.setValue(mFolderSelected.getValue());
-        // TODO: note database connection: note.saveNote();
+        setToast("Note " + noteName + " correctly created.");
     }
 
     public void setToast(String s) {
@@ -145,57 +169,64 @@ public class MainViewModel extends ViewModel {
     /* BUILDER PATTERN FOR DATABASE INTERFACE */
     protected class UserBuilder implements DatabaseAdapter.vmInterface{
 
-        private User buildingUser;
+        private User currentUser;
         private int loadingCounter;
 
         public UserBuilder(){
             Log.w("UserBuilder", "Beginning user building process...");
-            buildingUser = null;
+            currentUser = null;
             loadingCounter = 0;
         }
 
         @Override
         public void setUser(User user) {
-            buildingUser = user;
+            currentUser = user;
             Log.w("UserBuilder", "Step 1 succes: user correctly loaded from Database.");
-            DatabaseAdapter.databaseAdapter.getAmbitos(user.getMail());
+            DatabaseAdapter.databaseAdapter.getAmbitos();
         }
 
         @Override
-        public void setUserAmbitos(String userID, ArrayList<Ambito> userAmbitos) {
-            if (buildingUser != null) {
-                buildingUser.setUserAmbitos(userAmbitos);
-                Log.w("UserBuilder", "Step 2 succes: ambitos of user " + userID + " correctly loaded from Database.");
+        public void setUserAmbitos(ArrayList<Ambito> userAmbitos) {
+            if (currentUser != null) {
+                currentUser.setAmbitos(userAmbitos);
+                Log.w("UserBuilder", "Step 2 succes: ambitos of user " + currentUser.getSelfID() + " correctly loaded from Database.");
                 for (Ambito ambito : userAmbitos) {
-                    DatabaseAdapter.databaseAdapter.getNotes(userID, ambito.getAmbitoName());
+                    DatabaseAdapter.databaseAdapter.getNotes(ambito.getSelfID());
                 }
-            } else Log.w("UserBuilder", "Step 2 failure. User " + userID + " it's unitiallized.");
+            } else Log.w("UserBuilder", "Step 2 failure. User " + currentUser.getSelfID() + " it's unitiallized.");
         }
 
         @Override
-        public void setAmbitoNotes(String userID, String ambitoID, ArrayList<Note> ambitoNotes) {
-            if (buildingUser.getUserAmbitos().isEmpty())
+        public void setAmbitoNotes(String ambitoID, ArrayList<Note> ambitoNotes) {
+            if (currentUser.getAmbitos().isEmpty())
                 Log.w("UserBuilder", "Step 3 failure: Ambito " + ambitoID + " it's unitiallized.");
             else{
-                for (Ambito ambito : buildingUser.getUserAmbitos()) {
-                    if (ambito.getAmbitoName().equals(ambitoID)) {
+                for (Ambito ambito : currentUser.getAmbitos()) {
+                    if (ambito.getSelfID().equals(ambitoID)) {
+
+                        // Build the ambito's folders using a Map collection for avoiding repeated names
                         Map<String, Folder> ambitoFolders = new HashMap<>();
+                        ambitoFolders.put(Folder.BASE_FOLDER_NAME, new Folder(Folder.BASE_FOLDER_NAME, ambitoID));
                         for (Note note : ambitoNotes) {
-                            String folderID = note.getFolderID();
-                            if (ambitoFolders.get(folderID) == null)
-                                ambitoFolders.put(folderID, new Folder(folderID));
-                            ambitoFolders.get(folderID).addNote(note);
+                            String folderTAG = note.getFolderTAG();
+                            if (ambitoFolders.get(folderTAG) == null)
+                                ambitoFolders.put(folderTAG, new Folder(folderTAG, ambitoID));
+
+                            ambitoFolders.get(Folder.BASE_FOLDER_NAME).addNote(note);
+                            ambitoFolders.get(folderTAG).addNote(note);
                         }
-                        ambito.setAmbitoFolders(new ArrayList(ambitoFolders.values()));
+
+                        // Finally, sets the ambito notes structured by their folder containers
+                        ambito.setFolders(new ArrayList(ambitoFolders.values()));
                         loadingCounter++;
                         break;
                     }
                 }
 
-                // If notes for all user ambits have been set, call the owner class for setting the user
-                if (loadingCounter == buildingUser.getUserAmbitos().size()) {
-                    Log.w("UserBuilder", "Step 3 succes: all notes of user " + userID + " correctly loaded from Database.");
-                    selectUser(buildingUser);
+                // If notes for all user ambitos have been set, call the owner class for setting the user
+                if (loadingCounter == currentUser.getAmbitos().size()) {
+                    Log.w("UserBuilder", "Step 3 succes: all notes of user " + currentUser.getSelfID() + " correctly loaded from Database.");
+                    selectUser(currentUser);
                 }
             }
         }

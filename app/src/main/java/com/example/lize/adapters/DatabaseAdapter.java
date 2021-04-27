@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.lize.data.Ambito;
-import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -13,10 +12,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -40,20 +39,18 @@ public class DatabaseAdapter {
         this.listener = listener;
         databaseAdapter = this;
         FirebaseFirestore.setLoggingEnabled(true);
-        //initFirebase();
     }
 
     public interface vmInterface {
         void setUser(User user);
-        void setUserAmbitos(String userID, ArrayList<Ambito> userAmbitos);
-        void setAmbitoNotes(String userID, String ambitoID, ArrayList<Note> ambitoNotes);
+        void setUserAmbitos(ArrayList<Ambito> userAmbitos);
+        void setAmbitoNotes(String ambitoID, ArrayList<Note> ambitoNotes);
         void setToast(String s);
     }
 
     /* Firebase sign in */
     public void initFirebase() {
         user = mAuth.getCurrentUser();
-
         if (user == null) {
             mAuth.signInAnonymously()
                     // OnCompleteListener: when sign in, Authentication successful
@@ -65,6 +62,7 @@ public class DatabaseAdapter {
                                 Log.d(TAG, "signInAnonymously:success");
                                 listener.setToast("Authentication successful.");
                                 user = mAuth.getCurrentUser();
+                                //getUser(user.getEmail());
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "signInAnonymously:failure", task.getException());
@@ -79,8 +77,8 @@ public class DatabaseAdapter {
     }
 
     // Method for getting a base User from the 'users' collection
-    public void getUser(String userID) {
-        DocumentReference userRef = DatabaseAdapter.db.collection("users").document(userID);
+    public void getUser() {
+        DocumentReference userRef = DatabaseAdapter.db.collection("users").document("arnau6martinez@gmail.com");
         Log.d(TAG, "Getting current user document...");
         userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -95,9 +93,9 @@ public class DatabaseAdapter {
     }
 
     // Method for getting an Ambito from the 'ambitos' collection
-    public void getAmbitos(String userID) {
-        CollectionReference ambitosRef = DatabaseAdapter.db.collection("users/" + userID + "/ambitos");
-        Log.d(TAG, "Getting user " + userID + "'s ambitos collection...");
+    public void getAmbitos() {
+        Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", "arnau6martinez@gmail.com");
+        Log.d(TAG, "Getting current user ambitos collection...");
         ambitosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -107,16 +105,16 @@ public class DatabaseAdapter {
                         Log.d(TAG, document.getId() + " => " + document.getData());
                         userAmbitos.add(document.toObject(Ambito.class));
                     }
-                    listener.setUserAmbitos(userID, userAmbitos);
+                    listener.setUserAmbitos(userAmbitos);
                 } else Log.d(TAG, "Error getting documents: ", task.getException());
             }
         });
     }
 
     // Method for getting a Note from the 'notes' collection
-    public void getNotes(String userID, String ambitoID){
-        CollectionReference notasRef = DatabaseAdapter.db.collection("users/" + userID + "/ambitos/" + ambitoID + "/notes");
-        Log.d(TAG, "Getting user " + userID + "'s ambito " + ambitoID + "'s notes collection...");
+    public void getNotes(String ambitoID){
+        Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("ambitoID", ambitoID);
+        Log.d(TAG, "Getting ambito " + ambitoID + "'s notes collection...");
         notasRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -126,105 +124,44 @@ public class DatabaseAdapter {
                         Log.d(TAG, document.getId() + " => " + document.getData());
                         ambitoNotes.add(document.toObject(Note.class));
                     }
-                    listener.setAmbitoNotes(userID, ambitoID, ambitoNotes);
+                    listener.setAmbitoNotes(ambitoID, ambitoNotes);
                 } else Log.d(TAG, "Error getting documents: ", task.getException());
             }
         });
     }
 
-    /* TODO: Métodos para guardar Ámbitos, Carpetas y Notas, respectivamente */
-
-    public void saveAmbito(String id, String description, String userid, String url) {
+    public void saveAmbito(Ambito ambito) {
+        DocumentReference ambitoRef = db.collection("ambitos").document();
+        ambito.setSelfID(ambitoRef.getId());
+        Log.d(TAG, "Saving ambito with ID: " + ambitoRef.getId());
+        ambitoRef.set(ambito).addOnCompleteListener(new OnCompleteListener(){
+            @Override
+            public void onComplete(@NonNull Task task) {
+                DocumentSnapshot document = (DocumentSnapshot) task.getResult();
+                if (task.isSuccessful()) Log.d(TAG, "Ambito" + document.getId() + " correctly saved.");
+                else Log.d(TAG, "Error saving ambito " + document.getId(), task.getException());
+            }
+        });
     }
 
-        /* Create a new user with a first and last name
-        Map<String, Object> note = new HashMap<>();
-        note.put("id", id);
-        note.put("description", description);
-        note.put("userid", userid);
-        note.put("url", url);
-
-        Log.d(TAG, "saveDocument");
-        // Add a new document with a generated ID
-        db.collection("audioCards")
-                .add(note)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "Error adding document", e);
-                    }
-                });
-       */
-
-
-    public void saveFolder(String id, String description, String userid, String url) {
+    public void saveNote(Note note) {
+        DocumentReference noteRef = db.collection("notes").document();
+        note.setSelfID(noteRef.getId());
+        Log.d(TAG, "Saving note with ID: " + noteRef.getId());
+        noteRef.set(note).addOnCompleteListener(new OnCompleteListener(){
+            @Override
+            public void onComplete(@NonNull Task task) {
+                DocumentSnapshot document = (DocumentSnapshot) task.getResult();
+                if (task.isSuccessful()) Log.d(TAG, "Note" + document.getId() + " correctly saved.");
+                else Log.d(TAG, "Error saving note " + document.getId(), task.getException());
+            }
+        });
     }
 
-        /* Create a new user with a first and last name
-        Map<String, Object> note = new HashMap<>();
-        note.put("id", id);
-        note.put("description", description);
-        note.put("userid", userid);
-        note.put("url", url);
 
-        Log.d(TAG, "saveDocument");
-        // Add a new document with a generated ID
-        db.collection("audioCards")
-                .add(note)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
-       */
-
-
-    public void saveNote(String id, String description, String userid, String url) {
-    }
-
-        /* Create a new user with a first and last name
-        Map<String, Object> note = new HashMap<>();
-        note.put("id", id);
-        note.put("description", description);
-        note.put("userid", userid);
-        note.put("url", url);
-
-        Log.d(TAG, "saveDocument");
-        // Add a new document with a generated ID
-        db.collection("audioCards")
-                .add(note)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
-       */
 
     public void saveNoteWithFile(String id, String description, String userid, String path) {
-    }
-
-        /*
-        Uri file = Uri.fromFile(new File(path));
+    /*  Uri file = Uri.fromFile(new File(path));
         StorageReference storageRef = storage.getReference();
         StorageReference audioRef = storageRef.child("audio"+File.separator+file.getLastPathSegment());
         UploadTask uploadTask = audioRef.putFile(file);
@@ -258,4 +195,6 @@ public class DatabaseAdapter {
                 Log.d(TAG, "Upload is " + progress + "% done");
             }
         }); */
+    }
+
 }

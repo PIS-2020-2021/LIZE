@@ -3,11 +3,15 @@ package com.example.lize.data;
 import java.util.ArrayList;
 
 public class User {
-    private String mail;
-    private String password;
     private String first;
     private String last;
-    private ArrayList<Ambito> userAmbitos;
+    private String mail;
+    private String password;
+    private String selfID;
+
+    // TODO: username implementation! private String username;
+
+    private ArrayList<Ambito> ambitos;
 
     public User(){};
 
@@ -16,7 +20,7 @@ public class User {
         this.password = password;
         this.first = first;
         this.last = last;
-        userAmbitos = new ArrayList<>();
+        ambitos = new ArrayList<>();
     }
 
     public String getMail() {
@@ -51,13 +55,19 @@ public class User {
         this.last = last;
     }
 
-    public ArrayList<Ambito> getUserAmbitos() {
-        return userAmbitos;
+    public String getSelfID() {
+        return selfID;
+    }
+
+    public void setSelfID(String selfID) { this.selfID = selfID; }
+
+    public ArrayList<Ambito> getAmbitos() {
+        return ambitos;
     }
 
     public boolean addAmbito(Ambito ambito){
-        return userAmbitos.add(ambito);
+        return ambitos.add(ambito);
     }
 
-    public void setUserAmbitos(ArrayList<Ambito> ambitos) { userAmbitos = ambitos; }
+    public void setAmbitos(ArrayList<Ambito> ambitos) { this.ambitos = ambitos; }
 }

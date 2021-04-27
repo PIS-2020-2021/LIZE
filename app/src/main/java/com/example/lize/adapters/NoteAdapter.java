@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
-import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
     private boolean cardNoteType;
 
     /* Custom CardNote onClick Listener */
-    public interface CardNoteListener{ void onNoteSelected(Note n); }
+    public interface CardNoteListener{ void onNoteSelected(String noteID); }
 
     /**
      * Method for registering a CardNote onClick listener
@@ -45,10 +44,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
      * @param context contexto de la app
      * @param notesData ArrayList conteniendo la información de las notas.
      */
-    public NoteAdapter(Context context, ArrayList<Note> notesData) {
+    public NoteAdapter(Context context, ArrayList<Note> notesData, boolean cardNoteType) {
         this.mNotesData = notesData;
         this.mContext = context;
-        this.cardNoteType = true;
+        this.cardNoteType = cardNoteType;
         cardListeners = new ArrayList<>();
     }
 
@@ -106,7 +105,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
 
         private TextView mTitleNote;
         private TextView mTextNote;
-        private Note mNote;
+        private String mNoteID;
 
         /**
          * Constructor del ViewHolder correspondiente al layout de note_card
@@ -118,10 +117,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
             mTitleNote = (TextView) itemView.findViewById(R.id.note_name);
             mTextNote = (TextView) itemView.findViewById(R.id.note_body);
             itemView.setOnClickListener((v)->{
-                if (mNote != null) {
                     for (NoteAdapter.CardNoteListener listener : cardListeners)
-                        listener.onNoteSelected(mNote);
-                }
+                        listener.onNoteSelected(mNoteID);
             });
         }
 
@@ -133,6 +130,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
         public void bindTo(Note currentNote) {
             mTitleNote.setText(currentNote.getTitle());
             mTextNote.setText(currentNote.getText());
+            mNoteID = currentNote.getSelfID();
         }
 
     }
