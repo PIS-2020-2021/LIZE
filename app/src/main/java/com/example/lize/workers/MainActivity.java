@@ -27,6 +27,7 @@ import com.example.lize.models.MainViewModel;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
 
 ;import java.util.Timer;
 import java.util.TimerTask;
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         signOut.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
                 startActivity(intent);
             }
