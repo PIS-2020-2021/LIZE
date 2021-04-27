@@ -4,10 +4,14 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.util.Patterns;
 import com.google.android.material.textfield.TextInputLayout;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
 import com.example.lize.R;
+import com.google.firebase.auth.FirebaseAuth;
+
 import android.widget.Toast;
 import android.widget.EditText;
 
@@ -39,6 +43,16 @@ public class SignUpActivity extends AppCompatActivity {
             signup.setOnClickListener(v ->
             {
                 if(SetValidation()) {
+                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(email.getText().toString(),
+                            psw.getText().toString()).addOnCompleteListener(a -> {
+                        if(a.isComplete()){
+                            Intent intent = new Intent(this, MainActivity.class);
+                            intent.putExtra("email", email.getText().toString());
+                            startActivity(intent);
+                        } else {
+                            showAlert();
+                        }
+                    });
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(intent);
                 }
@@ -111,5 +125,16 @@ public class SignUpActivity extends AppCompatActivity {
         return false;
 
     }
+
+    //FireBase Alert
+    private void showAlert(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Error");
+        builder.setMessage("Se ha producido un error creando al usuario\n Pruebe de nuevo en otro momento");
+        builder.setPositiveButton("Aceptar", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 
 }

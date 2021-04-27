@@ -2,6 +2,8 @@ package com.example.lize.workers;
 
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Patterns;
 import com.example.lize.R;
@@ -9,6 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LogInActivity extends AppCompatActivity {
     // Variables
@@ -16,6 +20,9 @@ public class LogInActivity extends AppCompatActivity {
     Button login, signup;
     boolean isEmailValid, isPasswordValid;
     TextInputLayout emailError, passError;
+
+    //Relacionado con la Autentificación de FireBase
+    private FirebaseAuth mAuth;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +38,16 @@ public class LogInActivity extends AppCompatActivity {
 
             login.setOnClickListener(v -> {
                 if (SetValidation()) {
-                    Intent intent = new Intent(this, MainActivity.class);
-                    startActivity(intent);
+                    FirebaseAuth.getInstance().signInWithEmailAndPassword(email.getText().toString(),
+                            password.getText().toString()).addOnCompleteListener(a -> {
+                                if(a.isSuccessful()){
+                                    Intent intent = new Intent(this, MainActivity.class);
+                                    intent.putExtra("email", email.getText().toString());
+                                    startActivity(intent);
+                                } else {
+                                    showAlert();
+                                }
+                    });
                 }
             });
 
@@ -41,6 +56,7 @@ public class LogInActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, SignUpActivity.class);
                 startActivity(intent);
             });
+
         }
 
         /**
@@ -86,4 +102,16 @@ public class LogInActivity extends AppCompatActivity {
             }
             return false;
         }
+
+        //FireBase Alert
+        private void showAlert(){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Error");
+            builder.setMessage("Se ha producido un error autenticando al usuario\n ¿Está Registrado en la App?");
+            builder.setPositiveButton("Aceptar", null);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
+
     }
