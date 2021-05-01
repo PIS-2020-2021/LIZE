@@ -1,22 +1,26 @@
 package com.example.lize.workers;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
+
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
+import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -33,19 +37,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lize.R;
 import com.example.lize.adapters.DocumentAdapter;
 import com.example.lize.data.Documento;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.onegravity.rteditor.RTEditText;
 import com.onegravity.rteditor.RTManager;
 import com.onegravity.rteditor.RTToolbar;
 import com.onegravity.rteditor.api.RTApi;
 import com.onegravity.rteditor.api.RTMediaFactoryImpl;
 import com.onegravity.rteditor.api.RTProxyImpl;
+
 import com.onegravity.rteditor.api.format.RTFormat;
 import com.synnapps.carouselview.CarouselView;
+import com.synnapps.carouselview.ImageListener;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 
 
@@ -67,19 +72,20 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     private ViewGroup toolbarContainer;
     private  RTToolbar rtToolbar;
     private  RTEditText rtEditText;
-
+    private FloatingActionButton KeyboardButton;
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(R.style.RTE_ThemeLight);
-
         setContentView(R.layout.activity_notas);
 
         // Componentes
         inputNoteTexto = findViewById(R.id.inputNota);
-/*        carouselView = findViewById(R.id.carouselView);
-        imageLayout = findViewById(R.id.imageNote);*/
+        carouselView = findViewById(R.id.carouselView);
+        //imageLayout = findViewById(R.id.imageNote);
         ImageView backBtn = findViewById(R.id.backBtn);
+
         /**
         ImageView imageView = findViewById(R.id.insertImageBtn);
         ImageView documentBtn = findViewById(R.id.documentBtn);
@@ -155,8 +161,10 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
           rtManager = new RTManager(rtApi, savedInstanceState);
 
 // register toolbar
-          toolbarContainer = (ViewGroup) findViewById(R.id.rte_toolbar_container);
+          toolbarContainer = (ViewGroup) findViewById(R.id.toolbar_container);
           rtToolbar = (RTToolbar) findViewById(R.id.rte_toolbar);
+
+
         if (rtToolbar != null) {
             rtManager.registerToolbar(toolbarContainer, rtToolbar);
         }
@@ -188,6 +196,12 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
                 switch (item.getItemId()) {
                     case R.id.add_document: // Handle option1 Click
                         selectDocument();
+                        return true;
+
+
+                    case R.id.toolbar_image:
+                        selectImage();
+
                         return true;
                     case R.id.add_audio: // Handle option2 Click
 
@@ -293,7 +307,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     }
 
     // Carousel de imagenes de las notas
-   /* private void init_carousel() {
+   private void init_carousel() {
 
         ImageListener imageListener = new ImageListener() {
             @Override
@@ -305,17 +319,18 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
         carouselView.setPageCount(images.size());
         carouselView.setImageListener(imageListener);
-        if(images.isEmpty()){
-            carouselView.setVisibility(View.GONE);
+
+       if(images.isEmpty()){
+             carouselView.setVisibility(View.GONE);
         }else{
             carouselView.setVisibility(View.VISIBLE);
         }
 
-    }*/
+    }
 
 
     //Intent para seleccionar una imagen
-   /* private void selectImage() {
+   private void selectImage() {
         Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickIntent.setType("image/*");
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -325,7 +340,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
         startActivityForResult(chooserIntent, PICK_IMAGE);
     }
-*/
+
     //Intent para seleccionar un documento
 
     private void selectDocument(){
@@ -344,13 +359,13 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        /*f (requestCode == PICK_IMAGE && grantResults.length > 0) {
+        if (requestCode == PICK_IMAGE && grantResults.length > 0) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 selectImage();
             } else {
                 Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
             }
-        }*/if (requestCode == REQUEST_DOCUMENT_GET && grantResults.length > 0) {
+        }if (requestCode == REQUEST_DOCUMENT_GET && grantResults.length > 0) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 selectDocument();
             } else {
@@ -365,7 +380,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-       /* if (requestCode == PICK_IMAGE) {
+        if (requestCode == PICK_IMAGE) {
             if (data != null) {
                 Uri selectedImageUri = data.getData();
                 if (selectedImageUri != null) {
@@ -383,7 +398,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
                 }
 
             }
-        }else */if(requestCode == REQUEST_DOCUMENT_GET && resultCode == RESULT_OK){
+        }else if(requestCode == REQUEST_DOCUMENT_GET && resultCode == RESULT_OK){
             Uri uri = data.getData();
             String uriString = uri.toString();
             Documento myFile = new Documento(uriString);
@@ -413,27 +428,21 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     }
 
     // Context Menu para estilos de texto e imagenes
- /*   @Override
+   @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        if (v.getId() == R.id.inputNota) {
-            menu.add(0, v.getId(), 0, "Negrita");
-            menu.add(0, v.getId(), 1, "Subrayado");
-            menu.add(0, v.getId(), 2, "Subtitulo");
-        }
-        else{
-            menu.add(2, v.getId(), 0, "Eliminar");
-        }
-    }*/
+        menu.add(2, v.getId(), 0, "Eliminar");
+
+    }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        /*if (item.getTitle().equals("Eliminar")) {
+        if (item.getTitle().equals("Eliminar")) {
             images.remove(carouselView.getCurrentItem());
             init_carousel();
-        }else*/ if(item.getTitle().equals("Eliminar documento")){
+        }else if(item.getTitle().equals("Eliminar documento")){
             adapter.removeDocument(item.getGroupId());
-            if(adapter.getItemCount() == 0){
+            if(adapter.getItemCount() == 0 ){
                 recyclerView.setVisibility(View.GONE);
             }
         }/*else if (item.getTitle().equals("Negrita")) {

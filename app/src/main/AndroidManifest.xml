@@ -32,7 +32,7 @@
         <activity
             android:name=".workers.NotasActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="adjustResize">
         </activity>
         <activity android:name=".workers.SplashScreen"
             android:theme="@style/SplashScreenStyle">
@@ -52,13 +52,6 @@
         <activity android:name=".workers.MainActivity" />
         <activity android:name=".workers.EditarAmbitoActivity" />
         <activity android:name=".workers.AjustesActivity" />
-
-        <activity
-            android:name="com.onegravity.rteditor.media.choose.MediaChooserActivity"/>
-
-        <activity
-            android:name="com.onegravity.rteditor.media.crop.CropImageActivity"/>
-
 
     </application>
 
