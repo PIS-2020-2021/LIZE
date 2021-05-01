@@ -17,21 +17,30 @@ import java.util.ArrayList;
 
 public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHolder> {
     private ArrayList<Documento> localDataSet;
-
+    private OnDocumentListener mOnNoteListener;
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener, View.OnClickListener {
         private final TextView textView;
         private final ImageView imageView;
-        public ViewHolder(View view) {
+        OnDocumentListener onDocumentListener;
+
+        public ViewHolder(View view,OnDocumentListener onDocumentListener) {
             super(view);
             // Define click listener for the ViewHolder's View
 
             textView = (TextView) view.findViewById(R.id.DocumentTitle);
             imageView = (ImageView) view.findViewById(R.id.DocImage);
             imageView.setOnCreateContextMenuListener(this);
+            this.onDocumentListener = onDocumentListener;
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view){
+            onDocumentListener.onDocumentClick(getAdapterPosition());
         }
 
         public TextView getTextView() {
@@ -56,8 +65,9 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
      * @param dataSet String[] containing the data to populate views to be used
      * by RecyclerView.
      */
-    public DocumentAdapter(ArrayList<Documento> dataSet) {
+    public DocumentAdapter(ArrayList<Documento> dataSet, OnDocumentListener onDocumentListener){
         localDataSet = dataSet;
+        this.mOnNoteListener = onDocumentListener;
     }
 
     // Create new views (invoked by the layout manager)
@@ -67,7 +77,7 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.item_attach, viewGroup, false);
 
-        return new ViewHolder(view);
+        return new ViewHolder(view,mOnNoteListener);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -77,6 +87,8 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         viewHolder.getTextView().setText(localDataSet.get(position).getName());
+
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -88,5 +100,11 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
     public void removeDocument(int position){
         localDataSet.remove(position);
         notifyDataSetChanged();
+    }
+
+    public interface OnDocumentListener{
+        void onDocumentClick(int position);
+
+
     }
 }

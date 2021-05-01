@@ -8,9 +8,6 @@ import java.io.File;
 public class Documento extends File {
 
     String name;
-
-
-
     String path;
     public Documento(String name,String path){
         super(path);

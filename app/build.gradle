@@ -61,6 +61,10 @@ dependencies {
     // ImageView redondeado
     implementation "com.makeramen:roundedimageview:2.3.0"
 
+    implementation 'com.1gravity:android-rteditor:1.6.7'
+    implementation 'com.izettle:html2bitmap:1.9'
+
+
     // Lifecycle-extensions
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 

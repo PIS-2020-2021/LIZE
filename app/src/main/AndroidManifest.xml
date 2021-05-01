@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
 
     package="com.example.lize">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -17,7 +18,7 @@
         <activity
             android:name=".workers.NotasActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="adjustResize">
         </activity>
         <activity android:name=".workers.SplashScreen"
             android:theme="@style/SplashScreenStyle">
@@ -37,6 +38,7 @@
         <activity android:name=".workers.MainActivity" />
         <activity android:name=".workers.EditarAmbitoActivity" />
         <activity android:name=".workers.AjustesActivity" />
+
     </application>
 
 </manifest>

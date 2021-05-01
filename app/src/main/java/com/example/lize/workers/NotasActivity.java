@@ -1,59 +1,60 @@
 package com.example.lize.workers;
 
-import android.Manifest;
+import android.annotation.SuppressLint;
+
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.text.SpannableStringBuilder;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
-import android.text.style.UnderlineSpan;
+import android.text.TextUtils;
 import android.view.ContextMenu;
-import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
+
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
+
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
 import com.example.lize.adapters.DocumentAdapter;
 import com.example.lize.data.Documento;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.onegravity.rteditor.RTEditText;
+import com.onegravity.rteditor.RTManager;
+import com.onegravity.rteditor.RTToolbar;
+import com.onegravity.rteditor.api.RTApi;
+import com.onegravity.rteditor.api.RTMediaFactoryImpl;
+import com.onegravity.rteditor.api.RTProxyImpl;
+
+import com.onegravity.rteditor.api.format.RTFormat;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
 
-import org.w3c.dom.Text;
 
-import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Queue;
 
 
-public class NotasActivity extends AppCompatActivity {
+public class NotasActivity extends AppCompatActivity implements  BitmapGeneratingAsyncTask.Callback ,DocumentAdapter.OnDocumentListener {
 
     private EditText inputNoteTitulo, inputNoteTexto;
     private CarouselView carouselView;
@@ -66,19 +67,29 @@ public class NotasActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private DocumentAdapter adapter;
+    private  RTApi rtApi;
+    private  RTManager rtManager;
+    private ViewGroup toolbarContainer;
+    private  RTToolbar rtToolbar;
+    private  RTEditText rtEditText;
+    private FloatingActionButton KeyboardButton;
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.RTE_ThemeLight);
         setContentView(R.layout.activity_notas);
 
         // Componentes
         inputNoteTexto = findViewById(R.id.inputNota);
         carouselView = findViewById(R.id.carouselView);
-        imageLayout = findViewById(R.id.imageNote);
+        //imageLayout = findViewById(R.id.imageNote);
         ImageView backBtn = findViewById(R.id.backBtn);
+
+        /**
         ImageView imageView = findViewById(R.id.insertImageBtn);
         ImageView documentBtn = findViewById(R.id.documentBtn);
-
+**/
 
         // Apartado de documentos
         //ArrayList de imagenes y documentes
@@ -96,6 +107,10 @@ public class NotasActivity extends AppCompatActivity {
         });
 
 
+
+
+
+/*
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,9 +126,9 @@ public class NotasActivity extends AppCompatActivity {
                     selectImage();
                 }
             }
-        });
+        });*/
 
-        documentBtn.setOnClickListener(new View.OnClickListener() {
+        /*documentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (ContextCompat.checkSelfPermission(
@@ -130,23 +145,169 @@ public class NotasActivity extends AppCompatActivity {
             }
             }
         );
-
-        registerForContextMenu(inputNoteTexto);
+*/
+        //registerForContextMenu(inputNoteTexto);
 
         recyclerView = (RecyclerView) findViewById(R.id.fileAttachView);
         layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new DocumentAdapter(documents);
+        adapter = new DocumentAdapter(documents,this);
         recyclerView.setAdapter(adapter);
+
+        // create RTManager
+          rtApi = new RTApi(this, new RTProxyImpl(this), new RTMediaFactoryImpl(this, true));
+          rtManager = new RTManager(rtApi, savedInstanceState);
+
+// register toolbar
+          toolbarContainer = (ViewGroup) findViewById(R.id.toolbar_container);
+          rtToolbar = (RTToolbar) findViewById(R.id.rte_toolbar);
+
+
+        if (rtToolbar != null) {
+            rtManager.registerToolbar(toolbarContainer, rtToolbar);
+        }
+
+// register editor & set text
+          rtEditText = (RTEditText) findViewById(R.id.inputNota);
+        rtManager.registerEditor(rtEditText, true);
+        //rtEditText.setRichTextEditing(true, message);
+
+
+
+    }
+
+    public void showMenu(View v) {
+        //noinspection RestrictedApi
+        MenuBuilder menuBuilder = new MenuBuilder(this);
+        MenuInflater inflater = new MenuInflater(this);
+        inflater.inflate(R.menu.note_menu, menuBuilder);
+        //noinspection RestrictedApi
+        MenuPopupHelper optionsMenu = new MenuPopupHelper(this, menuBuilder, v);
+        //noinspection RestrictedApi
+        optionsMenu.setForceShowIcon(true);
+
+        // Set Item Click Listener
+        //noinspection RestrictedApi
+        menuBuilder.setCallback(new MenuBuilder.Callback() {
+            @Override
+            public boolean onMenuItemSelected(MenuBuilder menu, MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.add_document: // Handle option1 Click
+                        selectDocument();
+                        return true;
+
+
+                    case R.id.toolbar_image:
+                        selectImage();
+
+                        return true;
+                    case R.id.add_audio: // Handle option2 Click
+
+                        return true;
+                    case R.id.share:
+                        updateBitmap();
+
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public void onMenuModeChange(MenuBuilder menu) {}
+        });
+
+
+        // Display the menu
+        //noinspection RestrictedApi
+
+        optionsMenu.show();
 
 
     }
 
 
+
+    private void updateBitmap() {
+        getEnteredWidthOrDefault();
+        new BitmapGeneratingAsyncTask(this,rtEditText.getText(RTFormat.HTML), getEnteredWidthOrDefault(), this).execute();
+    }
+
+    @Override
+    public void done(Bitmap bitmap) {
+
+        String path = MediaStore.Images.Media.insertImage(this.getApplicationContext().getContentResolver(), bitmap,"test", null);
+
+
+
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
+        shareIntent.setType("image/jpeg");
+        startActivity(Intent.createChooser(shareIntent,"Share with" ));
+    }
+
+    public int getEnteredWidthOrDefault() {
+        String enteredValue = rtEditText.getText(RTFormat.PLAIN_TEXT);
+
+
+
+        if (!TextUtils.isEmpty(enteredValue)) {
+           return rtEditText.getWidth();
+        } else {
+            return 150;
+        }
+    }
+
+
+
+
+/*
+
+
+
+
+/*
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.add_document:
+                selectDocument();
+                return true;
+            case R.id.add_audio:
+
+                return true;
+            case R.id.add_reminder:
+
+                return true;
+            case R.id.share:
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }*/
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        rtManager.onSaveInstanceState(outState);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        rtManager.onDestroy(isFinishing());
+
+    }
+
     // Carousel de imagenes de las notas
-    private void init_carousel() {
+   private void init_carousel() {
 
         ImageListener imageListener = new ImageListener() {
             @Override
@@ -158,8 +319,9 @@ public class NotasActivity extends AppCompatActivity {
 
         carouselView.setPageCount(images.size());
         carouselView.setImageListener(imageListener);
-        if(images.isEmpty()){
-            carouselView.setVisibility(View.GONE);
+
+       if(images.isEmpty()){
+             carouselView.setVisibility(View.GONE);
         }else{
             carouselView.setVisibility(View.VISIBLE);
         }
@@ -168,7 +330,7 @@ public class NotasActivity extends AppCompatActivity {
 
 
     //Intent para seleccionar una imagen
-    private void selectImage() {
+   private void selectImage() {
         Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickIntent.setType("image/*");
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -182,9 +344,8 @@ public class NotasActivity extends AppCompatActivity {
     //Intent para seleccionar un documento
 
     private void selectDocument(){
-        Intent pickIntent = new Intent(Intent.ACTION_PICK);
+        Intent pickIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         pickIntent.setType("*/*");
-        pickIntent.addCategory(Intent.CATEGORY_OPENABLE);
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         Intent chooserIntent = Intent.createChooser(getIntent, "Selecciona un documento");
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
@@ -194,7 +355,7 @@ public class NotasActivity extends AppCompatActivity {
 
 
 
-    // Gestión de permisos
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -212,6 +373,7 @@ public class NotasActivity extends AppCompatActivity {
             }
         }
     }
+
 
 
     // Tratamiento de los datos de Intents de imagenes y documentos.
@@ -266,17 +428,11 @@ public class NotasActivity extends AppCompatActivity {
     }
 
     // Context Menu para estilos de texto e imagenes
-    @Override
+   @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        if (v.getId() == R.id.inputNota) {
-            menu.add(0, v.getId(), 0, "Negrita");
-            menu.add(0, v.getId(), 1, "Subrayado");
-            menu.add(0, v.getId(), 2, "Subtitulo");
-        }
-        else{
-            menu.add(2, v.getId(), 0, "Eliminar");
-        }
+        menu.add(2, v.getId(), 0, "Eliminar");
+
     }
 
     @Override
@@ -286,10 +442,10 @@ public class NotasActivity extends AppCompatActivity {
             init_carousel();
         }else if(item.getTitle().equals("Eliminar documento")){
             adapter.removeDocument(item.getGroupId());
-            if(adapter.getItemCount() == 0){
+            if(adapter.getItemCount() == 0 ){
                 recyclerView.setVisibility(View.GONE);
             }
-        }else if (item.getTitle().equals("Negrita")) {
+        }/*else if (item.getTitle().equals("Negrita")) {
             SpannableStringBuilder stringBuilder = (SpannableStringBuilder) inputNoteTexto.getText();
             int selectionStart = inputNoteTexto.getSelectionStart();
             int selectionEnd = inputNoteTexto.getSelectionEnd();
@@ -308,9 +464,29 @@ public class NotasActivity extends AppCompatActivity {
             stringBuilder.setSpan(new RelativeSizeSpan(1.35f), selectionStart, selectionEnd, 0);
             stringBuilder.setSpan(new StyleSpan(Typeface.BOLD_ITALIC), selectionStart, selectionEnd, 0);
 
-        }
+        }*/
         return true;
     }
+
+    @Override
+    public void onDocumentClick(int position) {
+
+        /*//File path = new File(getFilesDir(), "dl");
+        //File file = new File(  documents.get(position).getAbsolutePath());
+        File imagePath = new File(Context.getFilesDir(), "images");
+        File newFile = new File(imagePath, "default_image.jpg");
+        Uri contentUri = getUriForFile(this.getApplicationContext(), "com.mydomain.fileprovider", newFile);
+        // Get URI and MIME type of file
+
+        String mime = getContentResolver().getType(contentUri);
+
+        // Open file with user selected app
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(contentUri, mime);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(intent);*/
+        }
 
 }
 

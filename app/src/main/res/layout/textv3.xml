@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  Copyright (C) 2015-2018 Emanuel Moecklin
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/text_toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:background="?attr/colorPrimary"
+       >
+
+        <com.onegravity.rteditor.toolbar.HorizontalRTToolbar
+            android:id="@+id/rte_toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+
+            android:orientation="horizontal">
+
+            <GridLayout
+                android:id="@+id/gridLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp"
+                android:columnCount="4"
+                android:rowCount="2"
+                >
+
+                <com.onegravity.rteditor.toolbar.RTToolbarImageButton
+                    android:id="@+id/toolbar_bold"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/ic_baseline_format_bold_24"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_horizontal"
+
+                    android:textAlignment="center" />
+
+                <com.onegravity.rteditor.toolbar.RTToolbarImageButton
+                    android:id="@+id/toolbar_italic"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginLeft="15dp"
+
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/ic_baseline_format_italic_24"
+                    android:gravity="center_horizontal"
+
+                    android:textAlignment="center" />
+
+                <com.onegravity.rteditor.toolbar.RTToolbarImageButton
+                    android:id="@+id/toolbar_underline"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginLeft="15dp"
+
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/ic_baseline_format_underlined_24"
+                    android:gravity="center_horizontal"
+                    android:textAlignment="center" />
+
+                <com.onegravity.rteditor.toolbar.RTToolbarImageButton
+                    android:id="@+id/toolbar_strikethrough"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/ic_baseline_format_strikethrough_24"
+                    android:gravity="center_horizontal"
+                    android:textAlignment="center" />
+
+
+                <Spinner
+                    android:id="@+id/toolbar_fontcolor"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginLeft="15dp"
+
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/ic_baseline_format_color_text_24"
+                    android:gravity="center_horizontal"
+                    android:textAlignment="center" />
+
+
+                <com.onegravity.rteditor.toolbar.RTToolbarImageButton
+                    android:id="@+id/toolbar_number"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginLeft="15dp"
+
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/ic_baseline_format_list_numbered_24"
+                    android:gravity="center_horizontal"
+                    android:textAlignment="center" />
+
+                <com.onegravity.rteditor.toolbar.RTToolbarImageButton
+                    android:id="@+id/toolbar_bullet"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginLeft="15dp"
+
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/ic_baseline_format_list_bulleted_24"
+                    android:gravity="center_horizontal"
+                    android:textAlignment="center" />
+
+
+                <com.onegravity.rteditor.toolbar.RTToolbarImageButton
+                    android:id="@+id/toolbar_link"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginLeft="15dp"
+
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="15dp"
+                    android:background="@drawable/ic_baseline_insert_link_24"
+                    android:gravity="center_horizontal"
+                    android:textAlignment="center" />
+
+
+                <!-- com.onegravity.rteditor.toolbar.RTToolbarImageButton
+                    android:id="@+id/toolbar_audio"
+                    style="@style/ToolbarButton"
+                    android:background="?attr/rte_icToolbarAudio" /-->
+
+                <!-- com.onegravity.rteditor.toolbar.RTToolbarImageButton
+                    android:id="@+id/toolbar_video"
+                    style="@style/ToolbarButton"
+                    android:layout_marginRight="4dip"
+                    android:background="?attr/rte_icToolbarVideo" /-->
+
+
+            </GridLayout>
+
+        </com.onegravity.rteditor.toolbar.HorizontalRTToolbar>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
