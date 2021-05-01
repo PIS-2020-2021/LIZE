@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
         model.getAmbitoSelected().observe(this, (ambito) -> {
             topAppBar.setTitle(ambito.getName());
+            //TODO: setTheme en función del color del ámbito
         });
     }
 

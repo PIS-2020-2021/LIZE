@@ -132,11 +132,9 @@ public class MainViewModel extends ViewModel {
                 Log.w(TAG, "Failed to create ambito " + ambitoName + ": ambito already exists. ");
                 return;
             }
-        Ambito newAmbito = new Ambito(ambitoName, ambitoColor, mUserSelected.getValue().getSelfID());
-        newAmbito.addFolder(new Folder(Folder.BASE_FOLDER_NAME, newAmbito.getSelfID()));
+        Ambito newAmbito = new Ambito(ambitoName, ambitoColor);
         mUserSelected.getValue().addAmbito(newAmbito);
         mUserSelected.setValue(mUserSelected.getValue());
-
         DatabaseAdapter.getInstance().saveAmbito(newAmbito);
         setToast("Ambito " + ambitoName + " correctly created.");
         mAmbitoSelected.setValue(newAmbito);
@@ -148,7 +146,7 @@ public class MainViewModel extends ViewModel {
                 Log.w(TAG, "Failed to create folder " + folderName + ": folder already exists. ");
                 return;
             }
-        Folder folder = new Folder(folderName, mAmbitoSelected.getValue().getSelfID());
+        Folder folder = new Folder(folderName);
         mAmbitoSelected.getValue().addFolder(folder);
         mAmbitoSelected.setValue(mAmbitoSelected.getValue());
         setToast("Folder " + folderName + " correctly created.");
@@ -159,10 +157,10 @@ public class MainViewModel extends ViewModel {
             Log.w(TAG, "Failed to create note " + noteName + ": empty note. ");
             return;
         }
-        Note newNote = new Note(noteName, noteText, mAmbitoSelected.getValue().getSelfID(), mFolderSelected.getValue().getName());
-        DatabaseAdapter.getInstance().saveNote(newNote);
+        Note newNote = new Note(noteName, noteText);
         mFolderSelected.getValue().addNote(newNote);
         mFolderSelected.setValue(mFolderSelected.getValue());
+        DatabaseAdapter.getInstance().saveNote(newNote);
         setToast("Note " + noteName + " correctly created.");
     }
 
@@ -202,9 +200,7 @@ public class MainViewModel extends ViewModel {
             if (currentUser != null) {
                 currentUser.setAmbitos(userAmbitos);
                 Log.w("UserBuilder", "Step 2 succes: ambitos of user " + currentUser.getSelfID() + " correctly loaded from Database.");
-                for (Ambito ambito : userAmbitos) {
-                    DatabaseAdapter.getInstance().getNotes(ambito.getSelfID());
-                }
+                for (Ambito ambito : userAmbitos) DatabaseAdapter.getInstance().getNotes(ambito.getSelfID());
             } else Log.w("UserBuilder", "Step 2 failure. User " + currentUser.getSelfID() + " it's unitiallized.");
         }
 
@@ -221,9 +217,9 @@ public class MainViewModel extends ViewModel {
                         ambitoFolders.put(Folder.BASE_FOLDER_NAME, new Folder(Folder.BASE_FOLDER_NAME, ambitoID));
                         for (Note note : ambitoNotes) {
                             String folderTAG = note.getFolderTAG();
-                            if (ambitoFolders.get(folderTAG) == null)
-                                ambitoFolders.put(folderTAG, new Folder(folderTAG, ambitoID));
-
+                            if (ambitoFolders.get(folderTAG) == null) {
+                               ambitoFolders.put(folderTAG, new Folder(folderTAG, ambitoID));
+                            }
                             ambitoFolders.get(Folder.BASE_FOLDER_NAME).addNote(note);
                             ambitoFolders.get(folderTAG).addNote(note);
                         }

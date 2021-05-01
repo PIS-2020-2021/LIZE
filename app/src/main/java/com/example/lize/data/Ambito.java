@@ -15,12 +15,11 @@ public class Ambito {
 
     public Ambito(){}
 
-    public Ambito(String name, int color, String userID) {
+    public Ambito(String name, int color) {
         this.name = name;
         this.color = color;
-        this.userID = userID;
         this.folders = new ArrayList<>();
-
+        folders.add(new Folder(Folder.BASE_FOLDER_NAME));
     }
 
     public String getName() {
@@ -48,6 +47,7 @@ public class Ambito {
     }
 
     public boolean addFolder(Folder folder){
+        folder.setAmbitoID(selfID);
         return folders.add(folder);
     }
 
@@ -55,10 +55,22 @@ public class Ambito {
         return selfID;
     }
 
-    public void setSelfID(String selfID) { this.selfID = selfID; }
+    public void setSelfID(String selfID) {
+        this.selfID = selfID;
+        for (Folder folder : this.folders){
+            folder.setAmbitoID(selfID);
+        }
+    }
 
     public String getUserID() {
         return userID;
     }
 
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public ArrayList<Note> getNotes() {
+        return folders.get(0).getNotes();
+    }
 }

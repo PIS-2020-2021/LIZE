@@ -19,18 +19,9 @@ public class Note {
 
     public Note(){};
 
-    public Note(String title, String text, String ambitoID) {
+    public Note(String title, String text) {
         this.title = title;
         this.text = text;
-        this.ambitoID = ambitoID;
-        this.folderTAG = Folder.BASE_FOLDER_NAME;
-    }
-
-    public Note(String title, String text, String ambitoID, String folderTAG) {
-        this.title = title;
-        this.text = text;
-        this.ambitoID = ambitoID;
-        this.folderTAG = folderTAG;
     }
 
     public String getTitle() {

@@ -21,7 +21,8 @@ public class User {
         this.password = password;
         this.first = first;
         this.last = last;
-        ambitos = new ArrayList<>();
+        this.ambitos = new ArrayList<>();
+        ambitos.add(new Ambito(Ambito.BASE_AMBITO_NAME, Ambito.BASE_AMBITO_COLOR));
     }
 
     public String getMail() {
@@ -60,13 +61,18 @@ public class User {
         return selfID;
     }
 
-    public void setSelfID(String selfID) { this.selfID = selfID; }
+    public void setSelfID(String selfID) {
+        this.selfID = selfID;
+        for (Ambito ambito: this.ambitos)
+            ambito.setUserID(selfID);
+    }
 
     public ArrayList<Ambito> getAmbitos() {
         return ambitos;
     }
 
     public boolean addAmbito(Ambito ambito){
+        ambito.setUserID(selfID);
         return ambitos.add(ambito);
     }
 

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.example.lize.data.Ambito;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -14,13 +15,18 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 
@@ -91,7 +97,7 @@ public class DatabaseAdapter {
 
     // Method for getting a base User from the 'users' collection
     public void getUser() {
-        DocumentReference userRef = DatabaseAdapter.db.collection("users").document(user.getEmail());
+        DocumentReference userRef = DatabaseAdapter.db.collection("users").document(user.getUid());
         Log.d(TAG, "Getting current user document...");
         userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -99,7 +105,11 @@ public class DatabaseAdapter {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     Log.d(TAG, document.getId() + " => " + document.getData());
-                    if(listener != null) listener.setUser(document.toObject(User.class));
+                    User user = new User(document.getString("mail"), document.getString("password"),
+                            document.getString("first"), document.getString("last"));
+                    user.setSelfID(document.getString("selfID"));
+
+                    if(listener != null) listener.setUser(user);
                 } else Log.d(TAG, "Error getting documents: ", task.getException());
             }
         });
@@ -107,16 +117,20 @@ public class DatabaseAdapter {
 
     // Method for getting an Ambito from the 'ambitos' collection
     public void getAmbitos() {
-        Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", user.getEmail());
+        Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", user.getUid());
         Log.d(TAG, "Getting current user ambitos collection...");
         ambitosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     ArrayList<Ambito> userAmbitos = new ArrayList<>();
+                    // Por cada resultado, creamos el ambito a partir de los datos de DB y lo añadimos
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Log.d(TAG, document.getId() + " => " + document.getData());
-                        userAmbitos.add(document.toObject(Ambito.class));
+                        Ambito ambito = new Ambito(document.getString("name"), document.getLong("color").intValue());
+                        ambito.setUserID(document.getString("userID"));
+                        ambito.setSelfID(document.getString("selfID"));
+                        userAmbitos.add(ambito);
                     }
                     if(listener != null) listener.setUserAmbitos(userAmbitos);
                 } else Log.d(TAG, "Error getting documents: ", task.getException());
@@ -135,7 +149,11 @@ public class DatabaseAdapter {
                     ArrayList<Note> ambitoNotes = new ArrayList<>();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Log.d(TAG, document.getId() + " => " + document.getData());
-                        ambitoNotes.add(document.toObject(Note.class));
+                        Note note = new Note(document.getString("title"), document.getString("text"));
+                        note.setAmbitoID(document.getString("ambitoID"));
+                        note.setFolderTAG(document.getString("folderTAG"));
+                        note.setSelfID(document.getString("selfID"));
+                        ambitoNotes.add(note);
                     }
                     if(listener != null) listener.setAmbitoNotes(ambitoID, ambitoNotes);
                 } else Log.d(TAG, "Error getting documents: ", task.getException());
@@ -144,31 +162,34 @@ public class DatabaseAdapter {
     }
 
     /**
-     * Guardamos un User en FireBase
-     * Si ya está, se sobreescribe el contenido, pero si no está se crea un nuevo documento (en BaseDatos)
-     * Y guardamos ese usuario en el documento
+     * Guardamos un nuevo User en FireBase.
+     * Creamos un nuevo documento (en BaseDatos) con el ID del Usuario y guardamos ese Usuario.
      * @param user Usuario a guardar/modificar
      */
     public void saveUser(User user) {
-        DocumentReference userRef;
-        if(user.getSelfID() == null) {
-            user.setSelfID(user.getMail());
-        }
-        userRef = db.collection("users").document(user.getSelfID());
+        DocumentReference userRef = db.collection("users").document(user.getSelfID());
         Log.d(TAG, "Saving user with ID: " + userRef.getId());
 
-        userRef.set(user).addOnCompleteListener(new OnCompleteListener(){
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("mail", user.getMail());
+        userData.put("password", user.getPassword());
+        userData.put("first", user.getFirst());
+        userData.put("last", user.getLast());
+        userData.put("selfID", user.getSelfID());
+
+        userRef.set(userData).addOnCompleteListener(new OnCompleteListener(){
             @Override
             public void onComplete(@NonNull Task task) {
-                DocumentSnapshot document = (DocumentSnapshot) task.getResult();
-                if (task.isSuccessful()) Log.d(TAG, "User" + document.getId() + " correctly saved.");
-                else Log.d(TAG, "Error saving user " + document.getId(), task.getException());
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "User" + user.getSelfID() + " correctly saved.");
+                    for (Ambito ambito: user.getAmbitos()) saveAmbito(ambito);
+                }else Log.d(TAG, "Error saving user " + user.getSelfID(), task.getException());
             }
         });
     }
 
     /**
-     * Guardamos un ambito en FireBase
+     * Guardamos un ambito en FireBase.
      * Si ya está, se sobreescribe el contenido, pero si no está se crea un nuevo documento (en BaseDatos)
      * Y guardamos ese ambito en el documento
      * @param ambito Ambito a guardar/modificar
@@ -183,12 +204,19 @@ public class DatabaseAdapter {
         }
         Log.d(TAG, "Saving ambito with ID: " + ambitoRef.getId());
 
-        ambitoRef.set(ambito).addOnCompleteListener(new OnCompleteListener(){
+        Map<String, Object> ambitoData = new HashMap<>();
+        ambitoData.put("name", ambito.getName());
+        ambitoData.put("color", ambito.getColor());
+        ambitoData.put("selfID", ambito.getSelfID());
+        ambitoData.put("userID", ambito.getUserID());
+
+        ambitoRef.set(ambitoData).addOnCompleteListener(new OnCompleteListener(){
             @Override
             public void onComplete(@NonNull Task task) {
-                DocumentSnapshot document = (DocumentSnapshot) task.getResult();
-                if (task.isSuccessful()) Log.d(TAG, "Ambito" + document.getId() + " correctly saved.");
-                else Log.d(TAG, "Error saving ambito " + document.getId(), task.getException());
+                if (task.isSuccessful()){
+                    Log.d(TAG, "Ambito" + ambito.getSelfID() + " correctly saved.");
+                    for (Note note: ambito.getNotes()) saveNote(note);
+                } else Log.d(TAG, "Error saving ambito " + ambito.getSelfID(), task.getException());
             }
         });
     }
@@ -208,19 +236,22 @@ public class DatabaseAdapter {
             noteRef= db.collection("notes").document(note.getSelfID());
         }
         Log.d(TAG, "Saving note with ID: " + noteRef.getId());
-        noteRef.set(note).addOnCompleteListener(new OnCompleteListener(){
+
+        Map<String, Object> notesData = new HashMap<>();
+        notesData.put("title", note.getTitle());
+        notesData.put("text", note.getText());
+        notesData.put("selfID", note.getSelfID());
+        notesData.put("ambitoID", note.getAmbitoID());
+        notesData.put("folderTAG", note.getFolderTAG());
+
+        noteRef.set(notesData).addOnCompleteListener(new OnCompleteListener(){
             @Override
             public void onComplete(@NonNull Task task) {
-                DocumentSnapshot document = (DocumentSnapshot) task.getResult();
-                if (task.isSuccessful()) Log.d(TAG, "Note" + document.getId() + " correctly saved.");
-                else Log.d(TAG, "Error saving note " + document.getId(), task.getException());
+                if (task.isSuccessful()) Log.d(TAG, "Note" + note.getSelfID() + " correctly saved.");
+                else Log.d(TAG, "Error saving note " + note.getSelfID(), task.getException());
             }
         });
     }
-
-
-
-
 
     public void saveNoteWithFile(String id, String description, String userid, String path) {
     /*  Uri file = Uri.fromFile(new File(path));

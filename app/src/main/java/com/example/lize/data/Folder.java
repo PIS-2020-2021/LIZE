@@ -11,6 +11,11 @@ public class Folder {
 
     public Folder(){};
 
+    public Folder(String name) {
+        this.name = name;
+        this.notes = new ArrayList<>();
+    }
+
     public Folder(String name, String ambitoID) {
         this.name = name;
         this.ambitoID = ambitoID;
@@ -25,6 +30,13 @@ public class Folder {
 
     public String getAmbitoID(){ return ambitoID; }
 
+    public void setAmbitoID(String ambitoID){
+        this.ambitoID = ambitoID;
+        for (Note note : this.notes){
+            note.setAmbitoID(ambitoID);
+        }
+    }
+
     public ArrayList<Note> getNotes() {
         return notes;
     }
@@ -32,6 +44,8 @@ public class Folder {
     public void setNotes(ArrayList<Note> notes) { this.notes = notes; }
 
     public boolean addNote(Note note){
+        note.setFolderTAG(this.name);
+        note.setAmbitoID(this.ambitoID);
         return notes.add(note);
     }
 }

@@ -50,17 +50,11 @@ public class SignUpActivity extends AppCompatActivity {
                             psw.getText().toString()).addOnCompleteListener(a -> {
                         if(a.isSuccessful()){
                             //TODO: Crear Usuario y guardarlo en FireStore
-                            User user = new User(
-                                    email.getText().toString(),
-                                    psw.getText().toString(),
-                                    nombre.getText().toString(),
-                                    apellidos.getText().toString());
+                            User user = new User(email.getText().toString(), psw.getText().toString(),
+                                    nombre.getText().toString(), apellidos.getText().toString());
                             user.setSelfID(a.getResult().getUser().getUid());
-                            user.addAmbito(new Ambito(Ambito.BASE_AMBITO_NAME, Ambito.BASE_AMBITO_COLOR, user.getSelfID()));
                             DatabaseAdapter.getInstance().saveUser(user);
-                            Intent intent = new Intent(this, LogInActivity.class);
-                            startActivity(intent);
-
+                            startActivity(new Intent(this, LogInActivity.class));
                         } else {
                             showAlert();
                         }
