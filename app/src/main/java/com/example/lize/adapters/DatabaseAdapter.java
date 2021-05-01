@@ -39,6 +39,7 @@ public class DatabaseAdapter {
         this.listener = listener;
         databaseAdapter = this;
         FirebaseFirestore.setLoggingEnabled(true);
+        initFirebase();
     }
 
     public interface vmInterface {
@@ -78,7 +79,7 @@ public class DatabaseAdapter {
 
     // Method for getting a base User from the 'users' collection
     public void getUser() {
-        DocumentReference userRef = DatabaseAdapter.db.collection("users").document("arnau6martinez@gmail.com");
+        DocumentReference userRef = DatabaseAdapter.db.collection("users").document(user.getEmail());
         Log.d(TAG, "Getting current user document...");
         userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -94,7 +95,7 @@ public class DatabaseAdapter {
 
     // Method for getting an Ambito from the 'ambitos' collection
     public void getAmbitos() {
-        Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", "arnau6martinez@gmail.com");
+        Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", user.getEmail());
         Log.d(TAG, "Getting current user ambitos collection...");
         ambitosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

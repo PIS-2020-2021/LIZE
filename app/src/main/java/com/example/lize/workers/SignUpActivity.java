@@ -3,6 +3,8 @@ package com.example.lize.workers;
 import android.os.Bundle;
 import android.content.Intent;
 import android.util.Patterns;
+
+import com.example.lize.adapters.DatabaseAdapter;
 import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.appcompat.app.AlertDialog;
@@ -46,8 +48,7 @@ public class SignUpActivity extends AppCompatActivity {
                     FirebaseAuth.getInstance().createUserWithEmailAndPassword(email.getText().toString(),
                             psw.getText().toString()).addOnCompleteListener(a -> {
                         if(a.isComplete()){
-                            Intent intent = new Intent(this, MainActivity.class);
-                            intent.putExtra("email", email.getText().toString());
+                            Intent intent = new Intent(this, LogInActivity.class);
                             startActivity(intent);
                         } else {
                             showAlert();

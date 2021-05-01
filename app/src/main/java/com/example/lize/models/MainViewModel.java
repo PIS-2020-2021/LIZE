@@ -103,7 +103,7 @@ public class MainViewModel extends ViewModel {
             for (Note note : mFolderSelected.getValue().getNotes()) {
                 if (note.getSelfID().equals(noteID)) {
                     setToast("Note " + noteID + " selected.");
-                    // TODO: Note Selection implementation (call DB?)
+                    mNoteSelected.setValue(note);
                     return;
                 }
             }
