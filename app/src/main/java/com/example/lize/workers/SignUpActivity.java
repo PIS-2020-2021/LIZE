@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.util.Patterns;
 
 import com.example.lize.adapters.DatabaseAdapter;
-import com.example.lize.data.Ambito;
 import com.example.lize.data.User;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -35,7 +34,7 @@ public class SignUpActivity extends AppCompatActivity {
             nombre = findViewById(R.id.nombre);
             apellidos = findViewById(R.id.apellidos);
             email = findViewById(R.id.email);
-            psw = findViewById(R.id.password);
+            psw = findViewById(R.id.password_login);
             login = findViewById(R.id.login);
             signup = findViewById(R.id.signup);
             nameError = findViewById(R.id.nameError);

@@ -68,4 +68,22 @@
     <string name="android_default_user">Usuario Registrado</string>
     <string name="android_default_email">usuario@email.com</string>
 
+    <string name="crear">Crear</string>
+    <string name="back">back</string>
+    <string name="color_de_fondo">Color de Fondo:</string>
+    <string name="nombre_del_ambito">Nombre del Ámbito:</string>
+    <string name="rojo">Rojo</string>
+    <string name="morado">Morado</string>
+    <string name="indigo">Indigo</string>
+    <string name="azul">Azul</string>
+    <string name="teal">Teal</string>
+    <string name="verde">Verde</string>
+    <string name="amarillo">Amarillo</string>
+    <string name="naranja">Naranja</string>
+    <string name="marr_n">Marrón</string>
+    <string name="nuevo_ambito">Nuevo Ambito</string>
+    <string name="introduce_aqu_el_nombre">Introduce aquí el nombre</string>
+
+
+
 </resources>

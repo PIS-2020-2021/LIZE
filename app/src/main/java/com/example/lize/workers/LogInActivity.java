@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class LogInActivity extends AppCompatActivity {
     // Variables
@@ -30,7 +29,7 @@ public class LogInActivity extends AppCompatActivity {
             setContentView(R.layout.activity_login);
 
             email = findViewById(R.id.email);
-            password = findViewById(R.id.password);
+            password = findViewById(R.id.password_login);
             login = findViewById(R.id.login);
             signup = findViewById(R.id.signup);
             emailError = findViewById(R.id.emailError);
