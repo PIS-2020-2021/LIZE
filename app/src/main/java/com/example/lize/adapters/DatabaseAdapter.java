@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import com.example.lize.data.Ambito;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -15,13 +14,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
@@ -149,7 +145,7 @@ public class DatabaseAdapter {
                     ArrayList<Note> ambitoNotes = new ArrayList<>();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Log.d(TAG, document.getId() + " => " + document.getData());
-                        Note note = new Note(document.getString("title"), document.getString("text"));
+                        Note note = new Note(document.getString("title"), document.getString("text_plain"), document.getString("text_html"));
                         note.setAmbitoID(document.getString("ambitoID"));
                         note.setFolderTAG(document.getString("folderTAG"));
                         note.setSelfID(document.getString("selfID"));
@@ -239,7 +235,7 @@ public class DatabaseAdapter {
 
         Map<String, Object> notesData = new HashMap<>();
         notesData.put("title", note.getTitle());
-        notesData.put("text", note.getText());
+        notesData.put("text", note.getText_plain());
         notesData.put("selfID", note.getSelfID());
         notesData.put("ambitoID", note.getAmbitoID());
         notesData.put("folderTAG", note.getFolderTAG());

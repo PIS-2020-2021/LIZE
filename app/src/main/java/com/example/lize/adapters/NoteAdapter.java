@@ -129,7 +129,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
          */
         public void bindTo(Note currentNote) {
             mTitleNote.setText(currentNote.getTitle());
-            mTextNote.setText(currentNote.getText());
+            mTextNote.setText(currentNote.getText_plain());
             mNoteID = currentNote.getSelfID();
         }
 

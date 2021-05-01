@@ -56,6 +56,9 @@ import java.util.ArrayList;
 
 public class NotasActivity extends AppCompatActivity implements  BitmapGeneratingAsyncTask.Callback ,DocumentAdapter.OnDocumentListener {
 
+    private static String DEFAULT_TITLE = "Titulo";
+    public static final int REQUEST_CODE_ADD_NOTE = 1;
+
     private EditText inputNoteTitulo, inputNoteTexto;
     private CarouselView carouselView;
     private ArrayList<Bitmap> images;
@@ -81,6 +84,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         setContentView(R.layout.activity_notas);
 
         // Componentes
+        inputNoteTitulo = findViewById(R.id.inputNoteTitulo);
         inputNoteTexto = findViewById(R.id.inputNota);
         carouselView = findViewById(R.id.carouselView);
         //imageLayout = findViewById(R.id.imageNote);
@@ -102,7 +106,14 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
             @Override
             public void onClick(View v) {
                 /*saveNota();*/
-                onBackPressed();
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                Bundle nota = new Bundle();
+                nota.putString("title", inputNoteTitulo.getText().toString());
+                nota.putString("noteText_HTML", rtEditText.getText(RTFormat.HTML));
+                nota.putString("noteText_PLAIN", rtEditText.getText(RTFormat.PLAIN_TEXT));
+                intent.putExtras(nota);
+                setResult(validateNote(), intent);
+                finish();
             }
         });
 
@@ -176,6 +187,13 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
 
 
+    }
+
+    private int validateNote() {
+        if(inputNoteTitulo.getText().toString().isEmpty() && rtEditText.getText(RTFormat.PLAIN_TEXT).isEmpty())
+            return RESULT_CANCELED;
+
+        return RESULT_OK;
     }
 
     public void showMenu(View v) {

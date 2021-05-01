@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.os.Bundle;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
     public static final int REQUEST_CODE_ADD_NOTE = 1;
 
+    private MainViewModel dataViewModel;
     private FloatingActionButton addFAB, addNoteFAB, addFolderFAB;  // Floating Action Buttons
     private boolean isFABGroupExpanded = false;
     private Handler handler = new Handler();        // Methods to create a simple animation
@@ -59,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawable_nav);
-
 
         /*Asignamos el objeto toolBar de la view*/
         this.topAppBar = findViewById(R.id.ambito_material_toolbar);
@@ -125,16 +126,16 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      * Inicializamos el ViewModel del MainActivity y seteamos los observadores
      */
     private void observeLiveData() {
-        MainViewModel model = new ViewModelProvider(this).get(MainViewModel.class);
-        model.getToast().observe(this, (t) -> {
+        this.dataViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        dataViewModel.getToast().observe(this, (t) -> {
             Toast.makeText(this.getBaseContext(), t, Toast.LENGTH_SHORT).show();
         });
 
-        model.getUserSelected().observe(this, user -> {
+        dataViewModel.getUserSelected().observe(this, user -> {
             initHeaderNavigationView(user.getFirst() + user.getLast(), user.getMail(), 0);
         });
 
-        model.getAmbitoSelected().observe(this, (ambito) -> {
+        dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
             topAppBar.setTitle(ambito.getName());
             //TODO: setTheme en función del color del ámbito
         });
@@ -185,6 +186,18 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_CODE_ADD_NOTE && resultCode == RESULT_OK){
+            Bundle bundle = data.getExtras();
+            if (bundle != null) {
+                String title = bundle.getString("title");
+                String plain_text = bundle.getString("noteText_PLAIN");
+                String html_text = bundle.getString("noteText_HTML");
+                Log.d("Titulo", title);
+                Log.d("Texto Plano", plain_text);
+                Log.d("Texto HTML", html_text);
+
+                noteHostFragment.addCardNote(title, plain_text, html_text);
+            }
+
             //TODO: Crear lógica de guardar cambios en Base de Datos
         }
     }
@@ -278,5 +291,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             popupWindow.dismiss();
         });
     }
+
+
 
 }

@@ -9,7 +9,8 @@ import java.util.ArrayList;
 public class Note {
 
     private String title;
-    private String text;
+    private String text_plain;
+    private String text_html;
     private String selfID;
     private String ambitoID;
     private String folderTAG;
@@ -19,17 +20,18 @@ public class Note {
 
     public Note(){};
 
-    public Note(String title, String text) {
+    public Note(String title, String text_plain, String text_html) {
         this.title = title;
-        this.text = text;
+        this.text_plain = text_plain;
+        this.text_html = text_html;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public String getText() {
-        return text;
+    public String getText_plain() {
+        return text_plain;
     }
 
     public String getAmbitoID() {

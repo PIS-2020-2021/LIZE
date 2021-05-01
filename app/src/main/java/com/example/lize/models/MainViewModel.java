@@ -152,12 +152,12 @@ public class MainViewModel extends ViewModel {
         setToast("Folder " + folderName + " correctly created.");
     }
 
-    public void addNote(String noteName, String noteText) {
-        if (noteText == null) {
+    public void addNote(String noteName, String text_plain, String text_html) {
+        if (text_plain == null) {
             Log.w(TAG, "Failed to create note " + noteName + ": empty note. ");
             return;
         }
-        Note newNote = new Note(noteName, noteText);
+        Note newNote = new Note(noteName, text_plain, text_html);
         mFolderSelected.getValue().addNote(newNote);
         mFolderSelected.setValue(mFolderSelected.getValue());
         DatabaseAdapter.getInstance().saveNote(newNote);
