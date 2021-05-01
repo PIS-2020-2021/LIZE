@@ -42,7 +42,6 @@ public class LogInActivity extends AppCompatActivity {
                             password.getText().toString()).addOnCompleteListener(a -> {
                                 if(a.isSuccessful()){
                                     Intent intent = new Intent(this, MainActivity.class);
-                                    intent.putExtra("email", email.getText().toString());
                                     startActivity(intent);
                                 } else {
                                     showAlert();

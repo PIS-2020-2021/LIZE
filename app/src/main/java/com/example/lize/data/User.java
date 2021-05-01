@@ -8,6 +8,7 @@ public class User {
     private String mail;
     private String password;
     private String selfID;
+    //TODO: Image de User
 
     // TODO: username implementation! private String username;
 
@@ -70,4 +71,6 @@ public class User {
     }
 
     public void setAmbitos(ArrayList<Ambito> ambitos) { this.ambitos = ambitos; }
+
+
 }

@@ -65,5 +65,7 @@
     <string name="closeDrawer">Close Drawer </string>
     <string name="add_description_msg">Nombre carpeta</string>
     <string name="save_folder">Crear Carpeta</string>
+    <string name="android_default_user">Usuario Registrado</string>
+    <string name="android_default_email">usuario@email.com</string>
 
 </resources>

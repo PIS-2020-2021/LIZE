@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Ambito {
     public static final String BASE_AMBITO_NAME = "Personal";
+    public static final int BASE_AMBITO_COLOR = 1;
 
     private String name;
     private int color;
@@ -19,6 +20,7 @@ public class Ambito {
         this.color = color;
         this.userID = userID;
         this.folders = new ArrayList<>();
+
     }
 
     public String getName() {

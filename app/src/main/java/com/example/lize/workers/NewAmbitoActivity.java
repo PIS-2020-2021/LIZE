@@ -12,7 +12,7 @@ import android.widget.Toast;
 import com.example.lize.R;
 import com.google.android.material.textfield.TextInputLayout;
 
-public class NewAmbito extends AppCompatActivity {
+public class NewAmbitoActivity extends AppCompatActivity {
 
     private EditText nombre;
     private String colorAmbito;
@@ -36,6 +36,7 @@ public class NewAmbito extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (validarDatos()){
+                    //TODO: Añadir Ambitos a AmbitoHostFragment
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(intent);
                 }

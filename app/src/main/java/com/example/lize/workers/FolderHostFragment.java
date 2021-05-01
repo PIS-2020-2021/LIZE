@@ -33,6 +33,7 @@ import java.util.function.Predicate;
  * <li> Definir su lógica mediante un {@link FolderAdapter}, y escucha al ChipFolder seleccionado. </li>
  * <li> Conectar el DataSet de Folders con el adaptador mediante la clase {@link MainViewModel} </li> </ol> */
 
+//TODO: Refactorizar el ChipRoot Folder (Layout)
 public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFolderListener{
 
     private Context mContext;                    // root context

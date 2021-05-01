@@ -93,6 +93,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
      */
     @Override
     public void onNoteSelected(String noteID) {
+        //TODO: DataViewModel.selectNote(NOTE_ID);
         //TODO: startActivityForResult(new Intent(getApplicationContext(), NotasActivity.class), REQUEST_CODE_ADD_NOTE);
     }
 }

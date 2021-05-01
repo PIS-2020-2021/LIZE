@@ -31,7 +31,9 @@ public class MainViewModel extends ViewModel {
         mFolderSelected = new MutableLiveData<>();
         mNoteSelected = new MutableLiveData<>();
         mToast = new MutableLiveData<>();
-        DatabaseAdapter da = new DatabaseAdapter(new UserBuilder());
+        DatabaseAdapter da = DatabaseAdapter.getInstance();
+        da.setListener(new UserBuilder());
+        da.initFireBase();
         da.getUser();           // Build User process
     }
 
@@ -53,14 +55,20 @@ public class MainViewModel extends ViewModel {
         return mToast;
     }
 
-    /* Selects the application user mUserSelected*/
+    /**
+     * Selects the application user mUserSelected
+     * @param user Usuario Logeado y cargado de base de datos
+     */
     public void selectUser(User user){
         setToast("User " + user.getMail() + " selected.");
         mUserSelected.setValue(user);
         selectAmbito(Ambito.BASE_AMBITO_NAME);
     }
 
-    /* Selects an Ambito of the current user mUserSelected */
+    /**
+     * Selects an Ambito of the current user mUserSelected
+     * @param ambitoName Ambito seleccionado
+     */
     public void selectAmbito(String ambitoName) {
         try {
             for (Ambito ambito : mUserSelected.getValue().getAmbitos()) {
@@ -79,7 +87,10 @@ public class MainViewModel extends ViewModel {
         }
     }
 
-    /* Selects a Folder of the current Ambito mAmbitoSelected */
+    /**
+     * Selects a Folder of the current Ambito mAmbitoSelected
+     * @param folderName Carpeta Seleccionada
+     */
     public void selectFolder(String folderName) {
         try{
             for (Folder folder : mAmbitoSelected.getValue().getFolders()) {
@@ -122,10 +133,11 @@ public class MainViewModel extends ViewModel {
                 return;
             }
         Ambito newAmbito = new Ambito(ambitoName, ambitoColor, mUserSelected.getValue().getSelfID());
-        DatabaseAdapter.databaseAdapter.saveAmbito(newAmbito);
         newAmbito.addFolder(new Folder(Folder.BASE_FOLDER_NAME, newAmbito.getSelfID()));
         mUserSelected.getValue().addAmbito(newAmbito);
         mUserSelected.setValue(mUserSelected.getValue());
+
+        DatabaseAdapter.getInstance().saveAmbito(newAmbito);
         setToast("Ambito " + ambitoName + " correctly created.");
         mAmbitoSelected.setValue(newAmbito);
     }
@@ -148,7 +160,7 @@ public class MainViewModel extends ViewModel {
             return;
         }
         Note newNote = new Note(noteName, noteText, mAmbitoSelected.getValue().getSelfID(), mFolderSelected.getValue().getName());
-        DatabaseAdapter.databaseAdapter.saveNote(newNote);
+        DatabaseAdapter.getInstance().saveNote(newNote);
         mFolderSelected.getValue().addNote(newNote);
         mFolderSelected.setValue(mFolderSelected.getValue());
         setToast("Note " + noteName + " correctly created.");
@@ -182,7 +194,7 @@ public class MainViewModel extends ViewModel {
         public void setUser(User user) {
             currentUser = user;
             Log.w("UserBuilder", "Step 1 succes: user correctly loaded from Database.");
-            DatabaseAdapter.databaseAdapter.getAmbitos();
+            DatabaseAdapter.getInstance().getAmbitos();
         }
 
         @Override
@@ -191,7 +203,7 @@ public class MainViewModel extends ViewModel {
                 currentUser.setAmbitos(userAmbitos);
                 Log.w("UserBuilder", "Step 2 succes: ambitos of user " + currentUser.getSelfID() + " correctly loaded from Database.");
                 for (Ambito ambito : userAmbitos) {
-                    DatabaseAdapter.databaseAdapter.getNotes(ambito.getSelfID());
+                    DatabaseAdapter.getInstance().getNotes(ambito.getSelfID());
                 }
             } else Log.w("UserBuilder", "Step 2 failure. User " + currentUser.getSelfID() + " it's unitiallized.");
         }

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.util.Patterns;
 
 import com.example.lize.adapters.DatabaseAdapter;
+import com.example.lize.data.Ambito;
+import com.example.lize.data.User;
 import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.appcompat.app.AlertDialog;
@@ -28,7 +30,6 @@ public class SignUpActivity extends AppCompatActivity {
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_drawable_nav);
             setContentView(R.layout.activity_signup);
 
             nombre = findViewById(R.id.nombre);
@@ -47,15 +48,23 @@ public class SignUpActivity extends AppCompatActivity {
                 if(SetValidation()) {
                     FirebaseAuth.getInstance().createUserWithEmailAndPassword(email.getText().toString(),
                             psw.getText().toString()).addOnCompleteListener(a -> {
-                        if(a.isComplete()){
+                        if(a.isSuccessful()){
+                            //TODO: Crear Usuario y guardarlo en FireStore
+                            User user = new User(
+                                    email.getText().toString(),
+                                    psw.getText().toString(),
+                                    nombre.getText().toString(),
+                                    apellidos.getText().toString());
+                            user.setSelfID(a.getResult().getUser().getUid());
+                            user.addAmbito(new Ambito(Ambito.BASE_AMBITO_NAME, Ambito.BASE_AMBITO_COLOR, user.getSelfID()));
+                            DatabaseAdapter.getInstance().saveUser(user);
                             Intent intent = new Intent(this, LogInActivity.class);
                             startActivity(intent);
+
                         } else {
                             showAlert();
                         }
                     });
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
                 }
             });
 
@@ -110,7 +119,7 @@ public class SignUpActivity extends AppCompatActivity {
             passError.setError(getResources().getString(R.string.error_campo_vacio));
             isPasswordValid = false;
             Toast.makeText(getApplicationContext(), passError.getError(), Toast.LENGTH_SHORT).show();
-        } else if (psw.getText().length() < 6) {
+        } else if (psw.getText().length() < 8) {
             passError.setError(getResources().getString(R.string.error_invalid_pwd));
             isPasswordValid = false;
             Toast.makeText(getApplicationContext(), passError.getError(), Toast.LENGTH_SHORT).show();

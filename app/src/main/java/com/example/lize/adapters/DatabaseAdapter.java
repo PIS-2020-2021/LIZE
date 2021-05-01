@@ -32,14 +32,27 @@ public class DatabaseAdapter {
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser user;
 
-    public static DatabaseAdapter databaseAdapter;  // Singleton implementation
-    public static vmInterface listener;
+    private static DatabaseAdapter databaseAdapter;  // Singleton implementation
 
-    public DatabaseAdapter(vmInterface listener) {
+    private vmInterface listener;
+
+    public void setListener(vmInterface listener) {
         this.listener = listener;
-        databaseAdapter = this;
+    }
+
+    public DatabaseAdapter() {
         FirebaseFirestore.setLoggingEnabled(true);
-        initFirebase();
+    }
+
+    public static DatabaseAdapter getInstance() {
+        if (databaseAdapter == null){
+            synchronized (DatabaseAdapter.class){
+                if (databaseAdapter == null){
+                    databaseAdapter = new DatabaseAdapter();
+                }
+            }
+        }
+        return databaseAdapter;
     }
 
     public interface vmInterface {
@@ -50,7 +63,7 @@ public class DatabaseAdapter {
     }
 
     /* Firebase sign in */
-    public void initFirebase() {
+    public void initFireBase() {
         user = mAuth.getCurrentUser();
         if (user == null) {
             mAuth.signInAnonymously()
@@ -61,19 +74,18 @@ public class DatabaseAdapter {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "signInAnonymously:success");
-                                listener.setToast("Authentication successful.");
+                                if(listener != null) listener.setToast("Authentication successful.");
                                 user = mAuth.getCurrentUser();
-                                //getUser(user.getEmail());
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "signInAnonymously:failure", task.getException());
-                                listener.setToast("Authentication failed.");
+                                if(listener != null) listener.setToast("Authentication failed.");
 
                             }
                         }
                     });
         } else {
-            listener.setToast("Authentication with current user.");
+            if(listener != null) listener.setToast("Authentication with current user.");
         }
     }
 
@@ -87,7 +99,7 @@ public class DatabaseAdapter {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     Log.d(TAG, document.getId() + " => " + document.getData());
-                    listener.setUser(document.toObject(User.class));
+                    if(listener != null) listener.setUser(document.toObject(User.class));
                 } else Log.d(TAG, "Error getting documents: ", task.getException());
             }
         });
@@ -106,7 +118,7 @@ public class DatabaseAdapter {
                         Log.d(TAG, document.getId() + " => " + document.getData());
                         userAmbitos.add(document.toObject(Ambito.class));
                     }
-                    listener.setUserAmbitos(userAmbitos);
+                    if(listener != null) listener.setUserAmbitos(userAmbitos);
                 } else Log.d(TAG, "Error getting documents: ", task.getException());
             }
         });
@@ -125,16 +137,52 @@ public class DatabaseAdapter {
                         Log.d(TAG, document.getId() + " => " + document.getData());
                         ambitoNotes.add(document.toObject(Note.class));
                     }
-                    listener.setAmbitoNotes(ambitoID, ambitoNotes);
+                    if(listener != null) listener.setAmbitoNotes(ambitoID, ambitoNotes);
                 } else Log.d(TAG, "Error getting documents: ", task.getException());
             }
         });
     }
 
+    /**
+     * Guardamos un User en FireBase
+     * Si ya está, se sobreescribe el contenido, pero si no está se crea un nuevo documento (en BaseDatos)
+     * Y guardamos ese usuario en el documento
+     * @param user Usuario a guardar/modificar
+     */
+    public void saveUser(User user) {
+        DocumentReference userRef;
+        if(user.getSelfID() == null) {
+            user.setSelfID(user.getMail());
+        }
+        userRef = db.collection("users").document(user.getSelfID());
+        Log.d(TAG, "Saving user with ID: " + userRef.getId());
+
+        userRef.set(user).addOnCompleteListener(new OnCompleteListener(){
+            @Override
+            public void onComplete(@NonNull Task task) {
+                DocumentSnapshot document = (DocumentSnapshot) task.getResult();
+                if (task.isSuccessful()) Log.d(TAG, "User" + document.getId() + " correctly saved.");
+                else Log.d(TAG, "Error saving user " + document.getId(), task.getException());
+            }
+        });
+    }
+
+    /**
+     * Guardamos un ambito en FireBase
+     * Si ya está, se sobreescribe el contenido, pero si no está se crea un nuevo documento (en BaseDatos)
+     * Y guardamos ese ambito en el documento
+     * @param ambito Ambito a guardar/modificar
+     */
     public void saveAmbito(Ambito ambito) {
-        DocumentReference ambitoRef = db.collection("ambitos").document();
-        ambito.setSelfID(ambitoRef.getId());
+        DocumentReference ambitoRef;
+        if(ambito.getSelfID() == null) {
+            ambitoRef = db.collection("ambitos").document();
+            ambito.setSelfID(ambitoRef.getId());
+        } else {
+            ambitoRef = db.collection("ambitos").document(ambito.getSelfID());
+        }
         Log.d(TAG, "Saving ambito with ID: " + ambitoRef.getId());
+
         ambitoRef.set(ambito).addOnCompleteListener(new OnCompleteListener(){
             @Override
             public void onComplete(@NonNull Task task) {
@@ -145,9 +193,20 @@ public class DatabaseAdapter {
         });
     }
 
+    /**
+     * Guardamos una nota en FireBase.
+     * Si ya está, se sobreescribe el contenido, pero si no está se crea un nuevo documento (en BaseDatos)
+     * Y guardamos esa nota en el documento
+     * @param note Nota a guardar/modificar
+     */
     public void saveNote(Note note) {
-        DocumentReference noteRef = db.collection("notes").document();
-        note.setSelfID(noteRef.getId());
+        DocumentReference noteRef;
+        if(note.getSelfID() == null){
+            noteRef= db.collection("notes").document();
+            note.setSelfID(noteRef.getId());
+        } else {
+            noteRef= db.collection("notes").document(note.getSelfID());
+        }
         Log.d(TAG, "Saving note with ID: " + noteRef.getId());
         noteRef.set(note).addOnCompleteListener(new OnCompleteListener(){
             @Override
@@ -158,6 +217,8 @@ public class DatabaseAdapter {
             }
         });
     }
+
+
 
 
 
