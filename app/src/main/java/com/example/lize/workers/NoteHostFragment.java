@@ -1,65 +1,65 @@
 package com.example.lize.workers;
 
-import android.app.Fragment;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
-import com.example.lize.adapters.FolderAdapter;
 import com.example.lize.adapters.NoteAdapter;
 import com.example.lize.data.Folder;
-import com.example.lize.data.Note;
-import com.google.android.material.chip.Chip;
+import com.example.lize.models.MainViewModel;
 
-/** Fragment contenedor de Notas. Gestiona el RecycleView de CardNotes, sincronizandolo mediante un
- *  NoteAdapter. Además, modifica el NotaManager (GridLayoutManager) según el tipo de vista de las notas. */
-public class NoteHostFragment extends Fragment implements FolderAdapter.ChipFolderListener {
+/** Notes View Host fragment. Responsabilidades:
+ * <ol><li> Gestionar la parte de la UI correspondiente con el RecycleView de CardNotes </li>
+ * <li> Definir la lógica del RecycleView mediante un {@link NoteAdapter}</li>
+ * <li> Conectar el DataSet de Notas con el adaptador mediante un {@link com.example.lize.models.MainViewModel} </li></ol> */
+public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteListener {
 
-    private Folder mFolder;                             // Model data
+    private Context mContext;                           // Root context
     private RecyclerView mNotesRecyclerView;            // Recycle View of Card-Notes
     private GridLayoutManager mNotesManager;            // Recycle View Layout Manager
     private NoteAdapter mNoteAdapter;                   // NoteAdapter for the RecycleView
     private boolean cardNoteType;                       // boolean cardNote type
 
+    private MainViewModel dataViewModel;                // Model Shared Data between Fragments
+
     /** Inicializa el fragment contenedor de Notas. */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.notes_host_view, container, false);
-        mFolder = new Folder("General");
-
+        mContext = root.getContext();
         // Recycle View initiallization. By default, cardView enabled.
         mNotesRecyclerView = root.findViewById(R.id.note_recycler_view);
-        mNotesManager = new GridLayoutManager(mNotesRecyclerView.getContext(), 2);
+        mNotesManager = new GridLayoutManager(mContext, 2);
         mNotesRecyclerView.setLayoutManager(mNotesManager);
         this.cardNoteType = true;
-
-        // Sets the NoteAdapter for the Recycle
-        mNoteAdapter = new NoteAdapter(mNotesRecyclerView.getContext(), mFolder.getFolderNotes());
-        mNotesRecyclerView.setAdapter(mNoteAdapter);
-
-        //Get the data
-        initializeData();
         return root;
     }
 
-    /** Método para inicializar los DataSets a partir de los MOCKUPS definidos en strings.xml */
-    private void initializeData() {
-        //Get the resources from the XML file
-        String[] notesNames = getResources().getStringArray(R.array.notes_names);
-        String[] notesBody = getResources().getStringArray(R.array.notes_body);
+    /** Recuperamos la actividad que contiene este Fragmento para poder enlazarlo al MainViewModel */
+    @Override
+    public void onViewCreated(@NonNull View root, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(root, savedInstanceState);
+        mContext = root.getContext();
 
-        //Create the ArrayList of Notes objects with the titles and text data
-        for(int i=0; i < notesNames.length; i++){
-            mFolder.add( new Note(notesNames[i], notesBody[i]) );
-        }
+        dataViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-        //Notify the adapters of the changes
-        mNoteAdapter.notifyDataSetChanged();
+        dataViewModel.getFolderSelected().observe(getViewLifecycleOwner(), (Folder folder)->{
+            mNoteAdapter = new NoteAdapter(root.getContext(), folder.getNotes(), cardNoteType);
+            mNoteAdapter.registerCardNoteListener(this);
+            mNotesRecyclerView.swapAdapter(mNoteAdapter, false);
+            mNoteAdapter.notifyDataSetChanged();
+        });
+
     }
 
     /**
@@ -79,12 +79,21 @@ public class NoteHostFragment extends Fragment implements FolderAdapter.ChipFold
     }
 
     /**
-     * Cuando un folder chip sea clickeado, cambia el model folder y las notas expuestas mediante el adapter.
-     * @param folder el chipFolder que ha sido clickeado.
+     * Añadimos una nueva nota al DataSet del MainViewModel.
+     * @param noteName Nombre de la nueva nota a crear
+     * @param noteText Texto de la nueva nota a crear
+     */
+    public void addCardNote(String noteName, String noteText) {
+        dataViewModel.addNote(noteName, noteText);
+    }
+
+    /**
+     * Cuando un card note sea clickeado, inicia la actividad NotasActivity.class mediante un Intent
+     * @param noteID ID de la nota correspondiente al cardNote clickeado.
      */
     @Override
-    public void onChipClick(Chip folder) {
-        // TODO: find a model Folder usign its name and change the mNoteAdapter dataSet
-        mNoteAdapter.notifyDataSetChanged();
+    public void onNoteSelected(String noteID) {
+        //TODO: DataViewModel.selectNote(NOTE_ID);
+        //TODO: startActivityForResult(new Intent(getApplicationContext(), NotasActivity.class), REQUEST_CODE_ADD_NOTE);
     }
 }

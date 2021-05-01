@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:maxHeight="50dp"
     android:orientation="horizontal">
-        
+
     <com.google.android.material.chip.Chip
         android:id="@+id/root_folder"
         android:layout_width="wrap_content"

@@ -5,21 +5,26 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.lize.R;
-import com.example.lize.adapters.AmbitosAdapter;
+import com.example.lize.models.MainViewModel;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
 
 ;import java.util.Timer;
 import java.util.TimerTask;
@@ -29,23 +34,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener{
 
-    /*Mock-Up de Adrián */
-    //Declaramos Títulos para nuestro Navigation Drawer List View
-    String[] AMBITOS = {"Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más","Home", "Eventos", "Trabajo", "Universidad", "Otra Más"};
-
-    //Creamos un recurso String para el nombre y el eMail para el HeaderView
-    //También creamos un recurso para la imagen de perfil del HeaderView
-    String NAME = "Maribel Gonzalez";
-    String EMAIL = "mabel@gmail.com";
-    int IMG_PROFILE = R.drawable.fondo_inicio_app;
-
-
-
-
-
     private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
     private NoteHostFragment noteHostFragment;               // Contenedor de Notas
     private FolderHostFragment folderHostFragment;           // Contenedor de Folders
+    private AmbitoHostFragment ambitoHostFragment;           // Contenedor de Ambitos
     private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
     public static final int REQUEST_CODE_ADD_NOTE = 1;
 
@@ -54,21 +46,12 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private Handler handler = new Handler();        // Methods to create a simple animation
     private Timer t = new Timer();                  //
 
-    //Declaramos RecyclerView
-    RecyclerView mRecyclerView;
-    //Declaramos un Adapter par el Recycler View
-    RecyclerView.Adapter mAdapter;
-    //Declaramos un LayoutManager como Linear Layout Manager
-    RecyclerView.LayoutManager mLayoutManager;
-    //Declaramos un DrawerLayout
-    DrawerLayout drawerLayout;
+    private DrawerLayout drawerLayout;              //Declaramos DrawerLayout
 
-    //Declaramos un Action Bar Drawer Toggle
-    ActionBarDrawerToggle mDrawerToggle;
+    private ActionBarDrawerToggle mDrawerToggle;    //Declaramos Toggle
 
-    //Declaramos Los Botones
-    Button addAmbito;
-    Button signOut;
+    private Button addAmbito;                       //Declaramos Botones
+    private Button signOut;
 
 
     /** Main constructor */
@@ -77,32 +60,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawable_nav);
 
-        /*Configuramos el Header con la info proporcionada*/
-        initHeaderNavigationView(NAME, EMAIL, IMG_PROFILE);
 
-        /*Asignamos el objeto toolBar de la view
-        y después configuramos la Action Bar a nuestro ToolBar
-        toolbar = findViewById(R.id.ambito_material_toolbar);
-        setSupportActionBar(toolbar);*/
+        /*Asignamos el objeto toolBar de la view*/
         this.topAppBar = findViewById(R.id.ambito_material_toolbar);
-
-        //Asignamos el RecyclerView Object al xmlView
-        mRecyclerView = findViewById(R.id.recyclerView);
-        //Hacemos saber al sistema que la lista de objetos es fija
-        //mRecyclerView.setHasFixedSize(true);
-
-        //Creamos el Adaptador de MyAdapter class
-        //Le pasamos los ambitos, iconos (si hubiera), nombre/mail del header e imagen del header
-        mAdapter = new AmbitosAdapter(AMBITOS, NAME, EMAIL, IMG_PROFILE);
-
-        //Configuramos el adapter al RecyclerView
-        mRecyclerView.setAdapter(mAdapter);
-
-        //Creamos un LayoutManager
-        mLayoutManager = new LinearLayoutManager(this);
-        //Configuramos el LinearLayoutManager
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
 
         //Asignamos el Drawer Object a la view
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -126,39 +86,58 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         //Configuramos el DrawerToggle par que sincronice con el Estado
         mDrawerToggle.syncState();
 
+        //Asignamos Boton y Listener a addAmbito
         this.addAmbito = findViewById(R.id.addAmbitoButton);
         addAmbito.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NewAmbito.class);
+                Intent intent = new Intent(getApplicationContext(), NewAmbitoActivity.class);
                 startActivity(intent);
             }
         });
 
+        //Asignamos Boton y Listener a signOut
         this.signOut = findViewById(R.id.sign_out);
         signOut.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                //TODO: Cerrar el MainViewModel
+                FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
                 startActivity(intent);
             }
         });
 
-
-
-
-
         // Obtenemos los componentes y registramos Listeners
-
-        this.noteHostFragment = (NoteHostFragment) getFragmentManager().findFragmentById(R.id.notes_host_fragment);
-        this.folderHostFragment = (FolderHostFragment) getFragmentManager().findFragmentById(R.id.folders_host_fragment);
-
+        this.ambitoHostFragment = (AmbitoHostFragment) getSupportFragmentManager().findFragmentById(R.id.ambitos_host_fragment);
+        this.folderHostFragment = (FolderHostFragment) getSupportFragmentManager().findFragmentById(R.id.folders_host_fragment);
+        this.noteHostFragment = (NoteHostFragment) getSupportFragmentManager().findFragmentById(R.id.notes_host_fragment);
         topAppBar.setOnMenuItemClickListener(this);
-        folderHostFragment.registerChipListener(noteHostFragment);
 
         // Inicializamos los FABS
         initFABGroup();
 
+        //Observamos el LiveData del ViewModel
+        observeLiveData();
+    }
+
+    /**
+     * Inicializamos el ViewModel del MainActivity y seteamos los observadores
+     */
+    private void observeLiveData() {
+        MainViewModel model = new ViewModelProvider(this).get(MainViewModel.class);
+        model.getToast().observe(this, (t) -> {
+            Toast.makeText(this.getBaseContext(), t, Toast.LENGTH_SHORT).show();
+        });
+
+        model.getUserSelected().observe(this, user -> {
+            initHeaderNavigationView(user.getFirst() + user.getLast(), user.getMail(), 0);
+        });
+
+        model.getAmbitoSelected().observe(this, (ambito) -> {
+            topAppBar.setTitle(ambito.getName());
+            //TODO: setTheme en función del color del ámbito
+        });
     }
 
     /**
@@ -181,7 +160,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     }
 
     /**
-     * Método para buscar una Nota en el Ámbito en el que estamos. TODO
+     * Método para buscar una Nota en el Ámbito en el que estamos.
+     * TODO: Implementación futura
      */
     private void searchNote() {}
 
@@ -195,27 +175,41 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 R.drawable.ic_baseline_view_module_24);
     }
 
+    /**
+     * Retornamos de la actividad NotasActivity y guardamos los cambios realizados
+     * @param requestCode Petición de codigo
+     * @param resultCode Resultado del Code
+     * @param data Intent de retorno
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_CODE_ADD_NOTE && resultCode == RESULT_OK){
-
+            //TODO: Crear lógica de guardar cambios en Base de Datos
         }
     }
 
-    public void initHeaderNavigationView(String name, String eMail, int imgProfile){
-
+    /**
+     * Setea el Header de la MainActivity
+     * @param name nombre del User
+     * @param eMail email del User
+     * @param imgProfile Imagen del User
+     */
+    private void initHeaderNavigationView(String name, String eMail, int imgProfile){
         View header = (View) findViewById(R.id.headerView);
 
         TextView headerName = (TextView) header.findViewById(R.id.name);
         TextView headerEMail = (TextView) header.findViewById(R.id.email);
         CircleImageView headerImgProfile = header.findViewById(R.id.circleImageView);
 
-        headerName.setText(name);
-        headerEMail.setText(eMail);
-        headerImgProfile.setImageResource(imgProfile);
+        if(name != null) headerName.setText(name);
+        if(eMail != null)  headerEMail.setText(eMail);
+        if(imgProfile != -1) headerImgProfile.setImageResource(imgProfile);
     }
 
+    /**
+     * Inicializamos los fabs de creación de notas y carpetas
+     */
     private void initFABGroup() {
         this.addFAB = findViewById(R.id.add_button);
         this.addNoteFAB = findViewById(R.id.add_note_button);
@@ -236,6 +230,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         addFolderFAB.setOnClickListener((v)->{ showFolderMenu(v); });
     }
 
+    /**
+     * Lógica de expansión
+     */
     private void expandFABGroup() {
         addFAB.animate().rotationBy(- getResources().getInteger(R.integer.fab_rotation));
         addNoteFAB.animate().translationY(- getResources().getDimension(R.dimen.fab_translation_1));
@@ -248,6 +245,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             }); }}, 120);
     }
 
+    /**
+     * Lógica de cierre
+     */
     private void closeFABGroup() {
         addFAB.animate().rotation(0);
         addNoteFAB.animate().translationY(0);
@@ -260,7 +260,23 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             });}}, 200);
     }
 
+    /**
+     * Menu desplegable para la creación de una nueva carpeta
+     * @param v fab de nueva carpeta
+     */
     private void showFolderMenu(View v) {
+        View popupView = getLayoutInflater().inflate(R.layout.popup_layout, null);
+        PopupWindow popupWindow = new PopupWindow(popupView, 800, 600);
+        popupWindow.setFocusable(true);
+        popupWindow.setBackgroundDrawable(new ColorDrawable());
+        popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
+        TextInputLayout saveDescr = popupView.findViewById(R.id.note_description);
+        Button saveButton = popupView.findViewById(R.id.save_button);
+        saveButton.setOnClickListener((w)->{
+            String folderName = saveDescr.getEditText().getText().toString();
+            folderHostFragment.addFolderChip(folderName);
+            popupWindow.dismiss();
+        });
     }
 
 }

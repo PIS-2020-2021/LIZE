@@ -1,76 +1,127 @@
 package com.example.lize.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
+import com.example.lize.data.Ambito;
 
-public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.ViewHolder> {
+import java.util.ArrayList;
 
-    private String mNavTitles[]; // String Array to store the passed titles Value from MainActivity.java
+public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHolder> {
+
+    private final Context mContext;
+    private final ArrayList<Ambito> mAmbitos;
+    private final ArrayList<AmbitosAdapter.AmbitoListener> ambitoListeners;
+
+    /* Custom Ambito onClick Listener */
+    public interface AmbitoListener{ void onAmbitoSelected(String ambitoName); }
+
+    /**
+     * Method for registering a Ambito onClick listener
+     * @param listener Observer which knows when the recyclerViewAmbito is clicked.
+     */
+    public void registerAmbitoListener(AmbitosAdapter.AmbitoListener listener){ ambitoListeners.add(listener); }
+
+    /**
+     * Constructor que pasa el listado de ambitos i el contexto.
+     * @param context contexto de la App
+     * @param ambitos ArrayList de Ambitos
+     */
+    public AmbitosAdapter(Context context, ArrayList<Ambito> ambitos){
+        this.mAmbitos = ambitos;
+        this.mContext = context;
+        this.ambitoListeners = new ArrayList<>();
+    }
+
+
+    /**
+     * Generador de ViewHolders de ambitos
+     * @param parent ViewGroup correspondiente a RecyclerView - contenedor de ambitos
+     * @param viewType viewType de vista de ViewHolder
+     * @return El nuevo ViewHolder
+     */
+    @NonNull
+    @Override
+    public AmbitoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        return new AmbitoHolder(LayoutInflater.from(mContext).inflate(R.layout.ambito_card, parent, false));
+        /*
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row,parent,false); //Inflating the layout
+        AmbitoHolder vhItem = new AmbitoHolder(v,viewType); //Creating ViewHolder and passing the object of type view
+        return vhItem; // Returning the created object
+        */
+    }
+
+    /**
+     * Método requerido que permite enlazar los datos del ambito con el correspondiente ViewHolder.
+     * @param holder ViewHolder a quien pasr los datos;
+     * @param position Position del Adapter
+     */
+    @Override
+    public void onBindViewHolder(@NonNull AmbitoHolder holder, int position) {
+        // Obtenemos los parámetros del Layout correspondiente al holder y modificamos el height
+        Ambito currentAmbito = mAmbitos.get(position);
+        holder.bindTo(currentAmbito);
+    }
+
+    /**
+     * Metodo que necesita el adaptador para determinar el tamaño del dataSet
+     * @return tamaño del DataSet
+     */
+    @Override
+    public int getItemCount() {
+        return mAmbitos.size();
+    }
 
 
     // Creating a ViewHolder which extends the RecyclerView View Holder
     // ViewHolder are used to to store the inflated views in order to recycle them
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class AmbitoHolder extends RecyclerView.ViewHolder {
 
-        TextView textView;
+        private TextView mTitleAmbito;
 
-
-        public ViewHolder(View itemView, int ViewType) {                 // Creating ViewHolder Constructor with View and viewType As a parameter
+        /**
+         * Constructor del ViewHolder correspondiete al layout de ambito_card
+         * @param itemView rootView del fichero ambito_card.xml
+         */
+        public AmbitoHolder(@NonNull View itemView) {
             super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.rowText); // Creating TextView object with the id of textView from item_row.xml
+            //Inicializamos los componentes del Layout
+            mTitleAmbito = (TextView) itemView.findViewById(R.id.ambito_name);
+            itemView.setOnClickListener((a)->{
+                for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
+                    listener.onAmbitoSelected(mTitleAmbito.getText().toString());
+            });
         }
 
-        public TextView getTextView() {
-            return textView;
+        public TextView getmTitleAmbito() {
+            return mTitleAmbito;
         }
-    }
 
-
-
-    public AmbitosAdapter(String[] ambitos, String name, String email, int img_profile) {
-        // MyAdapter Constructor with titles and icons parameter
-        // titles, icons, name, email, profile pic are passed from the main activity as we
-        this.mNavTitles = ambitos;                //have seen earlier
-    }
-
-
-
-    //Below first we override the method onCreateViewHolder which is called when the ViewHolder is
-    //Created, In this method we inflate the item_row.xml layout if the viewType is Type_ITEM or else we inflate header.xml
-    // if the viewType is TYPE_HEADER
-    // and pass it to the view holder
-
-    @Override
-    public AmbitosAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row,parent,false); //Inflating the layout
-        ViewHolder vhItem = new ViewHolder(v,viewType); //Creating ViewHolder and passing the object of type view
-        return vhItem; // Returning the created object
+        /**
+         * Método para enlazar los datos del ambito con el RecyclerView de este objeto ViewHolder
+         * @param currentAmbito
+         */
+        public void bindTo(Ambito currentAmbito){
+            mTitleAmbito.setText(currentAmbito.getName());
+        }
 
     }
 
-    //Next we override a method which is called when the item in a row is needed to be displayed, here the int position
-    // Tells us item at which position is being constructed to be displayed and the holder id of the holder object tell us
-    // which view type is being created 1 for item row
-    @Override
-    public void onBindViewHolder(AmbitosAdapter.ViewHolder holder, int position) {
 
-        holder.textView.setText(mNavTitles[position]); // Setting the Text with the array of our Titles
 
-    }
 
-    // This method returns the number of items present in the list
-    @Override
-    public int getItemCount() {
-        return mNavTitles.length; // the number of items in the list will be +1 the titles including the header view.
-    }
+
+
+
+
 
 
 }

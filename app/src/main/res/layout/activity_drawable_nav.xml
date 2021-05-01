@@ -50,16 +50,11 @@
                 <include
                     layout="@layout/header" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView"
+                <fragment
+                    android:id="@+id/ambitos_host_fragment"
+                    android:name="com.example.lize.workers.AmbitoHostFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_weight="1"
-
-
-                    android:background="#ffffff"
-                    android:scrollbars="vertical"/>
+                    android:layout_height="wrap_content"/>
 
                 <LinearLayout
                     android:layout_height="wrap_content"
