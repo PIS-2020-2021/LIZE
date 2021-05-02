@@ -162,7 +162,7 @@
 
     <include android:id="@+id/toolbar_container" layout="@layout/textv3"
         android:layout_gravity="bottom"
-        android:layout_height="@dimen/_90sdp"
+        android:layout_height="@dimen/_100sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
 

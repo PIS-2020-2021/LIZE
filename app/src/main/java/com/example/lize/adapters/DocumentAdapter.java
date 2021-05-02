@@ -104,7 +104,5 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
 
     public interface OnDocumentListener{
         void onDocumentClick(int position);
-
-
     }
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">755112893045-mdijv0to959kc8qbcbu92ukgp4h9ni9g.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">755112893045</string>
+    <string name="google_api_key" translatable="false">AIzaSyDOKTx1noVcgYQkaHkBtOWrmUyg8odRhnI</string>
+    <string name="google_app_id" translatable="false">1:755112893045:android:c0a9601f808c94b90f363c</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDOKTx1noVcgYQkaHkBtOWrmUyg8odRhnI</string>
+    <string name="google_storage_bucket" translatable="false">lize-cd0ff.appspot.com</string>
+    <string name="project_id" translatable="false">lize-cd0ff</string>
+</resources>
