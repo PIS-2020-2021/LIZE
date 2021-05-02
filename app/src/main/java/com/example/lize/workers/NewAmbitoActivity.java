@@ -106,7 +106,9 @@ public class NewAmbitoActivity extends AppCompatActivity {
     public boolean onMenuItemClick(MenuItem item) {
 
         if (item.getItemId() == R.id.arrow) {
-            onBackPressed();
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            setResult(RESULT_CANCELED, intent);
+            finish();
         } else {
             return false;
         }
