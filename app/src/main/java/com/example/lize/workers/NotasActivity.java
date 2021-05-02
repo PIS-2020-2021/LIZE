@@ -54,9 +54,7 @@ import java.util.ArrayList;
 
 public class NotasActivity extends AppCompatActivity implements  BitmapGeneratingAsyncTask.Callback ,DocumentAdapter.OnDocumentListener {
 
-    private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private static String DEFAULT_TITLE = "Titulo";
-    public static final int REQUEST_CODE_ADD_NOTE = 1;
     private EditText inputNoteTitulo, inputNoteTexto;
     private CarouselView carouselView;
     private ArrayList<Bitmap> images;

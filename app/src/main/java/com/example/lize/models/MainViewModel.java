@@ -205,11 +205,6 @@ public class MainViewModel extends ViewModel {
     }
 
 
-
-
-
-
-
     public void setToast(String s) {
         Log.w(TAG, s);
         mToast.setValue(s);
