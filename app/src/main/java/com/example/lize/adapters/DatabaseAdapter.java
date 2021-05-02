@@ -235,7 +235,8 @@ public class DatabaseAdapter {
 
         Map<String, Object> notesData = new HashMap<>();
         notesData.put("title", note.getTitle());
-        notesData.put("text", note.getText_plain());
+        notesData.put("text_plain", note.getText_plain());
+        notesData.put("text_html", note.getText_html());
         notesData.put("selfID", note.getSelfID());
         notesData.put("ambitoID", note.getAmbitoID());
         notesData.put("folderTAG", note.getFolderTAG());

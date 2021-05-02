@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +18,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lize.R;
 import com.example.lize.adapters.NoteAdapter;
 import com.example.lize.data.Folder;
+import com.example.lize.data.Note;
 import com.example.lize.models.MainViewModel;
+import com.onegravity.rteditor.api.format.RTFormat;
+
+import static com.onegravity.rteditor.api.RTApi.getApplicationContext;
 
 /** Notes View Host fragment. Responsabilidades:
  * <ol><li> Gestionar la parte de la UI correspondiente con el RecycleView de CardNotes </li>
@@ -25,6 +30,7 @@ import com.example.lize.models.MainViewModel;
  * <li> Conectar el DataSet de Notas con el adaptador mediante un {@link com.example.lize.models.MainViewModel} </li></ol> */
 public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteListener {
 
+    private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private Context mContext;                           // Root context
     private RecyclerView mNotesRecyclerView;            // Recycle View of Card-Notes
     private GridLayoutManager mNotesManager;            // Recycle View Layout Manager
@@ -94,7 +100,17 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
      */
     @Override
     public void onNoteSelected(String noteID) {
-        //TODO: DataViewModel.selectNote(NOTE_ID);
-        //TODO: startActivityForResult(new Intent(getApplicationContext(), NotasActivity.class), REQUEST_CODE_ADD_NOTE);
+
+
+        dataViewModel.selectNote(noteID);
+        Note selectedNote = dataViewModel.getNoteSelected().getValue();
+        Intent intent = new Intent(mContext, NotasActivity.class);
+        Bundle nota = new Bundle();
+        nota.putString("title", selectedNote.getTitle());
+        nota.putString("noteText_HTML", selectedNote.getText_html());
+        intent.putExtras(nota);
+
+        requireActivity().startActivityForResult(intent, REQUEST_CODE_EDIT_NOTE);
+        //startActivityForResult(intent, REQUEST_CODE_EDIT_NOTE);
     }
 }

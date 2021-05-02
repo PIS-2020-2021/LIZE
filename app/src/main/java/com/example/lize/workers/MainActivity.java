@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lize.R;
+import com.example.lize.adapters.DatabaseAdapter;
+import com.example.lize.data.Note;
 import com.example.lize.models.MainViewModel;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -41,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private AmbitoHostFragment ambitoHostFragment;           // Contenedor de Ambitos
     private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
     public static final int REQUEST_CODE_ADD_NOTE = 1;
+    private static final int REQUEST_CODE_EDIT_NOTE = 2;
+
 
     private MainViewModel dataViewModel;
     private FloatingActionButton addFAB, addNoteFAB, addFolderFAB;  // Floating Action Buttons
@@ -197,8 +201,26 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
                 noteHostFragment.addCardNote(title, plain_text, html_text);
             }
-
             //TODO: Crear lógica de guardar cambios en Base de Datos
+        } else if(requestCode == REQUEST_CODE_EDIT_NOTE && resultCode == RESULT_OK) {
+            Bundle bundle = data.getExtras();
+            if (bundle != null) {
+                String title = bundle.getString("title");
+                String plain_text = bundle.getString("noteText_PLAIN");
+                String html_text = bundle.getString("noteText_HTML");
+                Log.d("Titulo", title);
+                Log.d("Texto Plano", plain_text);
+                Log.d("Texto HTML", html_text);
+
+                Note selectedNote = dataViewModel.getNoteSelected().getValue();
+                selectedNote.setTitle(title);
+                selectedNote.setText_plain(plain_text);
+                selectedNote.setText_html(html_text);
+
+                dataViewModel.getFolderSelected().setValue(dataViewModel.getFolderSelected().getValue());
+                dataViewModel.getNoteSelected().setValue(selectedNote);
+                DatabaseAdapter.getInstance().saveNote(selectedNote);
+            }
         }
     }
 

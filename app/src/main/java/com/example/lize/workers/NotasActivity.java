@@ -14,6 +14,7 @@ import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -56,6 +57,7 @@ import java.util.ArrayList;
 
 public class NotasActivity extends AppCompatActivity implements  BitmapGeneratingAsyncTask.Callback ,DocumentAdapter.OnDocumentListener {
 
+    private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private static String DEFAULT_TITLE = "Titulo";
     public static final int REQUEST_CODE_ADD_NOTE = 1;
 
@@ -82,6 +84,8 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         super.onCreate(savedInstanceState);
         setTheme(R.style.RTE_ThemeLight);
         setContentView(R.layout.activity_notas);
+
+
 
         // Componentes
         inputNoteTitulo = findViewById(R.id.inputNoteTitulo);
@@ -187,6 +191,22 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
 
 
+        getBundleForEdit();
+
+
+    }
+
+    private void getBundleForEdit() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            String title = bundle.getString("title");
+            String html_text = bundle.getString("noteText_HTML");
+            Log.d("Titulo", title);
+            Log.d("Texto HTML", html_text);
+
+            inputNoteTitulo.setText(title);
+            rtEditText.setRichTextEditing(true, html_text);
+        }
     }
 
     private int validateNote() {
@@ -398,6 +418,8 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+
         if (requestCode == PICK_IMAGE) {
             if (data != null) {
                 Uri selectedImageUri = data.getData();

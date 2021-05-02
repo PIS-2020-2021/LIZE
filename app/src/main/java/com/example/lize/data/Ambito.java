@@ -73,4 +73,5 @@ public class Ambito {
     public ArrayList<Note> getNotes() {
         return folders.get(0).getNotes();
     }
+
 }

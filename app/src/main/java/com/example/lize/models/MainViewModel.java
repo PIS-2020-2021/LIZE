@@ -158,8 +158,12 @@ public class MainViewModel extends ViewModel {
             return;
         }
         Note newNote = new Note(noteName, text_plain, text_html);
+        //TODO: Refactorizar pa dejalo bonico
+        if(!mFolderSelected.getValue().equals(Folder.BASE_FOLDER_NAME))
+            mAmbitoSelected.getValue().getFolders().get(0).addNote(newNote);
         mFolderSelected.getValue().addNote(newNote);
         mFolderSelected.setValue(mFolderSelected.getValue());
+
         DatabaseAdapter.getInstance().saveNote(newNote);
         setToast("Note " + noteName + " correctly created.");
     }
@@ -220,8 +224,9 @@ public class MainViewModel extends ViewModel {
                             if (ambitoFolders.get(folderTAG) == null) {
                                ambitoFolders.put(folderTAG, new Folder(folderTAG, ambitoID));
                             }
+                            if(!folderTAG.equals(Folder.BASE_FOLDER_NAME))
+                                ambitoFolders.get(folderTAG).addNote(note);
                             ambitoFolders.get(Folder.BASE_FOLDER_NAME).addNote(note);
-                            ambitoFolders.get(folderTAG).addNote(note);
                         }
 
                         // Finally, sets the ambito notes structured by their folder containers
