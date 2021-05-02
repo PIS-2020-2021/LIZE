@@ -3,10 +3,10 @@
     <item
         android:id="@+id/edit_ambito"
         android:icon="@drawable/edit_icon"
-        android:title="Editar Ambito"/>
+        android:title="@string/editar_ambito"/>
     <item
         android:id="@+id/delete_ambito"
         android:icon="@drawable/delete_icon"
-        android:title="Eliminar Ambito"/>
+        android:title="@string/eliminar_ambito"/>
 
 </menu>

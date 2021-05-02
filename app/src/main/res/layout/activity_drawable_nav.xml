@@ -74,9 +74,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:radius="50dip"
-                        android:text="Salir"
+                        android:text="@string/salir"
                         app:cornerRadius="50dp"
-
                         app:elevation="7dp" />
 
                 </LinearLayout>

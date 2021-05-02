@@ -54,7 +54,7 @@ import java.util.ArrayList;
 
 public class NotasActivity extends AppCompatActivity implements  BitmapGeneratingAsyncTask.Callback ,DocumentAdapter.OnDocumentListener {
 
-    private static String DEFAULT_TITLE = "Titulo";
+    private static final String DEFAULT_TITLE = "Titulo";
     private EditText inputNoteTitulo, inputNoteTexto;
     private CarouselView carouselView;
     private ArrayList<Bitmap> images;
@@ -78,8 +78,6 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         setTheme(R.style.RTE_ThemeLight);
         setContentView(R.layout.activity_notas);
 
-
-
         // Componentes
         inputNoteTitulo = findViewById(R.id.inputNoteTitulo);
         inputNoteTexto = findViewById(R.id.inputNota);
@@ -88,19 +86,13 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         ImageView backBtn = findViewById(R.id.backBtn);
 
 
-
         // Apartado de documentos
         //ArrayList de imagenes y documentes
         images = new ArrayList<>();
         documents = new ArrayList<>();
 
         //Onclick Listener botones
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveNote();
-            }
-        });
+        backBtn.setOnClickListener(v -> saveNote());
 
         recyclerView = (RecyclerView) findViewById(R.id.fileAttachView);
         layoutManager = new LinearLayoutManager(this);
@@ -123,7 +115,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
             rtManager.registerToolbar(toolbarContainer, rtToolbar);
         }
 
-// register editor & set text
+        // register editor & set text
         rtEditText = (RTEditText) findViewById(R.id.inputNota);
         rtManager.registerEditor(rtEditText, true);
         //rtEditText.setRichTextEditing(true, message);
@@ -133,7 +125,6 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     }
 
 
-
     //Método para guardar la nota en caso de que el usuario presione el botón atrás del móvil
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)  {
@@ -141,7 +132,6 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
             saveNote();
             return true;
         }
-
         return super.onKeyDown(keyCode, event);
     }
 
@@ -158,13 +148,14 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
             rtEditText.setRichTextEditing(true, html_text);
         }
     }
+
     //Función para validar el contenido de la nota antes de agregarla a base de datos
     private int validateNote() {
         if(inputNoteTitulo.getText().toString().isEmpty() && rtEditText.getText(RTFormat.PLAIN_TEXT).isEmpty())
             return RESULT_CANCELED;
-
         return RESULT_OK;
     }
+
     //Método que construye el menú de tres puntos.
     public void showMenu(View v) {
         //noinspection RestrictedApi
@@ -185,18 +176,13 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
                     case R.id.add_document: // Handle option1 Click
                         selectDocument();
                         return true;
-
-
                     case R.id.toolbar_image:
                         selectImage();
-
                         return true;
                     case R.id.add_audio: // Handle option2 Click
-
                         return true;
                     case R.id.share:
                         updateBitmap();
-
                         return true;
                     default:
                         return false;
@@ -207,11 +193,9 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
             public void onMenuModeChange(MenuBuilder menu) {}
         });
 
-
         // Display the menu
         //noinspection RestrictedApi
         optionsMenu.show();
-
 
     }
 
@@ -233,11 +217,9 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         new BitmapGeneratingAsyncTask(this,rtEditText.getText(RTFormat.HTML), getEnteredWidthOrDefault(), this).execute();
     }
 
-
     //Intent para compartir el contenido de las imágenes
     @Override
     public void done(Bitmap bitmap) {
-
         String path = MediaStore.Images.Media.insertImage(this.getApplicationContext().getContentResolver(), bitmap,"test", null);
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
@@ -256,14 +238,13 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         }
     }
 
-
-
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
         rtManager.onSaveInstanceState(outState);
 
     }
+
     //Cierre del manager de edición cuando la actividad finaliza
     @Override
     protected void onDestroy() {
@@ -274,24 +255,19 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
     // Carousel de imagenes de las notas
    private void init_carousel() {
-
-        ImageListener imageListener = new ImageListener() {
-            @Override
-            public void setImageForPosition(int position, ImageView imageView) {
-                imageView.setImageBitmap(images.get(position));
-                registerForContextMenu(imageView);
-            }
+        ImageListener imageListener = (position, imageView) -> {
+            imageView.setImageBitmap(images.get(position));
+            registerForContextMenu(imageView);
         };
 
         carouselView.setPageCount(images.size());
         carouselView.setImageListener(imageListener);
 
-       if(images.isEmpty()){
-             carouselView.setVisibility(View.GONE);
-        }else{
-            carouselView.setVisibility(View.VISIBLE);
-        }
-
+       if (images.isEmpty()) {
+           carouselView.setVisibility(View.GONE);
+       }else{
+           carouselView.setVisibility(View.VISIBLE);
+       }
     }
 
 
@@ -350,17 +326,13 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
                         InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         images.add(0,bitmap);
-
                         init_carousel();
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-
                     }
-
                 }
-
             }
-        }else if(requestCode == REQUEST_DOCUMENT_GET && resultCode == RESULT_OK){
+        } else if(requestCode == REQUEST_DOCUMENT_GET && resultCode == RESULT_OK) {
             Uri uri = data.getData();
             String uriString = uri.toString();
             Documento myFile = new Documento(uriString);
@@ -368,14 +340,10 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
             String displayName = null;
 
             if (uriString.startsWith("content://")) {
-                Cursor cursor = null;
-                try {
-                    cursor = getApplicationContext().getContentResolver().query(uri, null, null, null, null);
+                try (Cursor cursor = getApplicationContext().getContentResolver().query(uri, null, null, null, null)) {
                     if (cursor != null && cursor.moveToFirst()) {
                         displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                     }
-                } finally {
-                    cursor.close();
                 }
             } else if (uriString.startsWith("file://")) {
                 displayName = myFile.getName();

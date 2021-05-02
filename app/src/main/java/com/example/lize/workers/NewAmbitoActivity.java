@@ -11,7 +11,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.lize.R;
-import com.example.lize.data.Ambito;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -106,7 +105,9 @@ public class NewAmbitoActivity extends AppCompatActivity {
     public boolean onMenuItemClick(MenuItem item) {
 
         if (item.getItemId() == R.id.arrow) {
-            onBackPressed();
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            setResult(RESULT_CANCELED, intent);
+            finish();
         } else {
             return false;
         }

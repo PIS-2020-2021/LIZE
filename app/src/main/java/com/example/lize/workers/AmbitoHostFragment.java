@@ -3,7 +3,6 @@ package com.example.lize.workers;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
 import com.example.lize.adapters.AmbitosAdapter;
-import com.example.lize.data.Ambito;
 import com.example.lize.data.User;
 import com.example.lize.models.MainViewModel;
 
@@ -67,10 +65,11 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
         dataViewModel.addAmbito(ambitoName, ambitoColor);
     }
 
-
-    public void deleteAmbito(String ambitoID){
-
-    }
+    /**
+     * Eliminamos un ambito del DataSet del MainViewModel
+     * @param ambitoID Nombre del nuevo ambito a crear
+     */
+    public void deleteAmbito(String ambitoID){ }
 
 
     @Override
@@ -104,23 +103,18 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
                     case R.id.edit_ambito:
                         //TODO: EditarAmbito
                         return true;
-
                     case R.id.delete_ambito:
                         //TODO: EliminarAmbito
                         return true;
-
                     default:
                         return false;
-
                 }
             }
 
             @Override
             public void onMenuModeChange(@NonNull MenuBuilder menu){}
         });
-
         optionsMenu.show();
     }
-
 
 }

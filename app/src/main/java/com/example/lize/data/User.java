@@ -13,8 +13,6 @@ public class User {
 
     private ArrayList<Ambito> ambitos;
 
-    public User(){};
-
     public User(String mail, String password, String first, String last){
         this.mail = mail;
         this.password = password;
@@ -28,9 +26,7 @@ public class User {
         return mail;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
+    public void setMail(String mail) { this.mail = mail; }
 
     public String getPassword() {
         return password;
@@ -70,12 +66,11 @@ public class User {
         return ambitos;
     }
 
-    public boolean addAmbito(Ambito ambito){
+    public void addAmbito(Ambito ambito){
         ambito.setUserID(selfID);
-        return ambitos.add(ambito);
+        ambitos.add(ambito);
     }
 
     public void setAmbitos(ArrayList<Ambito> ambitos) { this.ambitos = ambitos; }
-
 
 }

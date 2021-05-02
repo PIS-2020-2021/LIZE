@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <androidx.recyclerview.widget.RecyclerView android:layout_width="match_parent"
     android:layout_height="@dimen/_55sdp"
     android:layout_marginTop="@dimen/_100sdp"
     android:scrollbars="none"
     android:visibility="visible"
-    layout_height="55sdp"
     xmlns:android="http://schemas.android.com/apk/res/android" />

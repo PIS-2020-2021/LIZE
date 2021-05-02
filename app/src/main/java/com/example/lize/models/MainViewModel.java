@@ -1,6 +1,6 @@
 package com.example.lize.models;
 
-import android.provider.ContactsContract;
+
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -13,8 +13,7 @@ import com.example.lize.data.Note;
 import com.example.lize.data.User;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class MainViewModel extends ViewModel {
 

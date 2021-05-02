@@ -1,7 +1,6 @@
 package com.example.lize.data;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.io.File;
 
@@ -9,11 +8,12 @@ public class Documento extends File {
 
     String name;
     String path;
+
     public Documento(String name,String path){
         super(path);
         this.name = name;
-
     }
+
     public Documento(String path){
         super(path);
         this.path = path;

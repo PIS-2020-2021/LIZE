@@ -1,9 +1,7 @@
 package com.example.lize.adapters;
 
 import android.util.Log;
-
 import androidx.annotation.NonNull;
-
 import com.example.lize.data.Ambito;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
@@ -21,7 +19,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,20 +69,17 @@ public class DatabaseAdapter {
         if (user == null) {
             mAuth.signInAnonymously()
                     // OnCompleteListener: when sign in, Authentication successful
-                    .addOnCompleteListener((Executor) this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                Log.d(TAG, "signInAnonymously:success");
-                                if(listener != null) listener.setToast("Authentication successful.");
-                                user = mAuth.getCurrentUser();
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w(TAG, "signInAnonymously:failure", task.getException());
-                                if(listener != null) listener.setToast("Authentication failed.");
+                    .addOnCompleteListener((Executor) this, task -> {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInAnonymously:success");
+                            if(listener != null) listener.setToast("Authentication successful.");
+                            user = mAuth.getCurrentUser();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInAnonymously:failure", task.getException());
+                            if(listener != null) listener.setToast("Authentication failed.");
 
-                            }
                         }
                     });
         } else {
@@ -97,19 +91,16 @@ public class DatabaseAdapter {
     public void getUser() {
         DocumentReference userRef = DatabaseAdapter.db.collection("users").document(user.getUid());
         Log.d(TAG, "Getting current user document...");
-        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    Log.d(TAG, document.getId() + " => " + document.getData());
-                    User user = new User(document.getString("mail"), document.getString("password"),
-                            document.getString("first"), document.getString("last"));
-                    user.setSelfID(document.getString("selfID"));
+        userRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                Log.d(TAG, document.getId() + " => " + document.getData());
+                User user = new User(document.getString("mail"), document.getString("password"),
+                        document.getString("first"), document.getString("last"));
+                user.setSelfID(document.getString("selfID"));
 
-                    if(listener != null) listener.setUser(user);
-                } else Log.d(TAG, "Error getting documents: ", task.getException());
-            }
+                if(listener != null) listener.setUser(user);
+            } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
 
@@ -117,22 +108,19 @@ public class DatabaseAdapter {
     public void getAmbitos() {
         Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", user.getUid());
         Log.d(TAG, "Getting current user ambitos collection...");
-        ambitosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    ArrayList<Ambito> userAmbitos = new ArrayList<>();
-                    // Por cada resultado, creamos el ambito a partir de los datos de DB y lo añadimos
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Log.d(TAG, document.getId() + " => " + document.getData());
-                        Ambito ambito = new Ambito(document.getString("name"), document.getLong("color").intValue());
-                        ambito.setUserID(document.getString("userID"));
-                        ambito.setSelfID(document.getString("selfID"));
-                        userAmbitos.add(ambito);
-                    }
-                    if(listener != null) listener.setUserAmbitos(userAmbitos);
-                } else Log.d(TAG, "Error getting documents: ", task.getException());
-            }
+        ambitosRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ArrayList<Ambito> userAmbitos = new ArrayList<>();
+                // Por cada resultado, creamos el ambito a partir de los datos de DB y lo añadimos
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Log.d(TAG, document.getId() + " => " + document.getData());
+                    Ambito ambito = new Ambito(document.getString("name"), document.getLong("color").intValue());
+                    ambito.setUserID(document.getString("userID"));
+                    ambito.setSelfID(document.getString("selfID"));
+                    userAmbitos.add(ambito);
+                }
+                if(listener != null) listener.setUserAmbitos(userAmbitos);
+            } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
 
@@ -140,22 +128,19 @@ public class DatabaseAdapter {
     public void getNotes(String ambitoID){
         Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("ambitoID", ambitoID);
         Log.d(TAG, "Getting ambito " + ambitoID + "'s notes collection...");
-        notasRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    ArrayList<Note> ambitoNotes = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Log.d(TAG, document.getId() + " => " + document.getData());
-                        Note note = new Note(document.getString("title"), document.getString("text_plain"), document.getString("text_html"));
-                        note.setAmbitoID(document.getString("ambitoID"));
-                        note.setFolderTAG(document.getString("folderTAG"));
-                        note.setSelfID(document.getString("selfID"));
-                        ambitoNotes.add(note);
-                    }
-                    if(listener != null) listener.setAmbitoNotes(ambitoID, ambitoNotes);
-                } else Log.d(TAG, "Error getting documents: ", task.getException());
-            }
+        notasRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ArrayList<Note> ambitoNotes = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Log.d(TAG, document.getId() + " => " + document.getData());
+                    Note note = new Note(document.getString("title"), document.getString("text_plain"), document.getString("text_html"));
+                    note.setAmbitoID(document.getString("ambitoID"));
+                    note.setFolderTAG(document.getString("folderTAG"));
+                    note.setSelfID(document.getString("selfID"));
+                    ambitoNotes.add(note);
+                }
+                if(listener != null) listener.setAmbitoNotes(ambitoID, ambitoNotes);
+            } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
 
@@ -255,100 +240,66 @@ public class DatabaseAdapter {
     }
     public void deleteNota(String notaID){
         DatabaseAdapter.db.collection("notes").document(notaID).delete()
-        .addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "Nota Eliminada Correctamente");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error al Eliminar la nota", e);
-            }
-        });
+        .addOnSuccessListener(aVoid -> Log.d(TAG, "Nota Eliminada Correctamente")).addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar la nota", e));
     }
 
     public void deleteFolder(String folderTAG) {
         Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("folderTAG", folderTAG);
 
-        notasRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    try {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            deleteNota(document.getId());
-                        }
-                        Log.d(TAG, "Colección de Notas de " + folderTAG + " eliminado correctamente");
-                    } catch (NullPointerException exception){
-                        Log.w(TAG, "Failed to get Collection of notes of  " + folderTAG + ": null pointer exception.");
+        notasRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                try {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        deleteNota(document.getId());
                     }
-                } else Log.d(TAG, "Error al eliminar la coleccion de notas: ", task.getException());
-            }
+                    Log.d(TAG, "Colección de Notas de " + folderTAG + " eliminado correctamente");
+                } catch (NullPointerException exception){
+                    Log.w(TAG, "Failed to get Collection of notes of  " + folderTAG + ": null pointer exception.");
+                }
+            } else Log.d(TAG, "Error al eliminar la coleccion de notas: ", task.getException());
         });
     }
 
     public void deleteAmbito(String ambitoID) {
         Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("ambitoID", ambitoID);
 
-        notasRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    try {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            deleteNota(document.getId());
-                        }
-                        Log.d(TAG, "Colección de Notas de " + ambitoID + " eliminado correctamente");
-                    } catch (NullPointerException exception){
-                        Log.w(TAG, "Failed to get Collection of notes of  " + ambitoID + ": null pointer exception.");
+        notasRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                try {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        deleteNota(document.getId());
                     }
-                } else{
-                    Log.d(TAG, "Error al eliminar la coleccion de notas: ", task.getException());
+                    Log.d(TAG, "Colección de Notas de " + ambitoID + " eliminado correctamente");
+                } catch (NullPointerException exception){
+                    Log.w(TAG, "Failed to get Collection of notes of  " + ambitoID + ": null pointer exception.");
                 }
+            } else{
+                Log.d(TAG, "Error al eliminar la coleccion de notas: ", task.getException());
             }
         });
 
         DatabaseAdapter.db.collection("ambitos").document(ambitoID).delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Ambito Eliminado Correctamente");
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error al Eliminar el Ambito", e);
-            }
-        });
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Ambito Eliminado Correctamente")).addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar el Ambito", e));
     }
 
     public void deleteUser(String userID) {
         Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", userID);
 
-        ambitosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    try{
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            deleteAmbito(document.getId());
-                        }
-                        Log.d(TAG, "Colección de Ambitos de " + userID + " eliminado correctamente");
-                    } catch (NullPointerException exception){
-                        Log.w(TAG, "Failed to get Collection of ambitos of  " + userID + ": null pointer exception.");
+        ambitosRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                try{
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        deleteAmbito(document.getId());
                     }
-                } else Log.d(TAG, "Error al eliminar la coleccion de ambitos: ", task.getException());
-            }
+                    Log.d(TAG, "Colección de Ambitos de " + userID + " eliminado correctamente");
+                } catch (NullPointerException exception){
+                    Log.w(TAG, "Failed to get Collection of ambitos of  " + userID + ": null pointer exception.");
+                }
+            } else Log.d(TAG, "Error al eliminar la coleccion de ambitos: ", task.getException());
         });
 
         DatabaseAdapter.db.collection("users").document(userID).delete()
-            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Log.d(TAG, "Usuario Eliminado Correctamente");
-                }
-            }).addOnFailureListener(new OnFailureListener() {
+            .addOnSuccessListener(aVoid -> Log.d(TAG, "Usuario Eliminado Correctamente")).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     Log.w(TAG, "Error al Eliminar el Usuario", e);

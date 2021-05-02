@@ -5,13 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.lize.R;
 import com.example.lize.data.Ambito;
-
 import java.util.ArrayList;
 
 public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHolder> {
@@ -88,7 +85,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
     // ViewHolder are used to to store the inflated views in order to recycle them
     public class AmbitoHolder extends RecyclerView.ViewHolder {
 
-        private TextView mTitleAmbito;
+        private final TextView mTitleAmbito;
 
         /**
          * Constructor del ViewHolder correspondiete al layout de ambito_card
@@ -103,13 +100,10 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
                     listener.onAmbitoSelected(mTitleAmbito.getText().toString());
             });
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    for(AmbitosAdapter.AmbitoListener listener : ambitoListeners)
-                        listener.onAmbitoHold(v);
-                    return false;
-                }
+            itemView.setOnLongClickListener(v -> {
+                for(AmbitoListener listener : ambitoListeners)
+                    listener.onAmbitoHold(v);
+                return false;
             });
         }
 
@@ -119,7 +113,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
 
         /**
          * Método para enlazar los datos del ambito con el RecyclerView de este objeto ViewHolder
-         * @param currentAmbito
+         * @param currentAmbito Ambito actual
          */
         public void bindTo(Ambito currentAmbito){
             mTitleAmbito.setText(currentAmbito.getName());
