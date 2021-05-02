@@ -93,14 +93,11 @@ public class MainViewModel extends ViewModel {
      */
     public void selectFolder(String folderName) {
         try{
-            for (Folder folder : mAmbitoSelected.getValue().getFolders()) {
-                if (folder.getName().equals(folderName)) {
-                    setToast("Folder " + folderName + " selected.");
-                    mFolderSelected.setValue(folder);
-                    return;
-                }
-            }
-            Log.w(TAG, "Failed to select folder " + folderName + ": invalid ID.");
+            Folder folder = mAmbitoSelected.getValue().getFolder(folderName);
+            if (folder != null) {
+                setToast("Folder " + folderName + " selected.");
+                mFolderSelected.setValue(folder);
+            } else Log.w(TAG, "Failed to select folder " + folder.getName()  + ": invalid Name.");
 
         }catch(NullPointerException exception){
             Log.w(TAG, "Failed to select folder " + folderName + ": null pointer exception.");
@@ -113,7 +110,7 @@ public class MainViewModel extends ViewModel {
         try{
             for (Note note : mFolderSelected.getValue().getNotes()) {
                 if (note.getSelfID().equals(noteID)) {
-                    setToast("Note " + noteID + " selected.");
+                    setToast("Note " + note.getTitle() + " selected.");
                     mNoteSelected.setValue(note);
                     return;
                 }
@@ -132,40 +129,51 @@ public class MainViewModel extends ViewModel {
                 Log.w(TAG, "Failed to create ambito " + ambitoName + ": ambito already exists. ");
                 return;
             }
-        Ambito newAmbito = new Ambito(ambitoName, ambitoColor);
-        mUserSelected.getValue().addAmbito(newAmbito);
-        mUserSelected.setValue(mUserSelected.getValue());
-        DatabaseAdapter.getInstance().saveAmbito(newAmbito);
-        setToast("Ambito " + ambitoName + " correctly created.");
-        mAmbitoSelected.setValue(newAmbito);
+
+        Ambito newAmbito = new Ambito(ambitoName, ambitoColor);     // Creamos un nuevo Ámbito
+        mUserSelected.getValue().addAmbito(newAmbito);              // Añadimos (y asignamos) ese Ámbito al Usuario registrado
+        mUserSelected.setValue(mUserSelected.getValue());           // Actualizamos la colección del Usuario registrado
+        DatabaseAdapter.getInstance().saveAmbito(newAmbito);        // Guardamos el Ámbito en DB
+        setToast("Ambito " + ambitoName + " correctly created.");   // Creamos Toast informativo
     }
 
     public void addFolder(String folderName) {
-        for (Folder folder: mAmbitoSelected.getValue().getFolders())
-            if (folder.getName().equals(folderName)) {
-                Log.w(TAG, "Failed to create folder " + folderName + ": folder already exists. ");
-                return;
-            }
-        Folder folder = new Folder(folderName);
-        mAmbitoSelected.getValue().addFolder(folder);
-        mAmbitoSelected.setValue(mAmbitoSelected.getValue());
-        setToast("Folder " + folderName + " correctly created.");
+        if (folderName == null || (folderName != null && folderName.length() == 0)) {
+            Log.w(TAG, "Failed to create folder with no name. ");
+            setToast("Failed to create folder with no name. ");
+            return;
+        }
+
+        if (mAmbitoSelected.getValue().getFolder(folderName) != null) {
+            Log.w(TAG, "Failed to create folder " + folderName + ": folder already exists. ");
+            setToast("Folder " + folderName + " already exists.");
+            return;
+        }
+
+        Folder folder = new Folder(folderName);                     // Creamos una nueva Folder
+        mAmbitoSelected.getValue().putFolder(folder);               // Añadimos (y asignamos) esa Folder al Ámbito seleccionado
+        mAmbitoSelected.setValue(mAmbitoSelected.getValue());       // Actualizamos colección del Ámbito seleccionado
+        setToast("Folder " + folderName + " correctly created.");   // Creamos Toast informativo
     }
 
     public void addNote(String noteName, String text_plain, String text_html) {
-        if (text_plain == null) {
-            Log.w(TAG, "Failed to create note " + noteName + ": empty note. ");
-            return;
-        }
-        Note newNote = new Note(noteName, text_plain, text_html);
-        //TODO: Refactorizar pa dejalo bonico
-        if(!mFolderSelected.getValue().equals(Folder.BASE_FOLDER_NAME))
-            mAmbitoSelected.getValue().getFolders().get(0).addNote(newNote);
-        mFolderSelected.getValue().addNote(newNote);
-        mFolderSelected.setValue(mFolderSelected.getValue());
+        Note newNote = new Note(noteName, text_plain, text_html);   // Creamos una nueva Nota
+        newNote.setFolderTAG(mFolderSelected.getValue().getName()); // Asignamos esa Nota a la Carpeta seleccionada
+        mAmbitoSelected.getValue().putNote(newNote);                // Añadimos esa Nota a la Carpeta BASE del Ámbito y a la Carpeta asignada
+        mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos colección de la carpeta seleccionada
+        DatabaseAdapter.getInstance().saveNote(newNote);            // Guardamos la Nota en DB
+        setToast("Note " + noteName + " correctly created.");       // Creamos Toast Informativo
+    }
 
-        DatabaseAdapter.getInstance().saveNote(newNote);
-        setToast("Note " + noteName + " correctly created.");
+    public void editNote(String title, String plainText, String htmlText){
+        Note selected = mNoteSelected.getValue();                   // Editamos la Nota seleccionada
+        selected.setTitle(title);
+        selected.setText_plain(plainText);
+        selected.setText_html(htmlText);
+        mNoteSelected.setValue(mNoteSelected.getValue());           // Actualizamos la Nota seleccionada
+        mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos colección de la carpeta seleccionada
+        DatabaseAdapter.getInstance().saveNote(selected);           // Guardamos la Nota en DB
+        setToast("Note " + title + " correctly edited.");           // Creamos Toast Informativo
     }
 
     public void setToast(String s) {
@@ -174,7 +182,6 @@ public class MainViewModel extends ViewModel {
     }
 
     /** TODO: Métodos para editar la Nota desde la NoteActivity! + DataBase connection: note.saveNote()
-     public void editNoteText(String noteText);
      public void addImageOnNote(String imageURL);
      public void addDocumentOnNote(String documentURL);
      public void addAudioOnNote(String audioURL); */
@@ -215,22 +222,7 @@ public class MainViewModel extends ViewModel {
             else{
                 for (Ambito ambito : currentUser.getAmbitos()) {
                     if (ambito.getSelfID().equals(ambitoID)) {
-
-                        // Build the ambito's folders using a Map collection for avoiding repeated names
-                        Map<String, Folder> ambitoFolders = new HashMap<>();
-                        ambitoFolders.put(Folder.BASE_FOLDER_NAME, new Folder(Folder.BASE_FOLDER_NAME, ambitoID));
-                        for (Note note : ambitoNotes) {
-                            String folderTAG = note.getFolderTAG();
-                            if (ambitoFolders.get(folderTAG) == null) {
-                               ambitoFolders.put(folderTAG, new Folder(folderTAG, ambitoID));
-                            }
-                            if(!folderTAG.equals(Folder.BASE_FOLDER_NAME))
-                                ambitoFolders.get(folderTAG).addNote(note);
-                            ambitoFolders.get(Folder.BASE_FOLDER_NAME).addNote(note);
-                        }
-
-                        // Finally, sets the ambito notes structured by their folder containers
-                        ambito.setFolders(new ArrayList(ambitoFolders.values()));
+                        for (Note note : ambitoNotes) ambito.putNote(note);
                         loadingCounter++;
                         break;
                     }

@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private FolderHostFragment folderHostFragment;           // Contenedor de Folders
     private AmbitoHostFragment ambitoHostFragment;           // Contenedor de Ambitos
     private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
+
+    public static final String TAG = "MainActivity";
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
 
@@ -189,39 +191,23 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_CODE_ADD_NOTE && resultCode == RESULT_OK){
-            Bundle bundle = data.getExtras();
-            if (bundle != null) {
-                String title = bundle.getString("title");
-                String plain_text = bundle.getString("noteText_PLAIN");
-                String html_text = bundle.getString("noteText_HTML");
-                Log.d("Titulo", title);
-                Log.d("Texto Plano", plain_text);
-                Log.d("Texto HTML", html_text);
+        Bundle bundle = data.getExtras();
+        if (bundle != null) {
+            Log.d(TAG, "Received new Bundle Data from NoteActivity: " + bundle.toString());
+            String title = bundle.getString("title");
+            String plainText = bundle.getString("noteText_PLAIN");
+            String htmlText = bundle.getString("noteText_HTML");
+            if(requestCode == REQUEST_CODE_ADD_NOTE && resultCode == RESULT_OK) {
+                Log.d(TAG, "Request Code for New Note Adding OK");
+                dataViewModel.addNote(title, plainText, htmlText);
 
-                noteHostFragment.addCardNote(title, plain_text, html_text);
-            }
-            //TODO: Crear lógica de guardar cambios en Base de Datos
-        } else if(requestCode == REQUEST_CODE_EDIT_NOTE && resultCode == RESULT_OK) {
-            Bundle bundle = data.getExtras();
-            if (bundle != null) {
-                String title = bundle.getString("title");
-                String plain_text = bundle.getString("noteText_PLAIN");
-                String html_text = bundle.getString("noteText_HTML");
-                Log.d("Titulo", title);
-                Log.d("Texto Plano", plain_text);
-                Log.d("Texto HTML", html_text);
+            } else if (requestCode == REQUEST_CODE_EDIT_NOTE && resultCode == RESULT_OK) {
+                Log.d(TAG, "Request Code for Note Editing OK");
+                dataViewModel.editNote(title, plainText, htmlText);
 
-                Note selectedNote = dataViewModel.getNoteSelected().getValue();
-                selectedNote.setTitle(title);
-                selectedNote.setText_plain(plain_text);
-                selectedNote.setText_html(html_text);
+            } else Log.d(TAG, "Invalid RESULT from NoteActivity: " + resultCode);
 
-                dataViewModel.getFolderSelected().setValue(dataViewModel.getFolderSelected().getValue());
-                dataViewModel.getNoteSelected().setValue(selectedNote);
-                DatabaseAdapter.getInstance().saveNote(selectedNote);
-            }
-        }
+        } else Log.d(TAG, "No Data from NoteActivity: null bundle");
     }
 
     /**

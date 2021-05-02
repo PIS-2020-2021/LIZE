@@ -1,12 +1,17 @@
 package com.example.lize.workers;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import com.example.lize.R;
 import com.example.lize.adapters.FolderAdapter;
@@ -16,6 +21,7 @@ import com.example.lize.models.MainViewModel;
 import com.google.android.material.chip.Chip;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import androidx.annotation.Nullable;
@@ -37,17 +43,19 @@ import java.util.function.Predicate;
 public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFolderListener{
 
     private Context mContext;                    // root context
-    private Chip rootFolder;                     // Root Chip Folder selected
     private RecyclerView mFoldersRecyclerView;   // Recycle View of folders
     private FolderAdapter mFolderAdapter;        // FolderAdapter for the RecycleView
+    private Chip selectedFolder;                 // Chip Folder selected
+    private TypedValue typedValue;               // For color wrapping
 
     private MainViewModel dataViewModel;        // Model Shared Data between Fragments
+
 
     /** Inicializa el Fragment contenedor de Folders */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.folders_host_view, container, false);
         this.mContext = root.getContext();
-        this.rootFolder = root.findViewById(R.id.root_folder);
+        typedValue = new TypedValue();
         this.mFoldersRecyclerView = root.findViewById(R.id.folder_recycler_view);
         mFoldersRecyclerView.setLayoutManager(new LinearLayoutManager(mContext,
                 LinearLayoutManager.HORIZONTAL, false));
@@ -59,7 +67,6 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
     public void onViewCreated(@NonNull View root, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(root, savedInstanceState);
         this.mContext = root.getContext();
-
         this.dataViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         dataViewModel.getAmbitoSelected().observe(getViewLifecycleOwner(), (Ambito ambito) ->{
@@ -68,6 +75,24 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
             mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
             mFolderAdapter.notifyDataSetChanged();
         });
+
+        // Si la carpeta seleccionada es la Folder
+        /*dataViewModel.getFolderSelected().observe(getViewLifecycleOwner(), (Folder folder) ->{
+            if (folder.getName().equals(Folder.BASE_FOLDER_NAME)){
+                // 1. Trobar el Chip corresponent a la BASE_FOLDER_NAME
+
+                for (int i = 0; i < mFolderAdapter.getItemCount(); i++){
+                    Chip chipFolder = (Chip) mFoldersRecyclerView.getLayoutManager().getChildAt(i);
+                    if (chipFolder.getText().toString().equals())
+                }getLayoutManager().get)
+                // 2. Aplicar un onChipSelected() de la BaseFolderName
+            }
+            mFolderAdapter = new FolderAdapter(mContext, ambito.getFolders());
+            mFolderAdapter.registerChipFolderListener(this);
+            mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
+            mFolderAdapter.notifyDataSetChanged();
+        });*/
+
     }
 
     /**
@@ -85,10 +110,41 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
     @Override
     public void onChipSelected(Chip chipFolder) {
         String folderName = chipFolder.getText().toString();
-        String rootName = rootFolder.getText().toString();
-        rootFolder.setText(folderName);
-        chipFolder.setText(rootName);
+        changeColorLogic(selectedFolder, chipFolder);
+        selectedFolder = chipFolder;
         dataViewModel.selectFolder(folderName);
     }
+
+    // Lógica de cambio de color de selección
+    private void changeColorLogic(Chip selectedFolder, Chip chipFolder) {
+        mContext.getTheme().resolveAttribute(R.attr.colorPrimaryDark, typedValue, true);
+        chipFolder.setChipBackgroundColor(ContextCompat.getColorStateList(mContext, typedValue.resourceId));
+
+        mContext.getTheme().resolveAttribute(R.attr.colorOnSurface, typedValue, true);
+        chipFolder.setTextColor(ContextCompat.getColor(mContext, typedValue.resourceId));
+
+        String currentFolderName = chipFolder.getText().toString();
+
+        // Si ya habíamos seleccionado un ChipFolder y es distinto al nuevo, lo deseleccionamos
+        if (selectedFolder != null && !(currentFolderName.equals(selectedFolder.getText().toString()))){
+
+            mContext.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+            selectedFolder.setChipBackgroundColor(ContextCompat.getColorStateList(mContext, typedValue.resourceId));
+
+            mContext.getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
+            selectedFolder.setTextColor(ContextCompat.getColor(mContext, typedValue.resourceId));
+        }
+    }
+
+
+    /**
+     * Cuando enlazemos el folder chip correspondiente a la BaseFolder por primera vez, lo seleccionamos.
+     * @param rootFolder el rootFolder que ha sido enlazado */
+    /*public void rootChipSelected(Chip rootFolder){
+        if (this.selectedFolder == null){
+            this.selectedFolder = rootFolder;
+            selectedFolder.setTextAppearance(R.style.Widget_Lize_Chip);
+        }
+    }*/
 
 }

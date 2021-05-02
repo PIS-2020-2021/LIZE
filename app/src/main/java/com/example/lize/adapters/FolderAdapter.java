@@ -25,7 +25,9 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
     private final ArrayList<ChipFolderListener> chipListeners;
 
     /* Custom ChipFolder onClick Listener */
-    public interface ChipFolderListener{ void onChipSelected(Chip folderChip);}
+    public interface ChipFolderListener{
+        void onChipSelected(Chip folderChip);
+    }
 
     /**
      * Method for registering a ChipFolder onClick listener

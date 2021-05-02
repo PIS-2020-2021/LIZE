@@ -48,7 +48,6 @@ public class SignUpActivity extends AppCompatActivity {
                     FirebaseAuth.getInstance().createUserWithEmailAndPassword(email.getText().toString(),
                             psw.getText().toString()).addOnCompleteListener(a -> {
                         if(a.isSuccessful()){
-                            //TODO: Crear Usuario y guardarlo en FireStore
                             User user = new User(email.getText().toString(), psw.getText().toString(),
                                     nombre.getText().toString(), apellidos.getText().toString());
                             user.setSelfID(a.getResult().getUser().getUid());
