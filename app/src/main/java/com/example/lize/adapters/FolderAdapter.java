@@ -81,7 +81,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
      */
     public class ChipFolder extends RecyclerView.ViewHolder{
 
-        private Chip folderChip;
+        private final Chip folderChip;
 
         /**
          * Constructor del ViewHolder correspondiente al layout de folder_chip

@@ -20,9 +20,7 @@ import com.example.lize.adapters.NoteAdapter;
 import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
 import com.example.lize.models.MainViewModel;
-import com.onegravity.rteditor.api.format.RTFormat;
 
-import static com.onegravity.rteditor.api.RTApi.getApplicationContext;
 
 /** Notes View Host fragment. Responsabilidades:
  * <ol><li> Gestionar la parte de la UI correspondiente con el RecycleView de CardNotes </li>

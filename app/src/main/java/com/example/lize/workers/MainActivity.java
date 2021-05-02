@@ -21,8 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lize.R;
-import com.example.lize.adapters.DatabaseAdapter;
-import com.example.lize.data.Note;
 import com.example.lize.models.MainViewModel;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -52,13 +50,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private MainViewModel dataViewModel;
     private FloatingActionButton addFAB, addNoteFAB, addFolderFAB;  // Floating Action Buttons
     private boolean isFABGroupExpanded = false;
-    private Handler handler = new Handler();        // Methods to create a simple animation
-    private Timer t = new Timer();                  //
-
+    private final Handler handler = new Handler();        // Methods to create a simple animation
+    private final Timer t = new Timer();
     private DrawerLayout drawerLayout;              //Declaramos DrawerLayout
-
     private ActionBarDrawerToggle mDrawerToggle;    //Declaramos Toggle
-
     private Button addAmbito;                       //Declaramos Botones
     private Button signOut;
 
@@ -96,23 +91,14 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
         //Asignamos Boton y Listener a addAmbito
         this.addAmbito = findViewById(R.id.addAmbitoButton);
-        addAmbito.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(getApplicationContext(), NewAmbitoActivity.class), REQUEST_CODE_ADD_AMBITO);
-
-            }
-        });
+        addAmbito.setOnClickListener(v -> startActivityForResult(new Intent(getApplicationContext(), NewAmbitoActivity.class), REQUEST_CODE_ADD_AMBITO));
 
         //Asignamos Boton y Listener a signOut
         this.signOut = findViewById(R.id.sign_out);
-        signOut.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
-                startActivity(intent);
-            }
+        signOut.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
+            startActivity(intent);
         });
 
         // Obtenemos los componentes y registramos Listeners
@@ -133,13 +119,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      */
     private void observeLiveData() {
         this.dataViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        dataViewModel.getToast().observe(this, (t) -> {
-            Toast.makeText(this.getBaseContext(), t, Toast.LENGTH_SHORT).show();
-        });
+        dataViewModel.getToast().observe(this, (t) -> Toast.makeText(this.getBaseContext(), t, Toast.LENGTH_SHORT).show());
 
-        dataViewModel.getUserSelected().observe(this, user -> {
-            initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), 0);
-        });
+        dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), 0));
 
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
             topAppBar.setTitle(ambito.getName());
@@ -256,11 +238,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             isFABGroupExpanded = !isFABGroupExpanded;
         });
 
-        addNoteFAB.setOnClickListener((v)->{
-            startActivityForResult(new Intent(getApplicationContext(), NotasActivity.class), REQUEST_CODE_ADD_NOTE);
-        });
+        addNoteFAB.setOnClickListener((v)-> startActivityForResult(new Intent(getApplicationContext(), NotasActivity.class), REQUEST_CODE_ADD_NOTE));
 
-        addFolderFAB.setOnClickListener((v)->{ showFolderMenu(v); });
+        addFolderFAB.setOnClickListener(this::showFolderMenu);
     }
 
     /**

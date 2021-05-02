@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
-    <RelativeLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/_44sdp"
-        android:background="@drawable/editor_control_bg"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/_44sdp"
+    android:background="@drawable/editor_control_bg"
+    android:orientation="horizontal"
+    android:layout_gravity="bottom">
 
-        <FrameLayout
-            android:id="@+id/container1"
-            android:layout_width="@dimen/_44sdp"
-            android:layout_height="match_parent">
+    <FrameLayout
+        android:id="@+id/container1"
+        android:layout_width="@dimen/_44sdp"
+        android:layout_height="match_parent">
 
-
-            <ImageView
+        <ImageView
                 android:id="@+id/checkBtn"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -24,7 +21,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="10dp"
-                android:src="@drawable/checkbox_uncheked"
+                app:srcCompat="@drawable/checkbox_uncheked"
                 android:contentDescription="@string/app_name" />
         </FrameLayout>
 
@@ -43,8 +40,9 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="10dp"
-                android:src="@drawable/document_icon"
+                app:srcCompat="@drawable/document_icon"
                 android:contentDescription="@string/app_name" />
+
         </RelativeLayout>
 
         <RelativeLayout
@@ -62,10 +60,9 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="10dp"
-                android:src="@drawable/ic_baseline_mic_24"
+                app:srcCompat="@drawable/ic_baseline_mic_24"
                 android:contentDescription="@string/todo" />
         </RelativeLayout>
-
 
 
         <FrameLayout
@@ -73,8 +70,7 @@
             android:layout_width="@dimen/_44sdp"
             android:layout_height="match_parent"
             android:layout_toEndOf="@+id/container3"
-            android:layout_toRightOf="@+id/container3"
-            >
+            android:layout_toRightOf="@+id/container3">
 
             <ImageView
                 android:id="@+id/insertImageBtn"
@@ -85,9 +81,8 @@
                 android:focusable="true"
                 android:padding="10dp"
                 android:src="@drawable/image"
-                android:contentDescription="TODO" />
+                android:contentDescription="@string/imagebutton" />
 
         </FrameLayout>
-
     </RelativeLayout>
 

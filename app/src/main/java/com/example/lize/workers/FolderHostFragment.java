@@ -1,37 +1,28 @@
 package com.example.lize.workers;
 
-import android.annotation.SuppressLint;
+
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.content.res.Resources;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import com.example.lize.R;
 import com.example.lize.adapters.FolderAdapter;
 import com.example.lize.data.Ambito;
-import com.example.lize.data.Folder;
 import com.example.lize.models.MainViewModel;
 import com.google.android.material.chip.Chip;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.function.Predicate;
 
 /**
  * Folder View Host fragment. Tiene las siguientes responsabilidades: <ol>
@@ -137,7 +128,7 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
     }
 
 
-    /**
+    /*
      * Cuando enlazemos el folder chip correspondiente a la BaseFolder por primera vez, lo seleccionamos.
      * @param rootFolder el rootFolder que ha sido enlazado */
     /*public void rootChipSelected(Chip rootFolder){

@@ -18,8 +18,6 @@ public class Note {
     private ArrayList<ImageView> images;
     private ArrayList<File> files;
 
-    public Note(){};
-
     public Note(String title, String text_plain, String text_html) {
         this.title = title;
         this.text_plain = text_plain;

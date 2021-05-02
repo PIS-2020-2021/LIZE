@@ -13,9 +13,7 @@ public class Ambito {
     private String selfID;
     private String userID;
 
-    private Map<String, Folder> folders;
-
-    public Ambito(){}
+    private final Map<String, Folder> folders;
 
     public Ambito(String name, int color) {
         this.name = name;

@@ -7,9 +7,8 @@ public class Folder {
 
     private String name;
     private String ambitoID;
-    private ArrayList<Note> notes;
+    private final ArrayList<Note> notes;
 
-    public Folder(){};
 
     public Folder(String name) {
         this.name = name;

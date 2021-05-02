@@ -103,8 +103,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
      */
     public class CardNote extends RecyclerView.ViewHolder{
 
-        private TextView mTitleNote;
-        private TextView mTextNote;
+        private final TextView mTitleNote;
+        private final TextView mTextNote;
         private String mNoteID;
 
         /**

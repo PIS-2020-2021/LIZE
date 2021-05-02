@@ -52,7 +52,9 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_baseline_add_24"/>
+            app:srcCompat="@drawable/ic_baseline_add_24"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@string/boton_mas_del_fab" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_note_button"
@@ -63,8 +65,9 @@
             android:layout_margin="16dp"
             app:fabSize="mini"
             android:visibility="invisible"
-            android:src="@drawable/ic_baseline_note_add_24"
-            android:layout_alignParentEnd="true" />
+            app:srcCompat="@drawable/ic_baseline_note_add_24"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@string/boton_add_note" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_folder_button"
@@ -75,8 +78,9 @@
             android:layout_margin="16dp"
             app:fabSize="mini"
             android:visibility="invisible"
-            android:src="@drawable/ic_baseline_folder_add_24"
-            android:layout_alignParentEnd="true" />
+            app:srcCompat="@drawable/ic_baseline_folder_add_24"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@string/boton_add_folder" />
 
     </RelativeLayout>
 
