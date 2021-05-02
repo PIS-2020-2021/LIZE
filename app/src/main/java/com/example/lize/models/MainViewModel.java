@@ -1,5 +1,6 @@
 package com.example.lize.models;
 
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -175,6 +176,39 @@ public class MainViewModel extends ViewModel {
         DatabaseAdapter.getInstance().saveNote(selected);           // Guardamos la Nota en DB
         setToast("Note " + title + " correctly edited.");           // Creamos Toast Informativo
     }
+
+    /* Deletes a Note of the current Folder mFolderSelected. */
+    //TODO:Eliminar bien las notas de todas las carpetas
+    public void deleteNote(String noteID) {
+        try{
+            for (Folder folder : mAmbitoSelected.getValue().getFolders()){
+                for(Note note : folder.getNotes()){
+                    if(note.getSelfID().equals(noteID)){
+                        folder.getNotes().remove(note);
+                    }
+                }
+            }
+
+            Log.w(TAG, "Failed to select note " + noteID + ": invalid ID.");
+        }catch(NullPointerException exception){
+            Log.w(TAG, "Failed to select note " + noteID + ": null pointer exception.");
+            Log.w(TAG, "Exception message: " + exception.getMessage());
+        }
+    }
+
+    /**
+     * Deletes a Folder of the current Ambito mAmbitoSelected
+     * @param folderName Carpeta Seleccionada
+     */
+    public void deleteFolder(String folderName) {
+        DatabaseAdapter.getInstance().deleteFolder(folderName);
+    }
+
+
+
+
+
+
 
     public void setToast(String s) {
         Log.w(TAG, s);

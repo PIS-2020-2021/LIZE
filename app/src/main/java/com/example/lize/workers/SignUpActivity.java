@@ -33,7 +33,7 @@ public class SignUpActivity extends AppCompatActivity {
 
             nombre = findViewById(R.id.nombre);
             apellidos = findViewById(R.id.apellidos);
-            email = findViewById(R.id.email);
+            email = findViewById(R.id.email_header);
             psw = findViewById(R.id.password_login);
             login = findViewById(R.id.login);
             signup = findViewById(R.id.signup);

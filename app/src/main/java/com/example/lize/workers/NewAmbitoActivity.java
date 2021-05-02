@@ -11,13 +11,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.lize.R;
+import com.example.lize.data.Ambito;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 public class NewAmbitoActivity extends AppCompatActivity {
 
     private EditText nombre;
-    private String colorAmbito;
+    private int colorAmbito;
     private TextInputLayout nombreError, colorAmbitoError;
     boolean isNameValid, isColorAmbitoValid;
 
@@ -27,7 +28,7 @@ public class NewAmbitoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_ambito);
 
-        colorAmbito = null;
+        colorAmbito = 0;
         nombre = findViewById(R.id.nombre);
         colorAmbitoError = findViewById(R.id.colorAmbitoError);
         nombreError = findViewById(R.id.nameError);
@@ -39,7 +40,12 @@ public class NewAmbitoActivity extends AppCompatActivity {
         newAmbito.setOnClickListener(v -> {
             if (validarDatos()){
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
+                Bundle ambito = new Bundle();
+                ambito.putString("name", nombre.getText().toString());
+                ambito.putLong("color", colorAmbito);
+                intent.putExtras(ambito);
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
     }
@@ -60,7 +66,7 @@ public class NewAmbitoActivity extends AppCompatActivity {
         }
 
         //Comprobamos que se ha seleccionado algún Color
-        if(colorAmbito == null){
+        if(colorAmbito == 0){
             colorAmbitoError.setError(getResources().getString(R.string.errorColorAmbito));
             Toast.makeText(getApplicationContext(), colorAmbitoError.getError(), Toast.LENGTH_SHORT).show();
             isColorAmbitoValid = false;
@@ -79,15 +85,15 @@ public class NewAmbitoActivity extends AppCompatActivity {
 
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.cardRojo:         colorAmbito = "Red";  break;
-            case R.id.cardMorado:       colorAmbito = "Purple";   break;
-            case R.id.cardIndigo:       colorAmbito = "Indigo";      break;
-            case R.id.cardAzul:         colorAmbito = "Blue";     break;
-            case R.id.cardTeal:         colorAmbito = "Teal";   break;
-            case R.id.cardVerde:        colorAmbito = "Green";      break;
-            case R.id.cardAmarillo:     colorAmbito = "Yellow";    break;
-            case R.id.cardNaranja:      colorAmbito = "Orange";      break;
-            case R.id.cardMarron:       colorAmbito = "Brown";   break;
+            case R.id.cardRojo:         colorAmbito = 1;  break;
+            case R.id.cardMorado:       colorAmbito = 2;   break;
+            case R.id.cardIndigo:       colorAmbito = 3;      break;
+            case R.id.cardAzul:         colorAmbito = 4;     break;
+            case R.id.cardTeal:         colorAmbito = 5;   break;
+            case R.id.cardVerde:        colorAmbito = 6;      break;
+            case R.id.cardAmarillo:     colorAmbito = 7;    break;
+            case R.id.cardNaranja:      colorAmbito = 8;      break;
+            case R.id.cardMarron:       colorAmbito = 9;   break;
 
             //case R.id.btnIcoAtras:      finish();                                           break;
         }

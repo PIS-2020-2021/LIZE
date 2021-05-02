@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     public static final String TAG = "MainActivity";
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
+    private static final int REQUEST_CODE_ADD_AMBITO = 3;
 
 
     private MainViewModel dataViewModel;
@@ -98,8 +99,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         addAmbito.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NewAmbitoActivity.class);
-                startActivity(intent);
+                startActivityForResult(new Intent(getApplicationContext(), NewAmbitoActivity.class), REQUEST_CODE_ADD_AMBITO);
+
             }
         });
 
@@ -138,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
 
         dataViewModel.getUserSelected().observe(this, user -> {
-            initHeaderNavigationView(user.getFirst() + user.getLast(), user.getMail(), 0);
+            initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), 0);
         });
 
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
@@ -193,21 +194,33 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         super.onActivityResult(requestCode, resultCode, data);
         Bundle bundle = data.getExtras();
         if (bundle != null) {
-            Log.d(TAG, "Received new Bundle Data from NoteActivity: " + bundle.toString());
-            String title = bundle.getString("title");
-            String plainText = bundle.getString("noteText_PLAIN");
-            String htmlText = bundle.getString("noteText_HTML");
-            if(requestCode == REQUEST_CODE_ADD_NOTE && resultCode == RESULT_OK) {
-                Log.d(TAG, "Request Code for New Note Adding OK");
+            Log.d(TAG, "Received new Bundle Data: " + bundle.toString());
+            if (requestCode == REQUEST_CODE_ADD_NOTE && resultCode == RESULT_OK) {
+                String title = bundle.getString("title");
+                String plainText = bundle.getString("noteText_PLAIN");
+                String htmlText = bundle.getString("noteText_HTML");
+                Log.d("Titulo", title);
+                Log.d("Texto Plano", plainText);
+                Log.d("Texto HTML", htmlText);
                 dataViewModel.addNote(title, plainText, htmlText);
 
             } else if (requestCode == REQUEST_CODE_EDIT_NOTE && resultCode == RESULT_OK) {
                 Log.d(TAG, "Request Code for Note Editing OK");
+                String title = bundle.getString("title");
+                String plainText = bundle.getString("noteText_PLAIN");
+                String htmlText = bundle.getString("noteText_HTML");
                 dataViewModel.editNote(title, plainText, htmlText);
+
+            } else if (requestCode == REQUEST_CODE_ADD_AMBITO && resultCode == RESULT_OK) {
+                String name = bundle.getString("name");
+                int color = (int) bundle.getLong("color");
+                Log.d("Nombre", name);
+                Log.d("Color ", String.valueOf(color));
+                ambitoHostFragment.addAmbito(name, color);
 
             } else Log.d(TAG, "Invalid RESULT from NoteActivity: " + resultCode);
 
-        } else Log.d(TAG, "No Data from NoteActivity: null bundle");
+        } else Log.d(TAG, "Null bundle");
     }
 
     /**
@@ -219,9 +232,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private void initHeaderNavigationView(String name, String eMail, int imgProfile){
         View header = (View) findViewById(R.id.headerView);
 
-        TextView headerName = (TextView) header.findViewById(R.id.name);
-        TextView headerEMail = (TextView) header.findViewById(R.id.email);
-        CircleImageView headerImgProfile = header.findViewById(R.id.circleImageView);
+        TextView headerName = (TextView) header.findViewById(R.id.name_header);
+        TextView headerEMail = (TextView) header.findViewById(R.id.email_header);
+        CircleImageView headerImgProfile = header.findViewById(R.id.circleImageView_header);
 
         if(name != null) headerName.setText(name);
         if(eMail != null)  headerEMail.setText(eMail);
