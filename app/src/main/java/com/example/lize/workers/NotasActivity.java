@@ -16,6 +16,7 @@ import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +24,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 
@@ -38,7 +38,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lize.R;
 import com.example.lize.adapters.DocumentAdapter;
 import com.example.lize.data.Documento;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.onegravity.rteditor.RTEditText;
 import com.onegravity.rteditor.RTManager;
 import com.onegravity.rteditor.RTToolbar;
@@ -49,8 +48,6 @@ import com.onegravity.rteditor.api.RTProxyImpl;
 import com.onegravity.rteditor.api.format.RTFormat;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
-
-
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -60,12 +57,10 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private static String DEFAULT_TITLE = "Titulo";
     public static final int REQUEST_CODE_ADD_NOTE = 1;
-
     private EditText inputNoteTitulo, inputNoteTexto;
     private CarouselView carouselView;
     private ArrayList<Bitmap> images;
     private ArrayList<Documento> documents;
-    private RelativeLayout imageLayout;
 
     public static final int PICK_IMAGE = 1;
     public static final int REQUEST_DOCUMENT_GET = 2;
@@ -77,7 +72,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     private ViewGroup toolbarContainer;
     private  RTToolbar rtToolbar;
     private  RTEditText rtEditText;
-    private FloatingActionButton KeyboardButton;
+
     @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,10 +89,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         //imageLayout = findViewById(R.id.imageNote);
         ImageView backBtn = findViewById(R.id.backBtn);
 
-        /**
-        ImageView imageView = findViewById(R.id.insertImageBtn);
-        ImageView documentBtn = findViewById(R.id.documentBtn);
-**/
+
 
         // Apartado de documentos
         //ArrayList de imagenes y documentes
@@ -105,63 +97,12 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         documents = new ArrayList<>();
 
         //Onclick Listener botones
-
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*saveNota();*/
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                Bundle nota = new Bundle();
-                nota.putString("title", inputNoteTitulo.getText().toString());
-                nota.putString("noteText_HTML", rtEditText.getText(RTFormat.HTML));
-                nota.putString("noteText_PLAIN", rtEditText.getText(RTFormat.PLAIN_TEXT));
-                intent.putExtras(nota);
-                setResult(validateNote(), intent);
-                finish();
+                saveNote();
             }
         });
-
-
-
-
-
-/*
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(
-                        getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(
-                            NotasActivity.this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            PICK_IMAGE
-                    );
-                } else {
-                    selectImage();
-                }
-            }
-        });*/
-
-        /*documentBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(
-                        getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(
-                            NotasActivity.this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            REQUEST_DOCUMENT_GET
-                    );
-                } else {
-                    selectDocument();
-                }
-            }
-            }
-        );
-*/
-        //registerForContextMenu(inputNoteTexto);
 
         recyclerView = (RecyclerView) findViewById(R.id.fileAttachView);
         layoutManager = new LinearLayoutManager(this);
@@ -171,11 +112,11 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         adapter = new DocumentAdapter(documents,this);
         recyclerView.setAdapter(adapter);
 
-        // create RTManager
+        // Crear RTManager para gestionar los botones de estilo
           rtApi = new RTApi(this, new RTProxyImpl(this), new RTMediaFactoryImpl(this, true));
           rtManager = new RTManager(rtApi, savedInstanceState);
 
-// register toolbar
+        // Asignamos el layout del toolbar de estilos
           toolbarContainer = (ViewGroup) findViewById(R.id.toolbar_container);
           rtToolbar = (RTToolbar) findViewById(R.id.rte_toolbar);
 
@@ -185,17 +126,28 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         }
 
 // register editor & set text
-          rtEditText = (RTEditText) findViewById(R.id.inputNota);
+        rtEditText = (RTEditText) findViewById(R.id.inputNota);
         rtManager.registerEditor(rtEditText, true);
         //rtEditText.setRichTextEditing(true, message);
 
-
-
         getBundleForEdit();
-
 
     }
 
+
+
+    //Método para guardar la nota en caso de que el usuario presione el botón atrás del móvil
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            saveNote();
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    // Método para recuperar el contenido de la nota al editar.
     private void getBundleForEdit() {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -208,14 +160,14 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
             rtEditText.setRichTextEditing(true, html_text);
         }
     }
-
+    //Función para validar el contenido de la nota antes de agregarla a base de datos
     private int validateNote() {
         if(inputNoteTitulo.getText().toString().isEmpty() && rtEditText.getText(RTFormat.PLAIN_TEXT).isEmpty())
             return RESULT_CANCELED;
 
         return RESULT_OK;
     }
-
+    //Método que construye el menú de tres puntos.
     public void showMenu(View v) {
         //noinspection RestrictedApi
         MenuBuilder menuBuilder = new MenuBuilder(this);
@@ -260,26 +212,35 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
         // Display the menu
         //noinspection RestrictedApi
-
         optionsMenu.show();
 
 
     }
 
+    //Método para crear el intent para regresar los datos al Main activity
+    private void saveNote(){
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        Bundle nota = new Bundle();
+        nota.putString("title", inputNoteTitulo.getText().toString());
+        nota.putString("noteText_HTML", rtEditText.getText(RTFormat.HTML));
+        nota.putString("noteText_PLAIN", rtEditText.getText(RTFormat.PLAIN_TEXT));
+        intent.putExtras(nota);
+        setResult(validateNote(), intent);
+        finish();
+    }
 
-
+    //Este método se encarga de crear una imagén a partir del contenido del EditText de notas.
     private void updateBitmap() {
         getEnteredWidthOrDefault();
         new BitmapGeneratingAsyncTask(this,rtEditText.getText(RTFormat.HTML), getEnteredWidthOrDefault(), this).execute();
     }
 
+
+    //Intent para compartir el contenido de las imágenes
     @Override
     public void done(Bitmap bitmap) {
 
         String path = MediaStore.Images.Media.insertImage(this.getApplicationContext().getContentResolver(), bitmap,"test", null);
-
-
-
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
@@ -287,11 +248,9 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         startActivity(Intent.createChooser(shareIntent,"Share with" ));
     }
 
+    //Este método calcula el tamaño por defecto que tendrá el editText
     public int getEnteredWidthOrDefault() {
         String enteredValue = rtEditText.getText(RTFormat.PLAIN_TEXT);
-
-
-
         if (!TextUtils.isEmpty(enteredValue)) {
            return rtEditText.getWidth();
         } else {
@@ -301,41 +260,13 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
 
 
-
-/*
-
-
-
-
-/*
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.add_document:
-                selectDocument();
-                return true;
-            case R.id.add_audio:
-
-                return true;
-            case R.id.add_reminder:
-
-                return true;
-            case R.id.share:
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }*/
-
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
         rtManager.onSaveInstanceState(outState);
 
     }
-
+    //Cierre del manager de edición cuando la actividad finaliza
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -366,7 +297,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     }
 
 
-    //Intent para seleccionar una imagen
+    //Intent para seleccionar una imagen del dispositivo e insertarlo en el Carrusel
    private void selectImage() {
         Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickIntent.setType("image/*");
@@ -378,8 +309,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         startActivityForResult(chooserIntent, PICK_IMAGE);
     }
 
-    //Intent para seleccionar un documento
-
+    //Intent para seleccionar un documento y agregarlo al apartado documentos de la nota
     private void selectDocument(){
         Intent pickIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         pickIntent.setType("*/*");
@@ -390,9 +320,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         startActivityForResult(chooserIntent, REQUEST_DOCUMENT_GET);
     }
 
-
-
-
+    //Método para el tratamiento de los permisos de la aplicación
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -412,13 +340,10 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     }
 
 
-
     // Tratamiento de los datos de Intents de imagenes y documentos.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-
         if (requestCode == PICK_IMAGE) {
             if (data != null) {
                 Uri selectedImageUri = data.getData();
@@ -474,6 +399,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
     }
 
+    //Esta función realiza las opciones de eliminar documento e imagen en función del elemento seleccionado
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getTitle().equals("Eliminar")) {
@@ -484,29 +410,11 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
             if(adapter.getItemCount() == 0 ){
                 recyclerView.setVisibility(View.GONE);
             }
-        }/*else if (item.getTitle().equals("Negrita")) {
-            SpannableStringBuilder stringBuilder = (SpannableStringBuilder) inputNoteTexto.getText();
-            int selectionStart = inputNoteTexto.getSelectionStart();
-            int selectionEnd = inputNoteTexto.getSelectionEnd();
-            stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), selectionStart, selectionEnd, 0);
-
-        } else if (item.getTitle().equals("Subrayado")) {
-            SpannableStringBuilder stringBuilder = (SpannableStringBuilder) inputNoteTexto.getText();
-            int selectionStart = inputNoteTexto.getSelectionStart();
-            int selectionEnd = inputNoteTexto.getSelectionEnd();
-            stringBuilder.setSpan(new UnderlineSpan(), selectionStart, selectionEnd, 0);
-
-        } else if (item.getTitle().equals("Subtitulo")) {
-            SpannableStringBuilder stringBuilder = (SpannableStringBuilder) inputNoteTexto.getText();
-            int selectionStart = inputNoteTexto.getSelectionStart();
-            int selectionEnd = inputNoteTexto.getSelectionEnd();
-            stringBuilder.setSpan(new RelativeSizeSpan(1.35f), selectionStart, selectionEnd, 0);
-            stringBuilder.setSpan(new StyleSpan(Typeface.BOLD_ITALIC), selectionStart, selectionEnd, 0);
-
-        }*/
+        }
         return true;
     }
 
+    //TODO funcionalidad de abrir documentos en aplicaciones externas
     @Override
     public void onDocumentClick(int position) {
 
@@ -525,7 +433,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         intent.setDataAndType(contentUri, mime);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(intent);*/
-        }
+    }
 
 }
 

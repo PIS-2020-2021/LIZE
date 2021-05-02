@@ -27,7 +27,8 @@
         android:orientation="vertical"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
-        android:background="?attr/colorPrimary"
+        android:background="@drawable/toolbar_backround"
+
        >
 
         <com.onegravity.rteditor.toolbar.HorizontalRTToolbar
@@ -56,6 +57,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="10dp"
                     android:background="@drawable/ic_baseline_format_bold_24"
+
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center_horizontal"

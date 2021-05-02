@@ -65,8 +65,8 @@
     <string name="closeDrawer">Close Drawer </string>
     <string name="share">Share</string>
     <string name="add_recordatory">Add reminder</string>
-    <string name="insert_document">Insert document</string>
-    <string name="insert_image">Insert image</string>
+    <string name="insert_document">Add document</string>
+    <string name="insert_image">Add image</string>
     <string name="add_audio">Add audio</string>
     <string name="add_reminder">Add reminder</string>
     <string name="keyboard_style">Cambio entre estilo y teclado</string>
