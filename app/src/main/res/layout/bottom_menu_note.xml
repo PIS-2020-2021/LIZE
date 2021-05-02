@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+    <RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_44sdp"
+        android:background="@drawable/editor_control_bg"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        >
+
+        <FrameLayout
+            android:id="@+id/container1"
+            android:layout_width="@dimen/_44sdp"
+            android:layout_height="match_parent">
+
+
+            <ImageView
+                android:id="@+id/checkBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/checkbox_uncheked"
+                android:contentDescription="@string/app_name" />
+        </FrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/container2"
+            android:layout_width="@dimen/_44sdp"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@+id/container1"
+            android:layout_toRightOf="@+id/container1">
+
+            <ImageView
+                android:id="@+id/documentBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/document_icon"
+                android:contentDescription="@string/app_name" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/container3"
+            android:layout_width="@dimen/_44sdp"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@+id/container2"
+            android:layout_toRightOf="@+id/container2">
+
+            <ImageView
+                android:id="@+id/AudioBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_baseline_mic_24"
+                android:contentDescription="@string/todo" />
+        </RelativeLayout>
+
+
+
+        <FrameLayout
+            android:id="@+id/container4"
+            android:layout_width="@dimen/_44sdp"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@+id/container3"
+            android:layout_toRightOf="@+id/container3"
+            >
+
+            <ImageView
+                android:id="@+id/insertImageBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/image"
+                android:contentDescription="TODO" />
+
+        </FrameLayout>
+
+    </RelativeLayout>
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- CardNote layout_height values -->
+    <dimen name="cardnote_layout_height_high">150dp</dimen>
+    <dimen name="cardnote_layout_height_low">100dp</dimen>
+
+    <!-- ChipFolder layout_margin value -->
+    <dimen name="chipfolder_layout_margin">5dp</dimen>
+
+    <!-- FAB Group translation-Y values -->
+    <dimen name="fab_translation_1">60dp</dimen>
+    <dimen name="fab_translation_2">110dp</dimen>
+    <integer name="fab_rotation">135</integer>
+
+</resources>

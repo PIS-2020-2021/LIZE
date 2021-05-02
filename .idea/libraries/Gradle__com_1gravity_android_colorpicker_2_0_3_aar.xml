@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="Gradle: com.1gravity:android-colorpicker:2.0.3@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c37deae83d8342a1832ee20d08226623/jetified-android-colorpicker-2.0.3/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c37deae83d8342a1832ee20d08226623/jetified-android-colorpicker-2.0.3/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c37deae83d8342a1832ee20d08226623/jetified-android-colorpicker-2.0.3/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.1gravity/android-colorpicker/2.0.3/dcaad660212a122f739d78dfa7503fbd4dd808f6/android-colorpicker-2.0.3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.1gravity/android-colorpicker/2.0.3/407a00c918a9468d8660f4e442a4040bb9fdfda0/android-colorpicker-2.0.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

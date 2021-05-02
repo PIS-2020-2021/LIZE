@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -10,9 +11,10 @@ android {
         applicationId "com.example.lize"
         minSdkVersion 16
         targetSdkVersion 30
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
-
+        vectorDrawables.useSupportLibrary = true;
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -25,6 +27,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+
     }
 }
 
@@ -33,7 +36,43 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
     testImplementation 'junit:junit:4.+'
+
+    //Dependencias del RecyclerView
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation "androidx.recyclerview:recyclerview-selection:1.1.0"
+
+    //Libreria del CircleImage del Header
+    implementation "de.hdodenhof:circleimageview:1.2.1"
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+
+
+    //CardView
+    implementation "androidx.cardview:cardview:1.0.0"
+    implementation 'com.synnapps:carouselview:0.1.4'
+
+
+    //Escala de tamaños (soporte para varios tipos de pantalla)
+    implementation "com.intuit.sdp:sdp-android:1.0.6"
+    implementation "com.intuit.ssp:ssp-android:1.0.6"
+
+    implementation 'com.1gravity:android-rteditor:1.6.7'
+    implementation 'com.izettle:html2bitmap:1.9'
+
+
+    // Lifecycle-extensions
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
+    // Firebase Dependencies
+    implementation platform('com.google.firebase:firebase-bom:26.8.0')
+    implementation 'com.google.firebase:firebase-firestore:21.4.0'
+    implementation 'com.google.firebase:firebase-storage'
+    implementation 'com.google.firebase:firebase-auth'
+
+    // Multidex for avoiding 64K method references limitation
+    implementation "androidx.multidex:multidex:2.0.1"
+
 }

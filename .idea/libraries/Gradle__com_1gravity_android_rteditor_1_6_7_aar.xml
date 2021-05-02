@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="Gradle: com.1gravity:android-rteditor:1.6.7@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/2aa2a0a24a67edc139d4a85a7f1995d1/jetified-android-rteditor-1.6.7/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/2aa2a0a24a67edc139d4a85a7f1995d1/jetified-android-rteditor-1.6.7/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/2aa2a0a24a67edc139d4a85a7f1995d1/jetified-android-rteditor-1.6.7/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.1gravity/android-rteditor/1.6.7/1a4b453aab98ff90e4646f7ae8c3c7722fc0c161/android-rteditor-1.6.7-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.1gravity/android-rteditor/1.6.7/8e565231f165a396368fd56905513417f08f696f/android-rteditor-1.6.7-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

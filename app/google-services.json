@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "755112893045",
+    "project_id": "lize-cd0ff",
+    "storage_bucket": "lize-cd0ff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755112893045:android:067b17289f2c5c140f363c",
+        "android_client_info": {
+          "package_name": "com.android.application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "755112893045-mdijv0to959kc8qbcbu92ukgp4h9ni9g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOKTx1noVcgYQkaHkBtOWrmUyg8odRhnI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "755112893045-mdijv0to959kc8qbcbu92ukgp4h9ni9g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755112893045:android:c0a9601f808c94b90f363c",
+        "android_client_info": {
+          "package_name": "com.example.lize"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "755112893045-mdijv0to959kc8qbcbu92ukgp4h9ni9g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOKTx1noVcgYQkaHkBtOWrmUyg8odRhnI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "755112893045-mdijv0to959kc8qbcbu92ukgp4h9ni9g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
