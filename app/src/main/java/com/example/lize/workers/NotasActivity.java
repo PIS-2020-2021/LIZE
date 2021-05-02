@@ -270,7 +270,6 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         rtManager.onDestroy(isFinishing());
 
     }

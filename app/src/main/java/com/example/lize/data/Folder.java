@@ -41,8 +41,6 @@ public class Folder {
         return notes;
     }
 
-    public void setNotes(ArrayList<Note> notes) { this.notes = notes; }
-
     public boolean addNote(Note note){
         note.setFolderTAG(this.name);
         note.setAmbitoID(this.ambitoID);
