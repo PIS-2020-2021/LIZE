@@ -8,8 +8,7 @@ public class User {
     private String mail;
     private String password;
     private String selfID;
-    //TODO: Image de User
-
+    // TODO: Imagen de User
     // TODO: username implementation! private String username;
 
     private ArrayList<Ambito> ambitos;

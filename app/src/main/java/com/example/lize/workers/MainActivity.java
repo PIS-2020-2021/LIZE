@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         signOut.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                //TODO: Cerrar el MainViewModel
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
                 startActivity(intent);

@@ -204,17 +204,10 @@ public class MainViewModel extends ViewModel {
         DatabaseAdapter.getInstance().deleteFolder(folderName);
     }
 
-
     public void setToast(String s) {
         Log.w(TAG, s);
         mToast.setValue(s);
     }
-
-    /** TODO: Métodos para editar la Nota desde la NoteActivity! + DataBase connection: note.saveNote()
-     public void addImageOnNote(String imageURL);
-     public void addDocumentOnNote(String documentURL);
-     public void addAudioOnNote(String audioURL); */
-
 
     /* BUILDER PATTERN FOR DATABASE INTERFACE */
     protected class UserBuilder implements DatabaseAdapter.vmInterface{
