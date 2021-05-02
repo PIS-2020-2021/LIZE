@@ -1,5 +1,6 @@
 package com.example.lize.workers;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.os.PersistableBundle;
@@ -29,6 +31,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
@@ -57,9 +60,9 @@ import java.util.ArrayList;
 
 public class NotasActivity extends AppCompatActivity implements  BitmapGeneratingAsyncTask.Callback ,DocumentAdapter.OnDocumentListener {
 
-    private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private static String DEFAULT_TITLE = "Titulo";
     public static final int REQUEST_CODE_ADD_NOTE = 1;
+    private static final int REQUEST_CODE_EDIT_NOTE = 2;
 
     private EditText inputNoteTitulo, inputNoteTexto;
     private CarouselView carouselView;
@@ -278,13 +281,13 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
         String path = MediaStore.Images.Media.insertImage(this.getApplicationContext().getContentResolver(), bitmap,"test", null);
 
-
-
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
         shareIntent.setType("image/jpeg");
+
         startActivity(Intent.createChooser(shareIntent,"Share with" ));
+
     }
 
     public int getEnteredWidthOrDefault() {

@@ -40,27 +40,31 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/white"
             android:fillViewport="true">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
 
                 <include
                     layout="@layout/header" />
 
                 <fragment
+                    app:layout_constraintTop_toBottomOf="@id/headerView"
                     android:id="@+id/ambitos_host_fragment"
                     android:name="com.example.lize.workers.AmbitoHostFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <LinearLayout
+                    app:layout_constraintBottom_toBottomOf="parent"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
+                    android:orientation="vertical"
                     android:background="#ffffff"
-                    android:gravity="center"
+                    android:gravity="bottom"
                     android:paddingTop="3dp"
                     android:paddingBottom="6dp">
 
@@ -70,13 +74,13 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:radius="50dip"
-                        app:cornerRadius="50dp"
                         android:text="Salir"
+                        app:cornerRadius="50dp"
 
                         app:elevation="7dp" />
 
                 </LinearLayout>
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
 
 

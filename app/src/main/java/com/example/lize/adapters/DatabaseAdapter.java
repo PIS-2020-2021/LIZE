@@ -8,6 +8,8 @@ import com.example.lize.data.Ambito;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -206,6 +208,7 @@ public class DatabaseAdapter {
         ambitoData.put("selfID", ambito.getSelfID());
         ambitoData.put("userID", ambito.getUserID());
 
+
         ambitoRef.set(ambitoData).addOnCompleteListener(new OnCompleteListener(){
             @Override
             public void onComplete(@NonNull Task task) {
@@ -228,6 +231,7 @@ public class DatabaseAdapter {
         if(note.getSelfID() == null){
             noteRef= db.collection("notes").document();
             note.setSelfID(noteRef.getId());
+
         } else {
             noteRef= db.collection("notes").document(note.getSelfID());
         }
@@ -248,6 +252,108 @@ public class DatabaseAdapter {
                 else Log.d(TAG, "Error saving note " + note.getSelfID(), task.getException());
             }
         });
+    }
+    public void deleteNota(String notaID){
+        DatabaseAdapter.db.collection("notes").document(notaID).delete()
+        .addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Nota Eliminada Correctamente");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w(TAG, "Error al Eliminar la nota", e);
+            }
+        });
+    }
+
+    public void deleteFolder(String folderTAG) {
+        Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("folderTAG", folderTAG);
+
+        notasRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    try {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            deleteNota(document.getId());
+                        }
+                        Log.d(TAG, "Colección de Notas de " + folderTAG + " eliminado correctamente");
+                    } catch (NullPointerException exception){
+                        Log.w(TAG, "Failed to get Collection of notes of  " + folderTAG + ": null pointer exception.");
+                    }
+                } else Log.d(TAG, "Error al eliminar la coleccion de notas: ", task.getException());
+            }
+        });
+    }
+
+    public void deleteAmbito(String ambitoID) {
+        Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("ambitoID", ambitoID);
+
+        notasRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    try {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            deleteNota(document.getId());
+                        }
+                        Log.d(TAG, "Colección de Notas de " + ambitoID + " eliminado correctamente");
+                    } catch (NullPointerException exception){
+                        Log.w(TAG, "Failed to get Collection of notes of  " + ambitoID + ": null pointer exception.");
+                    }
+                } else{
+                    Log.d(TAG, "Error al eliminar la coleccion de notas: ", task.getException());
+                }
+            }
+        });
+
+        DatabaseAdapter.db.collection("ambitos").document(ambitoID).delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Ambito Eliminado Correctamente");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w(TAG, "Error al Eliminar el Ambito", e);
+            }
+        });
+    }
+
+    public void deleteUser(String userID) {
+        Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", userID);
+
+        ambitosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    try{
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            deleteAmbito(document.getId());
+                        }
+                        Log.d(TAG, "Colección de Ambitos de " + userID + " eliminado correctamente");
+                    } catch (NullPointerException exception){
+                        Log.w(TAG, "Failed to get Collection of ambitos of  " + userID + ": null pointer exception.");
+                    }
+                } else Log.d(TAG, "Error al eliminar la coleccion de ambitos: ", task.getException());
+            }
+        });
+
+        DatabaseAdapter.db.collection("users").document(userID).delete()
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "Usuario Eliminado Correctamente");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error al Eliminar el Usuario", e);
+                }
+            });
     }
 
     public void saveNoteWithFile(String id, String description, String userid, String path) {

@@ -21,7 +21,10 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
     private final ArrayList<AmbitosAdapter.AmbitoListener> ambitoListeners;
 
     /* Custom Ambito onClick Listener */
-    public interface AmbitoListener{ void onAmbitoSelected(String ambitoName); }
+    public interface AmbitoListener{
+        void onAmbitoSelected(String ambitoName);
+        void onAmbitoHold(View view);
+    }
 
     /**
      * Method for registering a Ambito onClick listener
@@ -98,6 +101,15 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
             itemView.setOnClickListener((a)->{
                 for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
                     listener.onAmbitoSelected(mTitleAmbito.getText().toString());
+            });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    for(AmbitosAdapter.AmbitoListener listener : ambitoListeners)
+                        listener.onAmbitoHold(v);
+                    return false;
+                }
             });
         }
 

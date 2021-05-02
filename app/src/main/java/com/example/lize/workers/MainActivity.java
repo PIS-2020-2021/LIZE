@@ -37,6 +37,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener{
 
+
     private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
     private NoteHostFragment noteHostFragment;               // Contenedor de Notas
     private FolderHostFragment folderHostFragment;           // Contenedor de Folders
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
+    private static final int REQUEST_CODE_ADD_AMBITO = 3;
 
 
     private MainViewModel dataViewModel;
@@ -96,8 +98,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         addAmbito.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NewAmbitoActivity.class);
-                startActivity(intent);
+                startActivityForResult(new Intent(getApplicationContext(), NewAmbitoActivity.class), REQUEST_CODE_ADD_AMBITO);
+
             }
         });
 
@@ -136,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
 
         dataViewModel.getUserSelected().observe(this, user -> {
-            initHeaderNavigationView(user.getFirst() + user.getLast(), user.getMail(), 0);
+            initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), 0);
         });
 
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
@@ -221,6 +223,16 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 dataViewModel.getNoteSelected().setValue(selectedNote);
                 DatabaseAdapter.getInstance().saveNote(selectedNote);
             }
+        } else if(requestCode == REQUEST_CODE_ADD_AMBITO && resultCode ==RESULT_OK){
+                Bundle bundle = data.getExtras();
+                if (bundle != null) {
+                    String name = bundle.getString("name");
+                    int color = (int) bundle.getLong("color");
+                    Log.d("Nombre", name);
+                    Log.d("Color ", String.valueOf(color));
+
+                    ambitoHostFragment.addAmbito(name, color);
+            }
         }
     }
 
@@ -233,9 +245,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private void initHeaderNavigationView(String name, String eMail, int imgProfile){
         View header = (View) findViewById(R.id.headerView);
 
-        TextView headerName = (TextView) header.findViewById(R.id.name);
-        TextView headerEMail = (TextView) header.findViewById(R.id.email);
-        CircleImageView headerImgProfile = header.findViewById(R.id.circleImageView);
+        TextView headerName = (TextView) header.findViewById(R.id.name_header);
+        TextView headerEMail = (TextView) header.findViewById(R.id.email_header);
+        CircleImageView headerImgProfile = header.findViewById(R.id.circleImageView_header);
 
         if(name != null) headerName.setText(name);
         if(eMail != null)  headerEMail.setText(eMail);
