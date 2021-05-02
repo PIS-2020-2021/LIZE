@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
         if(name != null) headerName.setText(name);
         if(eMail != null)  headerEMail.setText(eMail);
-        if(imgProfile != -1) headerImgProfile.setImageResource(imgProfile);
+        //if(imgProfile != -1) headerImgProfile.setImageResource(imgProfile);
     }
 
     /**
