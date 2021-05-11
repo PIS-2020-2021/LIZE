@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import com.example.lize.R;
 import com.example.lize.adapters.FolderAdapter;
 import com.example.lize.data.Ambito;
+import com.example.lize.data.Folder;
 import com.example.lize.models.MainViewModel;
 import com.google.android.material.chip.Chip;
 
@@ -22,6 +23,8 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 
 /**
@@ -36,7 +39,7 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
     private Context mContext;                    // root context
     private RecyclerView mFoldersRecyclerView;   // Recycle View of folders
     private FolderAdapter mFolderAdapter;        // FolderAdapter for the RecycleView
-    private Chip selectedFolder;                 // Chip Folder selected
+    private Chip selectedFolder;                 // Selected ChipFolder
     private TypedValue typedValue;               // For color wrapping
 
     private MainViewModel dataViewModel;        // Model Shared Data between Fragments
@@ -60,30 +63,21 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
         this.mContext = root.getContext();
         this.dataViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-        dataViewModel.getAmbitoSelected().observe(getViewLifecycleOwner(), (Ambito ambito) ->{
+        // Actualizamos la lista de Carpetas cuando se seleccione un Ámbito
+        dataViewModel.getAmbitoSelected().observe(getViewLifecycleOwner(), (@NonNull Ambito ambito) ->{
             mFolderAdapter = new FolderAdapter(mContext, ambito.getFolders());
             mFolderAdapter.registerChipFolderListener(this);
             mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
             mFolderAdapter.notifyDataSetChanged();
         });
 
-        // Si la carpeta seleccionada es la Folder
-        /*dataViewModel.getFolderSelected().observe(getViewLifecycleOwner(), (Folder folder) ->{
-            if (folder.getName().equals(Folder.BASE_FOLDER_NAME)){
-                // 1. Trobar el Chip corresponent a la BASE_FOLDER_NAME
-
-                for (int i = 0; i < mFolderAdapter.getItemCount(); i++){
-                    Chip chipFolder = (Chip) mFoldersRecyclerView.getLayoutManager().getChildAt(i);
-                    if (chipFolder.getText().toString().equals())
-                }getLayoutManager().get)
-                // 2. Aplicar un onChipSelected() de la BaseFolderName
+        // Cuando deseleccionamos la Carpeta (folder == null), deseleccionamos el ChipFolder anterior.
+        dataViewModel.getFolderSelected().observe(getViewLifecycleOwner(), (@Nullable Folder folder)->{
+            if (folder == null){
+                if (selectedFolder != null) deselectColorChange(selectedFolder);
+                selectedFolder = null;
             }
-            mFolderAdapter = new FolderAdapter(mContext, ambito.getFolders());
-            mFolderAdapter.registerChipFolderListener(this);
-            mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
-            mFolderAdapter.notifyDataSetChanged();
-        });*/
-
+        });
     }
 
     /**
@@ -95,37 +89,46 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
     }
 
     /**
-     * Cuando un folder chip sea clickeado, cambia el root folder.
-     * @param chipFolder el chipFolder que ha sido clickeado.
+     * Cuando un folder chip sea clickeado, lo seleccionamos. Tenemos los siguientes casos:
+     * <ul><li> selectedFolder = chipFolder: lógica de deselección. selectedFolder = null</li>
+     * <li> selectedFolder != chipFolder: lógica de selección. selectedFolder = chipFolder </li></ul>
+     * @param chipFolder chipFolder seleccionado / deseleccionado.
      */
     @Override
     public void onChipSelected(Chip chipFolder) {
         String folderName = chipFolder.getText().toString();
-        changeColorLogic(selectedFolder, chipFolder);
-        selectedFolder = chipFolder;
-        dataViewModel.selectFolder(folderName);
-    }
+        selectColorChange(chipFolder);
+        if (selectedFolder != null) deselectColorChange(selectedFolder);
 
-    // Lógica de cambio de color de selección
-    private void changeColorLogic(Chip selectedFolder, Chip chipFolder) {
-        mContext.getTheme().resolveAttribute(R.attr.colorPrimaryDark, typedValue, true);
-        chipFolder.setChipBackgroundColor(ContextCompat.getColorStateList(mContext, typedValue.resourceId));
+        // Seleccionamos / Deseleccionamos en función de si el ChipFolder YA estaba seleccionado
+        if (selectedFolder != null && selectedFolder.getText().toString().equals(folderName)) {
+            dataViewModel.deselectFolder();
+            selectedFolder = null;
 
-        mContext.getTheme().resolveAttribute(R.attr.colorOnSurface, typedValue, true);
-        chipFolder.setTextColor(ContextCompat.getColor(mContext, typedValue.resourceId));
-
-        String currentFolderName = chipFolder.getText().toString();
-
-        // Si ya habíamos seleccionado un ChipFolder y es distinto al nuevo, lo deseleccionamos
-        if (selectedFolder != null && !(currentFolderName.equals(selectedFolder.getText().toString()))){
-
-            mContext.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
-            selectedFolder.setChipBackgroundColor(ContextCompat.getColorStateList(mContext, typedValue.resourceId));
-
-            mContext.getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
-            selectedFolder.setTextColor(ContextCompat.getColor(mContext, typedValue.resourceId));
+        } else{
+            dataViewModel.selectFolder(folderName);
+            selectedFolder = chipFolder;
         }
     }
+
+    // Resaltamos el color del ChipFolder seleccionado
+    private void selectColorChange(Chip selectedChip){
+        mContext.getTheme().resolveAttribute(R.attr.colorPrimaryDark, typedValue, true);
+        selectedChip.setChipBackgroundColor(ContextCompat.getColorStateList(mContext, typedValue.resourceId));
+
+        mContext.getTheme().resolveAttribute(R.attr.colorOnSurface, typedValue, true);
+        selectedChip.setTextColor(ContextCompat.getColor(mContext, typedValue.resourceId));
+    }
+
+    // Bajamos el color del ChipFolder deseleccionado
+    private void deselectColorChange(Chip deselectedChip){
+        mContext.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+        selectedFolder.setChipBackgroundColor(ContextCompat.getColorStateList(mContext, typedValue.resourceId));
+
+        mContext.getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
+        selectedFolder.setTextColor(ContextCompat.getColor(mContext, typedValue.resourceId));
+    }
+
 
 
     /*

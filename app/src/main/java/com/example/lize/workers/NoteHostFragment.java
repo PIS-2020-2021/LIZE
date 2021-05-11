@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +17,14 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
+import com.example.lize.adapters.FolderAdapter;
 import com.example.lize.adapters.NoteAdapter;
+import com.example.lize.data.Ambito;
 import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
 import com.example.lize.models.MainViewModel;
+
+import java.util.ArrayList;
 
 
 /** Notes View Host fragment. Responsabilidades:
@@ -57,11 +62,22 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
 
         dataViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-        dataViewModel.getFolderSelected().observe(getViewLifecycleOwner(), (Folder folder)->{
-            mNoteAdapter = new NoteAdapter(root.getContext(), folder.getNotes(), cardNoteType);
-            mNoteAdapter.registerCardNoteListener(this);
-            mNotesRecyclerView.swapAdapter(mNoteAdapter, false);
-            mNoteAdapter.notifyDataSetChanged();
+        // Actualizamos la lista de Notas cuando se seleccione una Carpeta
+        dataViewModel.getFolderSelected().observe(getViewLifecycleOwner(), (@Nullable Folder folder)->{
+            try{
+                if (folder == null) {
+                    Ambito ambito = dataViewModel.getAmbitoSelected().getValue();
+                    mNoteAdapter = new NoteAdapter(root.getContext(), ambito.getNotes(), cardNoteType);
+                } else mNoteAdapter = new NoteAdapter(root.getContext(), folder.getNotes(), cardNoteType);
+
+                mNoteAdapter.registerCardNoteListener(this);
+                mNotesRecyclerView.swapAdapter(mNoteAdapter, false);
+                mNoteAdapter.notifyDataSetChanged();
+
+            }catch(NullPointerException exception){
+                Log.w("NoteHostFragment", "Failed to update ambito's notes: null ambito selected.");
+                Log.w("NoteHostFragment", "Exception message: " + exception.getMessage());
+            }
         });
 
     }
@@ -98,8 +114,6 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
      */
     @Override
     public void onNoteSelected(String noteID) {
-
-
         dataViewModel.selectNote(noteID);
         Note selectedNote = dataViewModel.getNoteSelected().getValue();
         Intent intent = new Intent(mContext, NotasActivity.class);

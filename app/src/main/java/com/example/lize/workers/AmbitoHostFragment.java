@@ -49,7 +49,8 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
 
         this.dataViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-        dataViewModel.getUserSelected().observe(getViewLifecycleOwner(), (User user) ->{
+        // Actualizamos la lista de Ámbitos cuando se seleccione un Usuario
+        dataViewModel.getUserSelected().observe(getViewLifecycleOwner(), (@NonNull User user) ->{
             mAmbitosAdapter = new AmbitosAdapter(mContext, user.getAmbitos());
             mAmbitosAdapter.registerAmbitoListener(this);
             mAmbitosRecyclerView.swapAdapter(mAmbitosAdapter, false);
