@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
 
     private MainViewModel dataViewModel;
+
     private FloatingActionButton addFAB, addNoteFAB, addFolderFAB;  // Floating Action Buttons
     private boolean isFABGroupExpanded = false;
     private final Handler handler = new Handler();        // Methods to create a simple animation
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private ActionBarDrawerToggle mDrawerToggle;    //Declaramos Toggle
     private Button addAmbito;                       //Declaramos Botones
     private Button signOut;
+
+    private Toast toastReference;
 
 
     /** Main constructor */
@@ -115,14 +118,22 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     }
 
     /**
-     * Inicializamos el ViewModel del MainActivity y seteamos los observadores
+     * Inicializamos el ViewModel del MainActivity y seteamos los observadores de los LivesData.
      */
     private void observeLiveData() {
         this.dataViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        dataViewModel.getToast().observe(this, (t) -> Toast.makeText(this.getBaseContext(), t, Toast.LENGTH_SHORT).show());
 
+        //Observador del Toast Message del MainActivity. Evitamos acumulación de toasts mediante toastReference.
+        dataViewModel.getToast().observe(this, (t) -> {
+            if (toastReference != null) toastReference.cancel();
+            toastReference = Toast.makeText(this.getBaseContext(), t, Toast.LENGTH_SHORT);
+            toastReference.show();
+        });
+
+        // Observador del Usuario seleccionado. Inicializa el HeaderNavigationView.
         dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), 0));
 
+        // Observador del Ámbito seleccionado.
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
             topAppBar.setTitle(ambito.getName());
             //TODO: setTheme en función del color del ámbito

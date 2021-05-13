@@ -1,16 +1,24 @@
 package com.example.lize.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
 import com.example.lize.data.Folder;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
 
@@ -22,7 +30,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
 
     private final Context mContext;
     private final ArrayList<Folder> mFoldersData;
-    private final ArrayList<ChipFolderListener> chipListeners;
+    private final ChipFolderListener mChipListener;
 
     /* Custom ChipFolder onClick Listener */
     public interface ChipFolderListener{
@@ -30,20 +38,14 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
     }
 
     /**
-     * Method for registering a ChipFolder onClick listener
-     * @param listener Observer which knows when the chip is clicked.
-     */
-    public void registerChipFolderListener(ChipFolderListener listener){ chipListeners.add(listener); }
-
-    /**
      * Constructor que pasa el listado de carpetas i el contexto.
      * @param context contexto de la app
      * @param foldersData ArrayList conteniendo la información de las carpetas.
      */
-    public FolderAdapter(Context context, ArrayList<Folder> foldersData) {
+    public FolderAdapter(Context context, ArrayList<Folder> foldersData, ChipFolderListener listener) {
         this.mFoldersData = foldersData;
         this.mContext = context;
-        this.chipListeners = new ArrayList<>();
+        mChipListener = listener;
     }
 
     /**
@@ -90,10 +92,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
         public ChipFolder(View itemView) {
             super(itemView);
             this.folderChip = (Chip) itemView;
-            folderChip.setOnClickListener((v)->{
-                for (ChipFolderListener listener : chipListeners)
-                    listener.onChipSelected(folderChip);
-            });
+            folderChip.setOnClickListener(v -> mChipListener.onChipSelected((Chip)v));
         }
 
         /**
