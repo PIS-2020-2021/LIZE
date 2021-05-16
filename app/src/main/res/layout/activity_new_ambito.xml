@@ -131,8 +131,8 @@
                             android:focusable="true">
 
                             <TextView
-                                android:layout_width="90dp"
-                                android:layout_height="50dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:contentDescription="@string/rojo"
@@ -158,8 +158,8 @@
                             android:focusable="true">
 
                             <TextView
-                                android:layout_width="90dp"
-                                android:layout_height="50dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:contentDescription="@string/morado"
@@ -184,8 +184,8 @@
                             android:focusable="true">
 
                             <TextView
-                                android:layout_width="90dp"
-                                android:layout_height="50dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:contentDescription="@string/indigo"
@@ -212,8 +212,8 @@
                             android:layout_marginEnd="10dp">
 
                             <TextView
-                                android:layout_width="90dp"
-                                android:layout_height="50dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:contentDescription="@string/azul"
@@ -238,8 +238,8 @@
                             android:focusable="true">
 
                             <TextView
-                                android:layout_width="90dp"
-                                android:layout_height="50dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:contentDescription="@string/teal"
@@ -264,8 +264,8 @@
                             android:focusable="true">
 
                             <TextView
-                                android:layout_width="90dp"
-                                android:layout_height="50dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:contentDescription="@string/verde"
@@ -290,8 +290,8 @@
                             android:focusable="true">
 
                             <TextView
-                                android:layout_width="90dp"
-                                android:layout_height="50dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:contentDescription="@string/amarillo"
@@ -316,8 +316,8 @@
                             android:focusable="true">
 
                             <TextView
-                                android:layout_width="90dp"
-                                android:layout_height="50dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:contentDescription="@string/naranja"
@@ -342,8 +342,8 @@
                             android:focusable="true">
 
                             <TextView
-                                android:layout_width="90dp"
-                                android:layout_height="50dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:contentDescription="@string/marr_n"

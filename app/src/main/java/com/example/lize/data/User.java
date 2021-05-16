@@ -1,6 +1,7 @@
 package com.example.lize.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class User {
     private String first;
@@ -72,5 +73,13 @@ public class User {
     }
 
     public void setAmbitos(ArrayList<Ambito> ambitos) { this.ambitos = ambitos; }
+
+    public ArrayList<Integer> getColorsTaken(){
+        ArrayList<Integer> ambitoColors = new ArrayList<>();
+        for (Ambito ambito: this.ambitos)
+            ambitoColors.add(ambito.getColor());
+        Collections.sort(ambitoColors);
+        return ambitoColors;
+    }
 
 }

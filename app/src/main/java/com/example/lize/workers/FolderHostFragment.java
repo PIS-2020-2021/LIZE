@@ -44,6 +44,7 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
 
     /** Inicializa el Fragment contenedor de Folders */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View root = inflater.inflate(R.layout.folders_host_view, container, false);
         this.mContext = root.getContext();
         typedValue = new TypedValue();

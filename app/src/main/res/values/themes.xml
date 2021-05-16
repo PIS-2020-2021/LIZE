@@ -24,7 +24,9 @@
         <item name="chipStyle">@style/Widget.Lize.Chip</item>
         <item name="floatingActionButtonStyle">@style/Widget.Lize.FAB</item>
         <item name="hintTextColor">@style/Theme.hint</item>
+        <item name="android:windowDisablePreview">true</item>
     </style>
+
 
     <!-- CardView Style -->
     <style name="Widget.Lize.CardView" parent="Widget.MaterialComponents.CardView">

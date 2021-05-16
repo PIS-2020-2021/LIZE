@@ -14,7 +14,8 @@
     <string name="cancelar">Cancelar</string>
     <string name="apellidos">Apellidos</string>
     <string name="nombre">Nombre</string>
-    <string name="errorColorAmbito">No ha seleccionado ningún color</string>
+    <string name="errorColorAmbitoNoSelection">No ha seleccionado ningún color</string>
+    <string name="errorColorAmbitoAlredySelected">Este Color ya ha sido seleccionado</string>
 
     <string name="search">find note</string>
     <string name="more">change view</string>

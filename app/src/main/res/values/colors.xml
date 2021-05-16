@@ -4,7 +4,7 @@
     <color name="red_200">#FFEF9A9A</color>
     <color name="red_400">#FFEF5350</color>
     <color name="red_700">#FFD32F2F</color>
-    <color name="red_A400">#FFFF1744</color>
+    <color name="red_A400">#d50000</color>
 
     <color name="purple_100">#FFE1BEE7</color>
     <color name="purple_200">#FFE1BEE7</color>
@@ -51,11 +51,40 @@
     <color name="brown_100">#d7ccc8</color>
     <color name="brown_200">#bcaaa4</color>
     <color name="brown_400">#8d6e63</color>
-    <color name="brown_700">#5d4037</color>
-    <color name="brown_A400">#3e2723</color>
+    <color name="brown_A400">#5d4037</color>
+    <color name="brown_700">#3e2723</color>
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+
+    <!-- ********************************************
+        Colores  de Los CardViews para editar Dinamicamente
+    ******************************************************-->
+    <!-- Dafault Colors of Edit/New Ambito Cards-->
+    <color name="Default_Red">@color/red_400</color>
+    <color name="Default_Purple">@color/purple_400</color>
+    <color name="Default_Indigo">@color/indigo_400</color>
+    <color name="Default_Blue">@color/light_blue_400</color>
+    <color name="Default_Teal">@color/teal_400</color>
+    <color name="Default_Green">@color/light_green_400</color>
+    <color name="Default_Yellow">@color/yellow_400</color>
+    <color name="Default_Orange">@color/orange_400</color>
+    <color name="Default_Brown">@color/brown_400</color>
+
+    <!-- Dafault Grey of Edit/New Ambito Cards-->
+    <color name="Default_Grey">#757575</color>
+
+    <color name="Presseed_Red">@color/red_700</color>
+    <color name="Presseed_Purple">@color/purple_700</color>
+    <color name="Presseed_Indigo">@color/indigo_700</color>
+    <color name="Presseed_Blue">@color/light_blue_700</color>
+    <color name="Presseed_Teal">@color/teal_700</color>
+    <color name="Presseed_Green">@color/light_green_700</color>
+    <color name="Presseed_Yellow">@color/yellow_700</color>
+    <color name="Presseed_Orange">@color/orange_700</color>
+    <color name="Presseed_Brown">@color/brown_700</color>
+
 
 
 
@@ -232,7 +261,7 @@
     <color name="md_yellow_800">#f9a825</color>
     <color name="md_yellow_900">#f57f17</color>
     <color name="md_yellow_A100">#ffff8d</color>
-    <color name="md_yellow_A200">#ffff00</color>
+    <color name="md_yellow_A200">#FAFA39</color>
     <color name="md_yellow_A400">#ffea00</color>
     <color name="md_yellow_A700">#ffd600</color>
     <color name="md_yellow_500_25">#40ffeb3b</color>
@@ -322,7 +351,7 @@
     <color name="md_grey_300">#e0e0e0</color>
     <color name="md_grey_400">#bdbdbd</color>
     <color name="md_grey_500">#9e9e9e</color>
-    <color name="md_grey_600">#757575</color>
+    <color name="md_grey_600">#57757575</color>
     <color name="md_grey_700">#616161</color>
     <color name="md_grey_800">#424242</color>
     <color name="md_grey_900">#212121</color>

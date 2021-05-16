@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
@@ -57,10 +58,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private Button addAmbito;                       //Declaramos Botones
     private Button signOut;
 
-
     /** Main constructor */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawable_nav);
 
@@ -91,7 +92,11 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
         //Asignamos Boton y Listener a addAmbito
         this.addAmbito = findViewById(R.id.addAmbitoButton);
-        addAmbito.setOnClickListener(v -> startActivityForResult(new Intent(getApplicationContext(), NewAmbitoActivity.class), REQUEST_CODE_ADD_AMBITO));
+        addAmbito.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), NewAmbitoActivity.class);
+            intent.putIntegerArrayListExtra("Ambitos", dataViewModel.getUserSelected().getValue().getColorsTaken());
+            startActivityForResult(intent, REQUEST_CODE_ADD_AMBITO);
+        });
 
         //Asignamos Boton y Listener a signOut
         this.signOut = findViewById(R.id.sign_out);
