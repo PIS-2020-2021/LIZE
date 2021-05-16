@@ -32,6 +32,7 @@ public class NewAmbitoActivity extends AppCompatActivity {
     boolean isNameValid, isColorAmbitoValid;
     private ArrayList<Integer> colors;
     private CardView red, morado, indigo, azul, teal, verde, amarillo, naranja, marron;
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -183,6 +184,7 @@ public class NewAmbitoActivity extends AppCompatActivity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.cardRojo:         setColorSelected(1);    break;

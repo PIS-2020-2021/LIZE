@@ -24,7 +24,7 @@
 
     <!-- CardView Style -->
     <style name="Widget.Lize.CardView" parent="Widget.MaterialComponents.CardView">
-        <item name="colorSurface">@color/md_black_1000_50</item>
+        <item name="colorSurface">@color/md_black_1000</item>
         <item name="colorOnSurface">@color/black</item>
         <item name="cardBackgroundColor">?attr/colorPrimary</item>
         <item name="cornerFamily">cut</item>
@@ -68,7 +68,7 @@
         <item name="colorPrimary">@color/light_blue_400</item>
         <item name="colorPrimaryDark">@color/light_blue_700</item>
         <item name="colorSurface">@color/light_blue_A400</item>
-        <item name="colorOnPrimary">@color/md_black_1000_50</item>
+        <item name="colorOnPrimary">@color/md_black_1000</item>
         <item name="colorOnSurface">@color/black</item>
         <item name="colorAccent">@color/teal_A400</item>
     </style>
