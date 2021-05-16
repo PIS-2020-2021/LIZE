@@ -19,6 +19,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,17 +29,21 @@ import java.util.concurrent.Executor;
 public class DatabaseAdapter {
     public static final String TAG = "DatabaseAdapter";
 
-    public static FirebaseFirestore db = FirebaseFirestore.getInstance();
+    public final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser user;
 
     private static DatabaseAdapter databaseAdapter;  // Singleton implementation
 
-    private vmInterface listener;
+    private LoaderInterface loader;
+    private SaverInterface saver;
 
-    public void setListener(vmInterface listener) {
-        this.listener = listener;
+    public void setLoaderListener(LoaderInterface loader) {
+        this.loader = loader;
+    }
+    public void setSaverListener(SaverInterface saver) {
+        this.saver = saver;
     }
 
     public DatabaseAdapter() {
@@ -56,10 +61,19 @@ public class DatabaseAdapter {
         return databaseAdapter;
     }
 
-    public interface vmInterface {
-        void setUser(User user);
-        void setUserAmbitos(ArrayList<Ambito> userAmbitos);
-        void setAmbitoNotes(String ambitoID, ArrayList<Note> ambitoNotes);
+    // Métodos para reconstruir la jerarquía del modelo.
+    public interface LoaderInterface{
+        void getUserResult(User user);
+        void getAmbitoCollectionResult(String userID, ArrayList<Ambito> userAmbitos);
+        void getNoteCollectionResult(String ambitoID, ArrayList<Note> ambitoNotes);
+        void setToast(String s);
+    }
+
+    // Callbacks de operaciones de escritura.
+    public interface SaverInterface {
+        void saveUserResult(String userID, boolean result);
+        void saveAmbitoResult(String ambitoID, boolean result);
+        void saveNoteResult(String noteID, boolean result);
         void setToast(String s);
     }
 
@@ -73,23 +87,23 @@ public class DatabaseAdapter {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInAnonymously:success");
-                            if(listener != null) listener.setToast("Authentication successful.");
+                            if(loader != null) loader.setToast("Authentication successful.");
                             user = mAuth.getCurrentUser();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInAnonymously:failure", task.getException());
-                            if(listener != null) listener.setToast("Authentication failed.");
+                            if(loader != null) loader.setToast("Authentication failed.");
 
                         }
                     });
         } else {
-            if(listener != null) listener.setToast("Authentication with current user.");
+            if(loader != null) loader.setToast("Authentication with current user.");
         }
     }
 
     // Method for getting a base User from the 'users' collection
     public void getUser() {
-        DocumentReference userRef = DatabaseAdapter.db.collection("users").document(user.getUid());
+        DocumentReference userRef = db.collection("users").document(user.getUid());
         Log.d(TAG, "Getting current user document...");
         userRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -99,14 +113,14 @@ public class DatabaseAdapter {
                         document.getString("first"), document.getString("last"));
                 user.setSelfID(document.getString("selfID"));
 
-                if(listener != null) listener.setUser(user);
+                if(loader != null) loader.getUserResult(user);
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
 
     // Method for getting an Ambito from the 'ambitos' collection
     public void getAmbitos() {
-        Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", user.getUid());
+        Query ambitosRef = db.collection("ambitos").whereEqualTo("userID", user.getUid());
         Log.d(TAG, "Getting current user ambitos collection...");
         ambitosRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -119,14 +133,14 @@ public class DatabaseAdapter {
                     ambito.setSelfID(document.getString("selfID"));
                     userAmbitos.add(ambito);
                 }
-                if(listener != null) listener.setUserAmbitos(userAmbitos);
+                if(loader != null) loader.getAmbitoCollectionResult(user.getUid(), userAmbitos);
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
 
     // Method for getting a Note from the 'notes' collection
     public void getNotes(String ambitoID){
-        Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("ambitoID", ambitoID);
+        Query notasRef = db.collection("notes").whereEqualTo("ambitoID", ambitoID);
         Log.d(TAG, "Getting ambito " + ambitoID + "'s notes collection...");
         notasRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -137,9 +151,10 @@ public class DatabaseAdapter {
                     note.setAmbitoID(document.getString("ambitoID"));
                     note.setFolderTAG(document.getString("folderTAG"));
                     note.setSelfID(document.getString("selfID"));
+                    note.setLastUpdate(document.getDate("lastUpdate"));
                     ambitoNotes.add(note);
                 }
-                if(listener != null) listener.setAmbitoNotes(ambitoID, ambitoNotes);
+                if(loader != null) loader.getNoteCollectionResult(ambitoID, ambitoNotes);
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
@@ -165,8 +180,9 @@ public class DatabaseAdapter {
             public void onComplete(@NonNull Task task) {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "User" + user.getSelfID() + " correctly saved.");
-                    for (Ambito ambito: user.getAmbitos()) saveAmbito(ambito);
+                    //for (Ambito ambito: user.getAmbitos()) saveAmbito(ambito);
                 }else Log.d(TAG, "Error saving user " + user.getSelfID(), task.getException());
+                if (saver != null) saver.saveUserResult(user.getSelfID(), task.isSuccessful()); // ViewModel callback
             }
         });
     }
@@ -199,8 +215,9 @@ public class DatabaseAdapter {
             public void onComplete(@NonNull Task task) {
                 if (task.isSuccessful()){
                     Log.d(TAG, "Ambito" + ambito.getSelfID() + " correctly saved.");
-                    for (Note note: ambito.getNotes()) saveNote(note);
+                    //for (Note note: ambito.getNotes()) saveNote(note);
                 } else Log.d(TAG, "Error saving ambito " + ambito.getSelfID(), task.getException());
+                if (saver != null) saver.saveAmbitoResult(ambito.getSelfID(), task.isSuccessful()); // ViewModel callback
             }
         });
     }
@@ -216,7 +233,6 @@ public class DatabaseAdapter {
         if(note.getSelfID() == null){
             noteRef= db.collection("notes").document();
             note.setSelfID(noteRef.getId());
-
         } else {
             noteRef= db.collection("notes").document(note.getSelfID());
         }
@@ -229,22 +245,27 @@ public class DatabaseAdapter {
         notesData.put("selfID", note.getSelfID());
         notesData.put("ambitoID", note.getAmbitoID());
         notesData.put("folderTAG", note.getFolderTAG());
+        notesData.put("lastUpdate", note.getLastUpdate());
 
         noteRef.set(notesData).addOnCompleteListener(new OnCompleteListener(){
             @Override
             public void onComplete(@NonNull Task task) {
-                if (task.isSuccessful()) Log.d(TAG, "Note" + note.getSelfID() + " correctly saved.");
-                else Log.d(TAG, "Error saving note " + note.getSelfID(), task.getException());
+                if (task.isSuccessful()){
+                    Log.d(TAG, "Note" + note.getSelfID() + " correctly saved.");
+                } else Log.d(TAG, "Error saving note " + note.getSelfID(), task.getException());
+                if (saver != null) saver.saveNoteResult(note.getSelfID(), task.isSuccessful()); // ViewModel callback
             }
         });
     }
+
+
     public void deleteNota(String notaID){
-        DatabaseAdapter.db.collection("notes").document(notaID).delete()
+        db.collection("notes").document(notaID).delete()
         .addOnSuccessListener(aVoid -> Log.d(TAG, "Nota Eliminada Correctamente")).addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar la nota", e));
     }
 
     public void deleteFolder(String folderTAG) {
-        Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("folderTAG", folderTAG);
+        Query notasRef = db.collection("notes").whereEqualTo("folderTAG", folderTAG);
 
         notasRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -261,7 +282,7 @@ public class DatabaseAdapter {
     }
 
     public void deleteAmbito(String ambitoID) {
-        Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("ambitoID", ambitoID);
+        Query notasRef = db.collection("notes").whereEqualTo("ambitoID", ambitoID);
 
         notasRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -278,12 +299,12 @@ public class DatabaseAdapter {
             }
         });
 
-        DatabaseAdapter.db.collection("ambitos").document(ambitoID).delete()
+        db.collection("ambitos").document(ambitoID).delete()
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Ambito Eliminado Correctamente")).addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar el Ambito", e));
     }
 
     public void deleteUser(String userID) {
-        Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", userID);
+        Query ambitosRef = db.collection("ambitos").whereEqualTo("userID", userID);
 
         ambitosRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -298,7 +319,7 @@ public class DatabaseAdapter {
             } else Log.d(TAG, "Error al eliminar la coleccion de ambitos: ", task.getException());
         });
 
-        DatabaseAdapter.db.collection("users").document(userID).delete()
+        db.collection("users").document(userID).delete()
             .addOnSuccessListener(aVoid -> Log.d(TAG, "Usuario Eliminado Correctamente")).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {

@@ -1,31 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="8dp">
+    android:layout_margin="8dp"
+    android:clickable= "true"
+    android:focusable="true"
+    android:checkable="true">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:orientation="vertical"
+        android:weightSum="10"
+        android:padding="10dp">
 
-        <TextView
-            android:id="@+id/note_name"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/note_metadata"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:text="@string/note_default_metadata"
+                android:textAppearance="@style/TextAppearance.Lize.MetadataText"/>
+
+            <TextView
+                android:id="@+id/note_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/note_metadata"
+                android:text="@string/note_default_name"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                android:textColor="?attr/colorOnPrimary"/>
+
+            <ImageButton
+                android:id="@+id/note_star_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:tint="?attr/colorSurface"
+                app:srcCompat="@drawable/ic_baseline_star_border_24"
+                android:background="#00000000"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/note_has_files_icon"
+                app:layout_constraintEnd_toStartOf="@id/note_star_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:tint="?attr/colorSurface"
+                app:srcCompat="@drawable/file_attach"
+                android:background="#00000000"
+                android:visibility="gone"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/note_media"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/note_default_name"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            android:textColor="?attr/colorOnPrimary"/>
+            android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/note_body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/note_name"
+            android:layout_weight="4"
+            android:layout_marginTop="8dp"
             android:text="@string/note_default_body"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
             android:textColor="?attr/colorOnPrimary" />
 
-    </RelativeLayout>
+    </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

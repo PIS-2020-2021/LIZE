@@ -13,9 +13,10 @@ import com.example.lize.data.Note;
 import com.example.lize.data.User;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 
-public class MainViewModel extends ViewModel {
+public class MainViewModel extends ViewModel{
 
     private static final String TAG = "MainViewModel";
 
@@ -33,10 +34,9 @@ public class MainViewModel extends ViewModel {
         mNoteSelected = new MutableLiveData<>();
         mToast = new MutableLiveData<>();
 
-        // Enlazamos con la base de datos, reconstruyendo la jerarquía del modelo
-        // a partir del Usuario Registrado
+        // Enlazamos con la base de datos, reconstruyendo la jerarquía del modelo a partir del Usuario Registrado
         DatabaseAdapter da = DatabaseAdapter.getInstance();
-        da.setListener(new UserBuilder());
+        da.setLoaderListener(new UserBuilder());
         da.initFireBase();
         da.getUser();
     }
@@ -156,8 +156,8 @@ public class MainViewModel extends ViewModel {
                 }
 
             Ambito newAmbito = new Ambito(ambitoName, ambitoColor);     // Creamos un nuevo Ámbito
-            mUserSelected.getValue().addAmbito(newAmbito);              // Añadimos (y asignamos) ese Ámbito al Usuario registrado
-            mUserSelected.setValue(mUserSelected.getValue());           // Actualizamos la colección del Usuario registrado
+            mUserSelected.getValue().addAmbito(newAmbito);              // Añadimos ese Ámbito al Usuario registrado
+            mUserSelected.setValue(mUserSelected.getValue());           // Actualizamos la colección de Ámbitos del Usuario registrado
             DatabaseAdapter.getInstance().saveAmbito(newAmbito);        // Guardamos el Ámbito en DB
             setToast("Ambito " + ambitoName + " correctly created.");   // Creamos Toast informativo
 
@@ -210,7 +210,7 @@ public class MainViewModel extends ViewModel {
                 newNote.setFolderTAG(mFolderSelected.getValue().getName());
 
             mAmbitoSelected.getValue().addNote(newNote);                // Añadimos esa Nota al Ámbito seleccionado
-            mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos la colección de notas de la Carpeta seleccionada
+            mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos la colección de Notas de la Folder seleccionada
             DatabaseAdapter.getInstance().saveNote(newNote);            // Guardamos la Nota en DB
             setToast("Note " + noteName + " correctly created.");       // Creamos Toast Informativo
 
@@ -233,8 +233,9 @@ public class MainViewModel extends ViewModel {
             selected.setTitle(title);
             selected.setText_plain(plainText);
             selected.setText_html(htmlText);
-            mNoteSelected.setValue(mNoteSelected.getValue());           // Actualizamos la Nota seleccionada
-            mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos la colección de notas de la Carpeta seleccionada
+            selected.setLastUpdate(new Date());
+            mNoteSelected.setValue(selected);                           // Actualizamos la Nota editada
+            mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos la colección de Notas de la Folder seleccionada
             DatabaseAdapter.getInstance().saveNote(selected);           // Guardamos la Nota en DB
             setToast("Note " + title + " correctly edited.");           // Creamos Toast Informativo
 
@@ -271,13 +272,13 @@ public class MainViewModel extends ViewModel {
         DatabaseAdapter.getInstance().deleteFolder(folderName);
     }
 
-    public void setToast(String s) {
+    private void setToast(String s) {
         Log.w(TAG, s);
         mToast.setValue(s);
     }
 
     /* BUILDER PATTERN FOR DATABASE INTERFACE */
-    protected class UserBuilder implements DatabaseAdapter.vmInterface{
+    protected class UserBuilder implements DatabaseAdapter.LoaderInterface{
 
         private User currentUser;
         private int loadingCounter;
@@ -289,15 +290,15 @@ public class MainViewModel extends ViewModel {
         }
 
         @Override
-        public void setUser(User user) {
+        public void getUserResult(User user) {
             currentUser = user;
             Log.w("UserBuilder", "Step 1 succes: user correctly loaded from Database.");
             DatabaseAdapter.getInstance().getAmbitos();
         }
 
         @Override
-        public void setUserAmbitos(ArrayList<Ambito> userAmbitos) {
-            if (currentUser != null) {
+        public void getAmbitoCollectionResult(String userID, ArrayList<Ambito> userAmbitos) {
+            if (currentUser != null && currentUser.getSelfID().equals(userID)) {
                 currentUser.setAmbitos(userAmbitos);
                 Log.w("UserBuilder", "Step 2 succes: ambitos of user " + currentUser.getSelfID() + " correctly loaded from Database.");
                 for (Ambito ambito : userAmbitos) DatabaseAdapter.getInstance().getNotes(ambito.getSelfID());
@@ -305,7 +306,7 @@ public class MainViewModel extends ViewModel {
         }
 
         @Override
-        public void setAmbitoNotes(String ambitoID, ArrayList<Note> ambitoNotes) {
+        public void getNoteCollectionResult(String ambitoID, ArrayList<Note> ambitoNotes) {
             if (currentUser.getAmbitos().isEmpty())
                 Log.w("UserBuilder", "Step 3 failure: Ambito " + ambitoID + " it's unitiallized.");
             else{

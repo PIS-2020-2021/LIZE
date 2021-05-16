@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lize.R;
 import com.example.lize.data.Note;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -103,6 +105,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
      */
     public class CardNote extends RecyclerView.ViewHolder{
 
+        private final TextView mMetadataText;
         private final TextView mTitleNote;
         private final TextView mTextNote;
         private String mNoteID;
@@ -114,7 +117,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
         public CardNote(@NonNull View itemView) {
             super(itemView);
             // Inicializamos los componentes del layout
-            mTitleNote = (TextView) itemView.findViewById(R.id.note_name);
+            mMetadataText = (TextView) itemView.findViewById(R.id.note_metadata);
+            mTitleNote = (TextView) itemView.findViewById(R.id.note_title);
             mTextNote = (TextView) itemView.findViewById(R.id.note_body);
             itemView.setOnClickListener((v)->{
                     for (NoteAdapter.CardNoteListener listener : cardListeners)
@@ -130,8 +134,17 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
         public void bindTo(Note currentNote) {
             mTitleNote.setText(currentNote.getTitle());
             mTextNote.setText(currentNote.getText_plain());
+            DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
+
+            String metadata = "";
+            if (currentNote.getFolderTAG() != null) metadata += currentNote.getFolderTAG();
+            if (0 < metadata.length() && currentNote.getLastUpdate() != null)
+                metadata += " - " + dateFormat.format(currentNote.getLastUpdate());
+            else if(currentNote.getLastUpdate() != null)
+                metadata += dateFormat.format(currentNote.getLastUpdate());
+
+            mMetadataText.setText(metadata);
             mNoteID = currentNote.getSelfID();
         }
-
     }
 }

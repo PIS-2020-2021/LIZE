@@ -104,6 +104,7 @@
     <string name="barra">|</string>
     <string name="editar_ambito">Editar Ambito</string>
     <string name="eliminar_ambito">Eliminar Ambito</string>
+    <string name="note_default_metadata">ambitoID - folderTag - last connection</string>
 
 
 </resources>
