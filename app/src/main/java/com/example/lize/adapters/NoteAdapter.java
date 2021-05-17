@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
 import com.example.lize.data.Note;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,17 +32,22 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
 
     private final Context mContext;
     private final ArrayList<Note> mNotesData;
-    private final ArrayList<NoteAdapter.CardNoteListener> cardListeners;
+    private NoteAdapter.CardNoteListener customListener;
     private boolean cardNoteType;
 
     /* Custom CardNote onClick Listener */
-    public interface CardNoteListener{ void onNoteSelected(String noteID); }
+    public interface CardNoteListener{
+        void onCardNoteClicked(NoteAdapter.CardNote cardNote);
+        void onCardNoteSelected(NoteAdapter.CardNote cardNote);
+    }
 
     /**
      * Method for registering a CardNote onClick listener
      * @param listener Observer which knows when the chip is clicked.
      */
-    public void registerCardNoteListener(NoteAdapter.CardNoteListener listener){ cardListeners.add(listener); }
+    public void registerCardNoteListener(NoteAdapter.CardNoteListener listener){
+        customListener = listener;
+    }
 
     /**
      * Constructor que pasa el listado de notas i el contexto.
@@ -50,7 +58,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
         this.mNotesData = notesData;
         this.mContext = context;
         this.cardNoteType = cardNoteType;
-        cardListeners = new ArrayList<>();
     }
 
     /**
@@ -81,12 +88,16 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
      */
     @Override
     public void onBindViewHolder(@NonNull CardNote holder, int position) {
-        // Obtenemos los parámetros del Layout correspondiente al holder y modificamos el height
-        ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+        holder.mTitleNote.setMaxHeight(mContext.getResources().getDimensionPixelSize((cardNoteType) ?
+                R.dimen.cardnote_layout_height_high : R.dimen.cardnote_layout_height_low));
+
+        /*ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
         params.height = holder.itemView.getResources().getDimensionPixelSize((cardNoteType) ?
                 R.dimen.cardnote_layout_height_high : R.dimen.cardnote_layout_height_low);
 
-        holder.itemView.setLayoutParams(params);        // Seteamos el nuevo Layout
+        holder.itemView.setLayoutParams(params);        // Seteamos el nuevo Layout*/
+
+
         Note currentNote = mNotesData.get(position);    // Obtenemos la nota de la posición
         holder.bindTo(currentNote);                     // Enlazamos la nota con el ViewHolder
     }
@@ -105,10 +116,16 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
      */
     public class CardNote extends RecyclerView.ViewHolder{
 
-        private final TextView mMetadataText;
-        private final TextView mTitleNote;
-        private final TextView mTextNote;
-        private String mNoteID;
+        public final MaterialCardView holder;
+        public final TextView mMetadataText;
+        public final TextView mTitleNote;
+        public final TextView mTextNote;
+
+        public final MaterialButton mMoveBtn, mCopyBtn, mDeleteBtn;
+
+        public int BASE_HEIGHT;
+
+        public String mNoteID;
 
         /**
          * Constructor del ViewHolder correspondiente al layout de note_card
@@ -117,15 +134,69 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
         public CardNote(@NonNull View itemView) {
             super(itemView);
             // Inicializamos los componentes del layout
+            holder = (MaterialCardView) itemView;
             mMetadataText = (TextView) itemView.findViewById(R.id.note_metadata);
             mTitleNote = (TextView) itemView.findViewById(R.id.note_title);
             mTextNote = (TextView) itemView.findViewById(R.id.note_body);
-            itemView.setOnClickListener((v)->{
-                    for (NoteAdapter.CardNoteListener listener : cardListeners)
-                        listener.onNoteSelected(mNoteID);
-            });
+            mMoveBtn = (MaterialButton) itemView.findViewById(R.id.note_move_btn);
+            mCopyBtn = (MaterialButton) itemView.findViewById(R.id.note_copy_btn);
+            mDeleteBtn = (MaterialButton) itemView.findViewById(R.id.note_delete_btn);
+            BASE_HEIGHT = holder.getHeight();
+
+            if (customListener != null){
+                holder.setOnClickListener((v) -> performClick());
+                holder.setOnLongClickListener((v) -> performLongClick());
+            }
         }
 
+        public float getHeight(){
+            return (float) holder.getLayoutParams().height;
+        }
+
+        public void setHeight(float newHeight){
+            ViewGroup.LayoutParams params = holder.getLayoutParams();
+            params.height = (int) newHeight;
+            holder.setLayoutParams(params);
+        }
+
+        public float getTranslationY(){
+            return mMoveBtn.getTranslationY();
+        }
+
+        public void setTranslationY(float translationY){
+            //setHeight(getHeight() + translationY);
+            mMoveBtn.setTranslationY(translationY);
+            mCopyBtn.setTranslationY(translationY);
+            mDeleteBtn.setTranslationY(translationY);
+        }
+
+        public float getAlpha(){
+            return mMoveBtn.getAlpha();
+        }
+
+        public void setAlpha(float alpha){
+            mMoveBtn.setAlpha(alpha);
+            mCopyBtn.setAlpha(alpha);
+            mDeleteBtn.setAlpha(alpha);
+        }
+
+        public String getNoteID(){ return mNoteID; }
+
+        public void performClick() {
+            customListener.onCardNoteClicked(this);
+        }
+
+        public boolean performLongClick() {
+            holder.setChecked(!holder.isChecked());
+            mMoveBtn.setAlpha(0.0f);
+            mCopyBtn.setAlpha(0.0f);
+            mDeleteBtn.setAlpha(0.0f);
+            mMoveBtn.setVisibility(View.VISIBLE);
+            mCopyBtn.setVisibility(View.VISIBLE);
+            mDeleteBtn.setVisibility(View.VISIBLE);
+            customListener.onCardNoteSelected(this);
+            return true;
+        }
 
         /**
          * Método para <b>enlazar</b> los datos de la nota con el Card de este objeto ViewHolder.
@@ -145,6 +216,23 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
 
             mMetadataText.setText(metadata);
             mNoteID = currentNote.getSelfID();
+            BASE_HEIGHT = holder.getHeight();
         }
+
+        public boolean isSelected() { return holder.isChecked(); }
+
+        public void select(){ holder.setChecked(!holder.isChecked()); }
+
+        // Resets this Carnote to default state
+        public void reset() {
+            holder.setChecked(false);
+            mMoveBtn.setVisibility(View.INVISIBLE);
+            mCopyBtn.setVisibility(View.INVISIBLE);
+            mDeleteBtn.setVisibility(View.INVISIBLE);
+            setAlpha(0.0f);
+            setTranslationY(0.0f);
+            setHeight(BASE_HEIGHT);
+        }
+
     }
 }

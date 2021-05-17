@@ -131,6 +131,10 @@
         <item name="android:fontFamily">@font/rubik_medium</item>
     </style>
 
+    <style name="TextAppearance.Lize.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
     <!-- Ambit Color Themes -->
     <style name="Theme.hint" parent="">
         <item name="colorPrimary">@color/light_blue_400</item>

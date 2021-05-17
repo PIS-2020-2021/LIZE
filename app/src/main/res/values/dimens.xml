@@ -3,6 +3,7 @@
     <!-- CardNote layout_height values -->
     <dimen name="cardnote_layout_height_high">150dp</dimen>
     <dimen name="cardnote_layout_height_low">100dp</dimen>
+    <dimen name="cardnote_translation_1">50dp</dimen>
 
     <!-- ChipFolder dimensions value -->
     <dimen name="chipfolder_layout_margin">5dp</dimen>
