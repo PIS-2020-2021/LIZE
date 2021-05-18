@@ -21,6 +21,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.Interpolator;
+import android.view.animation.Transformation;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
@@ -51,11 +52,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
     private StaggeredGridLayoutManager mNotesManager;       // Recycle View Layout Manager
     private NoteAdapter mNoteAdapter;                       // NoteAdapter for the RecycleView
 
-    private final int ANIMATION_DURATION = 300;
-    private final Interpolator interpolator = new AccelerateDecelerateInterpolator();
-
-    private NoteAdapter.CardNote lastCardChecked;
-
+    private NoteAdapter.CardNote lastCardChecked;           // Last CardNote selected
     private boolean cardNoteType;                           // boolean cardNote type
 
     private MainViewModel dataViewModel;                    // Model Shared Data between Fragments
@@ -67,6 +64,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
 
         mNotesRecyclerView = root.findViewById(R.id.note_recycler_view);
         mNotesManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        //mNotesManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
         mNotesRecyclerView.setLayoutManager(mNotesManager);
 
         this.cardNoteType = true;
@@ -83,7 +81,10 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
 
         // Actualizamos la lista de Notas cuando se seleccione una Carpeta
         dataViewModel.getFolderSelected().observe(getViewLifecycleOwner(), (@Nullable Folder folder)->{
-            if (lastCardChecked != null) lastCardChecked.reset();
+            if (lastCardChecked != null){
+                lastCardChecked.reset();
+                lastCardChecked = null;
+            }
             try{
                 if (folder == null) {
                     Ambito ambito = dataViewModel.getAmbitoSelected().getValue();
@@ -152,44 +153,25 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
      */
     @Override
     public void onCardNoteSelected(NoteAdapter.CardNote newCardNote) {
+        if (lastCardChecked != null && lastCardChecked != newCardNote) lastCardChecked.reset();
+        if (newCardNote.isSelected()) lastCardChecked = newCardNote;
+        else lastCardChecked = null;
+    }
 
-        // Initiallize new AnimationSet with two Object Animations
-        AnimatorSet animatorSet = new AnimatorSet();
-
-        ObjectAnimator newHeightAnim, newTranslationAnim, newAlphaAnim, lastHeightAnim, lastTranslationAnim, lastAlphaAnim;
-
-        animatorSet.setInterpolator(interpolator);
-        animatorSet.setDuration(ANIMATION_DURATION);
-
-        newHeightAnim = ObjectAnimator.ofFloat(newCardNote, "height", newCardNote.isSelected() ?
-                newCardNote.BASE_HEIGHT + mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_translation_1) :
-                newCardNote.BASE_HEIGHT);
-
-        newTranslationAnim = ObjectAnimator.ofFloat(newCardNote, "translationY", newCardNote.isSelected() ?
-                mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_translation_1) : 0.0f);
-
-        newAlphaAnim = ObjectAnimator.ofFloat(newCardNote, "alpha", newCardNote.isSelected() ? 1.0f : 0.0f);
-
-        animatorSet.play(newHeightAnim).with(newTranslationAnim).with(newAlphaAnim);
-
-        // Also sets deselect animation, if necessarly
-        if (lastCardChecked != null && lastCardChecked != newCardNote && lastCardChecked.isSelected()){
-
-            lastHeightAnim = ObjectAnimator.ofFloat(lastCardChecked, "height", lastCardChecked.BASE_HEIGHT);
-            lastTranslationAnim = ObjectAnimator.ofFloat(lastCardChecked, "translationY", 0.0f);
-            lastAlphaAnim = ObjectAnimator.ofFloat(lastCardChecked, "alpha", 0.0f);
-
-            animatorSet.play(lastHeightAnim).with(lastTranslationAnim).with(lastAlphaAnim).with(newTranslationAnim);
-        }
-
-        animatorSet.start();
-        animatorSet.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (lastCardChecked != null) lastCardChecked.reset();
-                lastCardChecked = newCardNote;
-            }
-        });
+    //TODO: Implement CardNote #MOVE, #COPY & #DELETE operations
+    @Override
+    public void onCardNoteMoved(NoteAdapter.CardNote cardNote) {
 
     }
+
+    @Override
+    public void onCardNoteCopy(NoteAdapter.CardNote cardNote) {
+
+    }
+
+    @Override
+    public void onCardNoteDelete(NoteAdapter.CardNote cardNote) {
+
+    }
+
 }

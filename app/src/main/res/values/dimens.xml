@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
     <!-- CardNote layout_height values -->
     <dimen name="cardnote_layout_height_high">150dp</dimen>
     <dimen name="cardnote_layout_height_low">100dp</dimen>
-    <dimen name="cardnote_translation_1">50dp</dimen>
+    <dimen name="cardnote_selected_translation">50dp</dimen>
+
+    <dimen name="cardnote_selected_stroke_width">2dp</dimen>
+    <dimen name="cardnote_default_stroke_width">1dp</dimen>
+
+    <dimen name="cardnote_selected_elevation">4dp</dimen>
+    <dimen name="cardnote_default_elevation">0dp</dimen>
 
     <!-- ChipFolder dimensions value -->
     <dimen name="chipfolder_layout_margin">5dp</dimen>
