@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private static final int REQUEST_CODE_ADD_AMBITO = 3;
 
-
     private MainViewModel dataViewModel;
     private FloatingActionButton addFAB, addNoteFAB, addFolderFAB;  // Floating Action Buttons
     private boolean isFABGroupExpanded = false;
@@ -60,13 +59,14 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private Button signOut;
 
     private Toast toastReference;
-
+    private int themeReference;
 
     /** Main constructor */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        //Preferences.applyTheme(this);
+        Preferences.applyTheme(this);
+        themeReference = Preferences.getSelectedTheme();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawable_nav);
@@ -145,7 +145,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
             topAppBar.setTitle(ambito.getName());
             Preferences.setTheme(ambito.getColor());
-            recreate();
+
+            // Si el Tema de mi Actividad YA ha sido cambiado (coincide con el Tema del Preferences), recreamos
+            if (themeReference != Preferences.getSelectedTheme()) recreate();
         });
     }
 

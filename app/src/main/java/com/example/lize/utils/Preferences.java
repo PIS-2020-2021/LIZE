@@ -1,13 +1,15 @@
 package com.example.lize.utils;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.view.ContextThemeWrapper;
 
 import com.example.lize.R;
 
 public class Preferences {
-    private static int theme = R.style.Theme_Red;
 
+    private static int theme = R.style.Theme_Red;
 
     public static void setTheme(int selectedTheme){
         switch (selectedTheme){
@@ -23,12 +25,11 @@ public class Preferences {
         }
     }
 
-
-
-
-    public static void applyTheme(ContextThemeWrapper contextThemeWrapper) {
-
-        contextThemeWrapper.setTheme(theme);
+    public static int getSelectedTheme() {
+        return theme;
     }
 
+    public static void applyTheme(ContextThemeWrapper contextThemeWrapper) {
+        contextThemeWrapper.setTheme(theme);
+    }
 }
