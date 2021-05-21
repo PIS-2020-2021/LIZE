@@ -17,9 +17,6 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
 
-        <!-- Actual Base Ambit Theme -->
-        <!-- <item name="android:theme">@style/Theme.Yellow</item> -->
-
         <!-- Material Component filters -->
         <item name="materialCardViewStyle">@style/Widget.Lize.CardView.option1</item>
         <item name="toolbarStyle">@style/Widget.Lize.Toolbar</item>
