@@ -4,6 +4,7 @@ import android.widget.ImageView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 
 // Note Model Class
 public class Note {
@@ -14,6 +15,7 @@ public class Note {
     private String selfID;
     private String ambitoID;
     private String folderTAG;
+    private Date lastUpdate;
 
     private ArrayList<ImageView> images;
     private ArrayList<File> files;
@@ -22,6 +24,7 @@ public class Note {
         this.title = title;
         this.text_plain = text_plain;
         this.text_html = text_html;
+        this.lastUpdate = new Date();
     }
 
     public String getTitle() {
@@ -70,5 +73,11 @@ public class Note {
 
     public void setText_html(String text_html) {
         this.text_html = text_html;
+    }
+
+    public Date getLastUpdate() {return lastUpdate; }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 }
