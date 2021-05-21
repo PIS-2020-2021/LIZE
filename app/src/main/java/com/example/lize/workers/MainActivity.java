@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.example.lize.R;
 import com.example.lize.models.MainViewModel;
+import com.example.lize.utils.Preferences;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
@@ -64,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     /** Main constructor */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        //Preferences.applyTheme(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawable_nav);
 
@@ -140,7 +144,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         // Observador del Ámbito seleccionado.
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
             topAppBar.setTitle(ambito.getName());
-            //TODO: setTheme en función del color del ámbito
+            Preferences.setTheme(ambito.getColor());
+            recreate();
         });
     }
 
