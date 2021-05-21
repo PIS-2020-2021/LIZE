@@ -145,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
             topAppBar.setTitle(ambito.getName());
             Preferences.setTheme(ambito.getColor());
-
             // Si el Tema de mi Actividad YA ha sido cambiado (coincide con el Tema del Preferences), recreamos
             if (themeReference != Preferences.getSelectedTheme()) recreate();
         });
@@ -314,6 +313,15 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
     }
 
+    // INTENT ==> dataViewModel changes !!
+    protected void transitionRecreate(){
+        Bundle bundle = new Bundle();
+        //onSaveInstanceState(bundle);
+        Intent intent = new Intent(this, getClass());
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
 
 
 }
