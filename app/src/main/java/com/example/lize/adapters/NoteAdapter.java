@@ -2,6 +2,8 @@ package com.example.lize.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
@@ -158,7 +161,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
          */
         public void bindTo(Note currentNote) {
             mTitleNote.setText(currentNote.getTitle());
-            mTextNote.setText(currentNote.getText_plain());
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mTextNote.setText(Html.fromHtml(currentNote.getText_html(), Html.FROM_HTML_MODE_COMPACT));
+            } else {
+                mTextNote.setText(Html.fromHtml(currentNote.getText_html()));
+            }
+
             DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
 
             String metadata = "";
