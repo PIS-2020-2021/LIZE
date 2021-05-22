@@ -45,6 +45,7 @@
         <item name="cornerSize">4dp</item>
     </style>
 
+
     <!-- ToolBar Style -->
     <style name="Widget.Lize.Toolbar" parent="Widget.MaterialComponents.Toolbar">
         <item name="android:background">?attr/colorSurface</item>

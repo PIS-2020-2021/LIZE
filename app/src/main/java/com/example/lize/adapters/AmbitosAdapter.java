@@ -4,9 +4,15 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.chauthai.swipereveallayout.SwipeRevealLayout;
+import com.chauthai.swipereveallayout.ViewBinderHelper;
 import com.example.lize.R;
 import com.example.lize.data.Ambito;
 import java.util.ArrayList;
@@ -16,6 +22,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
     private final Context mContext;
     private final ArrayList<Ambito> mAmbitos;
     private final ArrayList<AmbitosAdapter.AmbitoListener> ambitoListeners;
+    private final ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
 
     /* Custom Ambito onClick Listener */
     public interface AmbitoListener{
@@ -66,8 +73,13 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
      */
     @Override
     public void onBindViewHolder(@NonNull AmbitoHolder holder, int position) {
-        // Obtenemos los parámetros del Layout correspondiente al holder y modificamos el height
         Ambito currentAmbito = mAmbitos.get(position);
+        // Obtenemos los parámetros del Layout correspondiente al holder y modificamos el height
+        viewBinderHelper.setOpenOnlyOne(true);
+        viewBinderHelper.bind(holder.swipeRevealLayout, String.valueOf(currentAmbito.getSelfID()));
+        viewBinderHelper.closeLayout(String.valueOf(currentAmbito.getSelfID()));
+
+
         holder.bindTo(currentAmbito);
     }
 
@@ -85,7 +97,11 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
     // ViewHolder are used to to store the inflated views in order to recycle them
     public class AmbitoHolder extends RecyclerView.ViewHolder {
 
-        private final TextView mTitleAmbito;
+        private TextView mTitleAmbito;
+        private ImageView mCancel;
+        private ImageView mEdit;
+        private ImageView mDelete;
+        private SwipeRevealLayout swipeRevealLayout;
 
         /**
          * Constructor del ViewHolder correspondiete al layout de ambito_card
@@ -94,10 +110,47 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
         public AmbitoHolder(@NonNull View itemView) {
             super(itemView);
             //Inicializamos los componentes del Layout
-            mTitleAmbito = (TextView) itemView.findViewById(R.id.ambito_name);
-            itemView.setOnClickListener((a)->{
-                for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
-                    listener.onAmbitoSelected(mTitleAmbito.getText().toString());
+            mTitleAmbito = itemView.findViewById(R.id.ambito_name);
+            mCancel = itemView.findViewById(R.id.ambitoCancel);
+            mEdit = itemView.findViewById(R.id.ambitoEdit);
+            mDelete = itemView.findViewById(R.id.ambitoDelete);
+            swipeRevealLayout = itemView.findViewById(R.id.swipeLaoyout);
+
+            /************************************************
+             * Handling the clicks events on the txtViews
+             ************************************************/
+            //Setemaos el Listener de Cancel
+            mCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext, "Se ha seleccionado \"Cancelar Menu Ambito\"", Toast.LENGTH_SHORT).show();
+                    swipeRevealLayout.close(true);
+                }
+            });
+
+            //Setemaos el Listener de Edit
+            mEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext, "Se ha seleccionado \"Editar Ambito\"", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            //Setemaos el Listener de Delete
+            mDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext, "Se ha seleccionado \"Eliminar Ambito\"", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            //Seteamos el Listener del Ambito
+            mTitleAmbito.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
+                        listener.onAmbitoSelected(mTitleAmbito.getText().toString());
+                }
             });
 
             itemView.setOnLongClickListener(v -> {

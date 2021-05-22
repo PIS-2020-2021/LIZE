@@ -1,22 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<com.chauthai.swipereveallayout.SwipeRevealLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeLaoyout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp"
-    android:paddingLeft="3dp"
-    android:paddingRight="3dp"
-    android:background="#ffffff"
-    android:orientation="horizontal">
+    app:dragEdge="left"
+    app:mode="normal">
 
-    <TextView
-        android:id="@+id/ambito_name"
+    <!-- Your secondary layout here -->
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="12dp"
-        android:paddingTop="4dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"/>
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-</LinearLayout>
+        <ImageButton
+            android:id="@+id/ambitoCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:tint="?attr/colorSurface"
+            app:srcCompat="@drawable/ic_cross"
+            android:background="@color/white"/>
+
+        <ImageButton
+            android:id="@+id/ambitoEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:tint="?attr/colorSurface"
+            app:srcCompat="@drawable/edit_icon"
+            android:background="@color/md_green_800"/>
+
+        <ImageButton
+            android:id="@+id/ambitoDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:tint="?attr/colorSurface"
+            app:srcCompat="@drawable/delete_icon"
+            android:background="@color/md_red_800"/>
+
+
+    </LinearLayout>
+
+
+    <!-- Your main layout here -->
+    <LinearLayout
+        android:id="@+id/ambitoCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/ambito_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:text="Medium Text"/>
+
+    </LinearLayout>
+
+
+</com.chauthai.swipereveallayout.SwipeRevealLayout>

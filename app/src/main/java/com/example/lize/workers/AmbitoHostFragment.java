@@ -15,6 +15,7 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +23,8 @@ import com.example.lize.R;
 import com.example.lize.adapters.AmbitosAdapter;
 import com.example.lize.data.User;
 import com.example.lize.models.MainViewModel;
+
+import java.util.Collections;
 
 public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.AmbitoListener {
 
@@ -56,7 +59,30 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
             mAmbitosRecyclerView.swapAdapter(mAmbitosAdapter, false);
             mAmbitosAdapter.notifyDataSetChanged();
         });
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(mAmbitosRecyclerView);
     }
+
+    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP |
+            ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END, 0) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            int fromPosition = viewHolder.getAdapterPosition();
+            int toPosition = target.getAdapterPosition();
+
+            Collections.swap(dataViewModel.getUserSelected().getValue().getAmbitos(), fromPosition, toPosition);
+
+            recyclerView.getAdapter().notifyItemMoved(fromPosition,toPosition);
+
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+        }
+    };
+
 
     /**
      * Añadimos un nuevo ambito al DataSet del MainViewModel
@@ -117,5 +143,8 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
         });
         optionsMenu.show();
     }
+
+
+
 
 }
