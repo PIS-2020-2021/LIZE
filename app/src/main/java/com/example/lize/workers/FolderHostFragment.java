@@ -64,9 +64,15 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
 
         // Actualizamos la lista de Carpetas cuando se seleccione un Ámbito
         dataViewModel.getAmbitoSelected().observe(getViewLifecycleOwner(), (@NonNull Ambito ambito) ->{
-            mFolderAdapter = new FolderAdapter(mContext, ambito.getFolders(), this);
-            mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
-            mFolderAdapter.notifyDataSetChanged();
+            if (dataViewModel.getViewUpdate().getValue()) {
+                mFolderAdapter = new FolderAdapter(mContext, ambito.getFolders(), this);
+                mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
+                mFolderAdapter.notifyDataSetChanged();
+            } else {
+                mFolderAdapter = new FolderAdapter(mContext, new ArrayList<>(), this);
+                mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
+                mFolderAdapter.notifyDataSetChanged();
+            }
         });
 
         // Cuando deseleccionamos la Carpeta (folder == null), deseleccionamos el ChipFolder anterior.
@@ -104,23 +110,5 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
             selectedFolder = null;
         }
     }
-
-    /* Métodos deprecated de cambio de color. Misma funcionalidad mediante selectores de color.
-    private void selectColorChange(Chip selectedChip){
-        mContext.getTheme().resolveAttribute(R.attr.colorPrimaryDark, typedValue, true);
-        selectedChip.setChipBackgroundColor(ContextCompat.getColorStateList(mContext, typedValue.resourceId));
-
-        mContext.getTheme().resolveAttribute(R.attr.colorOnSurface, typedValue, true);
-        selectedChip.setTextColor(ContextCompat.getColor(mContext, typedValue.resourceId));
-    }
-
-    // Bajamos el color del ChipFolder deseleccionado
-    private void deselectColorChange(Chip deselectedChip){
-        mContext.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
-        selectedFolder.setChipBackgroundColor(ContextCompat.getColorStateList(mContext, typedValue.resourceId));
-
-        mContext.getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
-        selectedFolder.setTextColor(ContextCompat.getColor(mContext, typedValue.resourceId));
-    }*/
 
 }
