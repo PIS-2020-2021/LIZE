@@ -22,6 +22,7 @@ import com.example.lize.R;
 import com.example.lize.adapters.AmbitosAdapter;
 import com.example.lize.data.User;
 import com.example.lize.models.MainViewModel;
+import com.example.lize.utils.Preferences;
 
 public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.AmbitoListener {
 
@@ -73,8 +74,14 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
     public void deleteAmbito(String ambitoID){ }
 
 
+    /**
+     * Seleccionamos un ambito del DataSet del MainViewModel, y aplicamos un cambio de tema de la app.
+     * @param ambitoName Nombre del ambito seleccionado.
+     * @param ambitoColor Color del ambito seleccionado.
+     */
     @Override
-    public void onAmbitoSelected(String ambitoName) {
+    public void onAmbitoSelected(String ambitoName, int ambitoColor) {
+        Preferences.setTheme(ambitoColor);
         dataViewModel.selectAmbito(ambitoName);
     }
 

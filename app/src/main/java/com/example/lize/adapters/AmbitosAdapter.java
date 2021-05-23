@@ -19,7 +19,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
 
     /* Custom Ambito onClick Listener */
     public interface AmbitoListener{
-        void onAmbitoSelected(String ambitoName);
+        void onAmbitoSelected(String ambitoName, int ambitoColor);
         void onAmbitoHold(View view);
     }
 
@@ -86,6 +86,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
     public class AmbitoHolder extends RecyclerView.ViewHolder {
 
         private final TextView mTitleAmbito;
+        private int mAmbitoColor;
 
         /**
          * Constructor del ViewHolder correspondiete al layout de ambito_card
@@ -97,7 +98,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
             mTitleAmbito = (TextView) itemView.findViewById(R.id.ambito_name);
             itemView.setOnClickListener((a)->{
                 for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
-                    listener.onAmbitoSelected(mTitleAmbito.getText().toString());
+                    listener.onAmbitoSelected(mTitleAmbito.getText().toString(), mAmbitoColor);
             });
 
             itemView.setOnLongClickListener(v -> {
@@ -117,6 +118,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
          */
         public void bindTo(Ambito currentAmbito){
             mTitleAmbito.setText(currentAmbito.getName());
+            mAmbitoColor = currentAmbito.getColor();
         }
 
     }

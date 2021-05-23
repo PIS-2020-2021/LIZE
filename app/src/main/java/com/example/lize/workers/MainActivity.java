@@ -1,13 +1,18 @@
 package com.example.lize.workers;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.app.Activity;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.TimeInterpolator;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
@@ -16,6 +21,16 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.Transformation;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -26,6 +41,7 @@ import com.example.lize.models.MainViewModel;
 import com.example.lize.utils.Preferences;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -47,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private static final int REQUEST_CODE_ADD_AMBITO = 3;
+    private static final int THEME_UPDATE_DURATION = 1000;
 
     private MainViewModel dataViewModel;
     private FloatingActionButton addFAB, addNoteFAB, addFolderFAB;  // Floating Action Buttons
@@ -61,15 +78,26 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private Toast toastReference;
     private int themeReference;
 
+
+    /* Método auxiliar para saber si esta actividad tiene el TEMA actualizado. */
+    public boolean isThemeUpdated(){ return themeReference == Preferences.getSelectedTheme(); }
+
     /** Main constructor */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        // Theme Setting Logic
         Preferences.applyTheme(this);
         themeReference = Preferences.getSelectedTheme();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawable_nav);
+
+        /*final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new DecelerateInterpolator());
+        fadeIn.setDuration(500);
+        viewGroup.startAnimation(fadeIn);*/
 
         /*Asignamos el objeto toolBar de la view*/
         this.topAppBar = findViewById(R.id.ambito_material_toolbar);
@@ -133,20 +161,21 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
         //Observador del Toast Message del MainActivity. Evitamos acumulación de toasts mediante toastReference.
         dataViewModel.getToast().observe(this, (t) -> {
-            if (toastReference != null) toastReference.cancel();
-            toastReference = Toast.makeText(this.getBaseContext(), t, Toast.LENGTH_SHORT);
-            toastReference.show();
+            if (isThemeUpdated()) {
+                if (toastReference != null) toastReference.cancel();
+                toastReference = Toast.makeText(this.getBaseContext(), t, Toast.LENGTH_SHORT);
+                toastReference.show();
+            }
         });
 
         // Observador del Usuario seleccionado. Inicializa el HeaderNavigationView.
         dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), 0));
 
-        // Observador del Ámbito seleccionado.
+        // Observador del Ámbito seleccionado. Si el Tema de la Actividad ha sido cambiado, recreamos
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
-            topAppBar.setTitle(ambito.getName());
-            Preferences.setTheme(ambito.getColor());
-            // Si el Tema de mi Actividad YA ha sido cambiado (coincide con el Tema del Preferences), recreamos
-            if (themeReference != Preferences.getSelectedTheme()) recreate();
+            drawerLayout.closeDrawer(Gravity.LEFT);
+            if (isThemeUpdated()) topAppBar.setTitle(ambito.getName());
+            else updateTheme();
         });
     }
 
@@ -313,15 +342,31 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
     }
 
-    // INTENT ==> dataViewModel changes !!
-    protected void transitionRecreate(){
-        Bundle bundle = new Bundle();
-        //onSaveInstanceState(bundle);
-        Intent intent = new Intent(this, getClass());
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-    }
+    protected void updateTheme() {
+        ViewGroup root = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
+        CircularProgressIndicator circleProgress = findViewById(R.id.progress_circle);
+        Animation recreate = new Animation(){};
+        recreate.setDuration(THEME_UPDATE_DURATION);
+        recreate.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                if (toastReference != null) toastReference.cancel();
+                toastReference = Toast.makeText(getBaseContext(), "Loading color Theme...", Toast.LENGTH_SHORT);
+                toastReference.show();
+                circleProgress.show();
+            }
 
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                circleProgress.hide();
+                recreate();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        root.startAnimation(recreate);
+    }
 
 }

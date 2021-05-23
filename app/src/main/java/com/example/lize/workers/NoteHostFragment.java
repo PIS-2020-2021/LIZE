@@ -81,23 +81,27 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
 
         // Actualizamos la lista de Notas cuando se seleccione una Carpeta
         dataViewModel.getFolderSelected().observe(getViewLifecycleOwner(), (@Nullable Folder folder)->{
-            if (lastCardChecked != null){
-                lastCardChecked.reset();
-                lastCardChecked = null;
-            }
-            try{
-                if (folder == null) {
-                    Ambito ambito = dataViewModel.getAmbitoSelected().getValue();
-                    mNoteAdapter = new NoteAdapter(root.getContext(), ambito.getNotes(), cardNoteType);
-                } else mNoteAdapter = new NoteAdapter(root.getContext(), folder.getNotes(), cardNoteType);
+            if (((MainActivity) requireActivity()).isThemeUpdated()) {
 
-                mNoteAdapter.registerCardNoteListener(this);
-                mNotesRecyclerView.swapAdapter(mNoteAdapter, false);
-                mNoteAdapter.notifyDataSetChanged();
+                if (lastCardChecked != null) {
+                    lastCardChecked.reset();
+                    lastCardChecked = null;
+                }
+                try {
+                    if (folder == null) {
+                        Ambito ambito = dataViewModel.getAmbitoSelected().getValue();
+                        mNoteAdapter = new NoteAdapter(root.getContext(), ambito.getNotes(), cardNoteType);
+                    } else
+                        mNoteAdapter = new NoteAdapter(root.getContext(), folder.getNotes(), cardNoteType);
 
-            }catch(NullPointerException exception){
-                Log.w("NoteHostFragment", "Failed to update ambito's notes: null ambito selected.");
-                Log.w("NoteHostFragment", "Exception message: " + exception.getMessage());
+                    mNoteAdapter.registerCardNoteListener(this);
+                    mNotesRecyclerView.swapAdapter(mNoteAdapter, false);
+                    mNoteAdapter.notifyDataSetChanged();
+
+                } catch (NullPointerException exception) {
+                    Log.w("NoteHostFragment", "Failed to update ambito's notes: null ambito selected.");
+                    Log.w("NoteHostFragment", "Exception message: " + exception.getMessage());
+                }
             }
         });
 
