@@ -187,13 +187,4 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
 
     }
 
-
-
-
-
-
-
-
-
-
 }
