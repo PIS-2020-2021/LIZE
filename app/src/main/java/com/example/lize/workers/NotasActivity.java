@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lize.R;
 import com.example.lize.adapters.DocumentAdapter;
 import com.example.lize.data.Documento;
+import com.example.lize.utils.Preferences;
 import com.onegravity.rteditor.RTEditText;
 import com.onegravity.rteditor.RTManager;
 import com.onegravity.rteditor.RTToolbar;
@@ -75,7 +76,8 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.RTE_ThemeLight);
+        //setTheme(R.style.RTE_ThemeLight);
+        Preferences.applySelectedTheme(this);
         setContentView(R.layout.activity_notas);
 
         // Componentes

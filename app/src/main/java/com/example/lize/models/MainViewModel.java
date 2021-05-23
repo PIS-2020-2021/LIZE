@@ -2,6 +2,7 @@ package com.example.lize.models;
 
 
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -26,6 +27,7 @@ public class MainViewModel extends ViewModel{
     private final MutableLiveData<Note> mNoteSelected;          // Contiene la Nota Seleccionada
 
     private final MutableLiveData<String> mToast;               // Toast informativo
+    private final MutableLiveData<Boolean> mViewUpdate;         // Vista actualizada?
 
     public MainViewModel() {
         mUserSelected = new MutableLiveData<>();
@@ -33,6 +35,8 @@ public class MainViewModel extends ViewModel{
         mFolderSelected = new MutableLiveData<>();
         mNoteSelected = new MutableLiveData<>();
         mToast = new MutableLiveData<>();
+        mViewUpdate = new MutableLiveData<>();
+        mViewUpdate.setValue(false);
 
         // Enlazamos con la base de datos, reconstruyendo la jerarquía del modelo a partir del Usuario Registrado
         DatabaseAdapter da = DatabaseAdapter.getInstance();
@@ -59,8 +63,11 @@ public class MainViewModel extends ViewModel{
         return mToast;
     }
 
+    public MutableLiveData<Boolean> getViewUpdate(){ return mViewUpdate; }
+
     /**
-     * Selecciona un Ámbito del Usuario logueado mUserSelected.
+     * Selecciona un Ámbito del Usuario logueado mUserSelected. Antes de nada, marcamos que la Vista
+     * se debe refrescar para así evitar dobles llamadas a los observadores.
      * @param ambitoName Ambito seleccionado
      * @throws NullPointerException Si el Usuario logueado no ha sido correctamente cargado de DB.
      */
@@ -68,6 +75,7 @@ public class MainViewModel extends ViewModel{
         try {
             for (Ambito ambito : mUserSelected.getValue().getAmbitos()) {
                 if (ambito.getName().equals(ambitoName)) {
+                    mViewUpdate.setValue(false);
                     setToast("Ambito " + ambitoName + " selected.");
                     mAmbitoSelected.setValue(ambito);
                     mFolderSelected.setValue(null);

@@ -37,6 +37,8 @@ import com.example.lize.data.Note;
 import com.example.lize.models.MainViewModel;
 import com.google.android.material.card.MaterialCardView;
 
+import java.util.ArrayList;
+
 
 /** Notes View Host fragment. Responsabilidades:
  * <ol><li> Gestionar la parte de la UI correspondiente con el RecycleView de CardNotes </li>
@@ -81,8 +83,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
 
         // Actualizamos la lista de Notas cuando se seleccione una Carpeta
         dataViewModel.getFolderSelected().observe(getViewLifecycleOwner(), (@Nullable Folder folder)->{
-            if (((MainActivity) requireActivity()).isThemeUpdated()) {
-
+            if (dataViewModel.getViewUpdate().getValue()) {
                 if (lastCardChecked != null) {
                     lastCardChecked.reset();
                     lastCardChecked = null;
@@ -102,6 +103,11 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
                     Log.w("NoteHostFragment", "Failed to update ambito's notes: null ambito selected.");
                     Log.w("NoteHostFragment", "Exception message: " + exception.getMessage());
                 }
+            }
+            else{
+                mNoteAdapter = new NoteAdapter(root.getContext(), new ArrayList<>(), cardNoteType);
+                mNotesRecyclerView.swapAdapter(mNoteAdapter, false);
+                mNoteAdapter.notifyDataSetChanged();
             }
         });
 

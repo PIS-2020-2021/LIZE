@@ -76,28 +76,15 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private Button signOut;
 
     private Toast toastReference;
-    private int themeReference;
-
-
-    /* Método auxiliar para saber si esta actividad tiene el TEMA actualizado. */
-    public boolean isThemeUpdated(){ return themeReference == Preferences.getSelectedTheme(); }
 
     /** Main constructor */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Theme Setting Logic
-        Preferences.applyTheme(this);
-        themeReference = Preferences.getSelectedTheme();
+        Preferences.applySelectedTheme(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawable_nav);
-
-        /*final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
-        Animation fadeIn = new AlphaAnimation(0, 1);
-        fadeIn.setInterpolator(new DecelerateInterpolator());
-        fadeIn.setDuration(500);
-        viewGroup.startAnimation(fadeIn);*/
 
         /*Asignamos el objeto toolBar de la view*/
         this.topAppBar = findViewById(R.id.ambito_material_toolbar);
@@ -159,9 +146,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private void observeLiveData() {
         this.dataViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
-        //Observador del Toast Message del MainActivity. Evitamos acumulación de toasts mediante toastReference.
+        // Observador del Toast Message del MainActivity. Evitamos acumulación de toasts mediante toastReference.
         dataViewModel.getToast().observe(this, (t) -> {
-            if (isThemeUpdated()) {
+            if (dataViewModel.getViewUpdate().getValue()) {
                 if (toastReference != null) toastReference.cancel();
                 toastReference = Toast.makeText(this.getBaseContext(), t, Toast.LENGTH_SHORT);
                 toastReference.show();
@@ -171,11 +158,11 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         // Observador del Usuario seleccionado. Inicializa el HeaderNavigationView.
         dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), 0));
 
-        // Observador del Ámbito seleccionado. Si el Tema de la Actividad ha sido cambiado, recreamos
+        // Observador del Ámbito seleccionado.
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
             drawerLayout.closeDrawer(Gravity.LEFT);
-            if (isThemeUpdated()) topAppBar.setTitle(ambito.getName());
-            else updateTheme();
+            if (dataViewModel.getViewUpdate().getValue()) topAppBar.setTitle(ambito.getName());
+            else updateAmbito();
         });
     }
 
@@ -342,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
     }
 
-    protected void updateTheme() {
+    protected void updateAmbito() {
         ViewGroup root = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
         CircularProgressIndicator circleProgress = findViewById(R.id.progress_circle);
         Animation recreate = new Animation(){};
@@ -351,13 +338,14 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             @Override
             public void onAnimationStart(Animation animation) {
                 if (toastReference != null) toastReference.cancel();
-                toastReference = Toast.makeText(getBaseContext(), "Loading color Theme...", Toast.LENGTH_SHORT);
+                toastReference = Toast.makeText(getBaseContext(), "Cargando Ámbito...", Toast.LENGTH_SHORT);
                 toastReference.show();
                 circleProgress.show();
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                dataViewModel.getViewUpdate().setValue(true);
                 circleProgress.hide();
                 recreate();
             }

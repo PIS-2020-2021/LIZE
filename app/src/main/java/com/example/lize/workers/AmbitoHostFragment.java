@@ -81,7 +81,7 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
      */
     @Override
     public void onAmbitoSelected(String ambitoName, int ambitoColor) {
-        Preferences.setTheme(ambitoColor);
+        Preferences.setSelectedTheme(ambitoColor);
         dataViewModel.selectAmbito(ambitoName);
     }
 

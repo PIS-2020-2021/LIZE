@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.lize.R;
 import com.example.lize.data.Ambito;
+import com.example.lize.utils.Preferences;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -37,6 +38,7 @@ public class NewAmbitoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        Preferences.applySelectedTheme(this);
         setContentView(R.layout.activity_new_ambito);
 
         getColors();
