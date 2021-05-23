@@ -113,22 +113,21 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
 
     /**
      * Seleccionamos un ambito del DataSet del MainViewModel, y aplicamos un cambio de tema de la app.
-     * @param ambitoName Nombre del ambito seleccionado.
-     * @param ambitoColor Color del ambito seleccionado.
+     * @param ambitoHolder Holder del ambito seleccionado.
      */
     @Override
     public void onAmbitoSelected(AmbitosAdapter.AmbitoHolder ambitoHolder) {
-        Preferences.setSelectedTheme(ambitoHolder.getmColor());
+        Preferences.setSelectedTheme(ambitoHolder.getAmbitomColor());
         if (lastAmbitoSel != null && lastAmbitoSel != ambitoHolder) lastAmbitoSel.reset();
         lastAmbitoSel = ambitoHolder;
         dataViewModel.selectAmbito(ambitoHolder.getmTitleAmbito().getText().toString());
 
     }
 
-    }
-
-
-
-
-
 }
+
+
+
+
+
+

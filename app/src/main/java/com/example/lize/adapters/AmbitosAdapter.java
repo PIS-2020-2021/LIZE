@@ -166,7 +166,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
             return mTitleAmbito;
         }
 
-        public int getmAmbitoColor(){
+        public int getAmbitomColor(){
             return mAmbitoColor;
         }
 

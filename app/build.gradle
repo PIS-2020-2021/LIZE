@@ -75,4 +75,7 @@ dependencies {
     // Multidex for avoiding 64K method references limitation
     implementation "androidx.multidex:multidex:2.0.1"
 
+    //Swipe Motion of Cardviews
+    implementation 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.4.1'
+
 }
