@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             public void onDrawerClosed(View drawerView){
                 super.onDrawerClosed(drawerView);
                 //Si quisieramos que pasase algo cuando cerremos el drawer, esta es la función
+                dataViewModel.savePositionAmbitos();
             }
         };
 
@@ -122,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         //Asignamos Boton y Listener a signOut
         this.signOut = findViewById(R.id.sign_out);
         signOut.setOnClickListener(v -> {
+            dataViewModel.savePositionAmbitos();
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
             startActivity(intent);

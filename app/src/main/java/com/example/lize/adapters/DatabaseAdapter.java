@@ -1,7 +1,10 @@
 package com.example.lize.adapters;
 
+import android.os.Build;
 import android.util.Log;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+
 import com.example.lize.data.Ambito;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
@@ -21,6 +24,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -131,8 +136,11 @@ public class DatabaseAdapter {
                     Ambito ambito = new Ambito(document.getString("name"), document.getLong("color").intValue());
                     ambito.setUserID(document.getString("userID"));
                     ambito.setSelfID(document.getString("selfID"));
+                    ambito.setPosition(document.getLong("position").intValue());
                     userAmbitos.add(ambito);
                 }
+
+                Collections.sort(userAmbitos, (Ambito a1, Ambito a2) -> a1.getPosition() - a2.getPosition());
                 if(loader != null) loader.getAmbitoCollectionResult(user.getUid(), userAmbitos);
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
@@ -180,8 +188,8 @@ public class DatabaseAdapter {
             public void onComplete(@NonNull Task task) {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "User" + user.getSelfID() + " correctly saved.");
-                    //for (Ambito ambito: user.getAmbitos()) saveAmbito(ambito);
-                }else Log.d(TAG, "Error saving user " + user.getSelfID(), task.getException());
+                    for (Ambito ambito: user.getAmbitos()) saveAmbito(ambito);
+                } else Log.d(TAG, "Error saving user " + user.getSelfID(), task.getException());
                 if (saver != null) saver.saveUserResult(user.getSelfID(), task.isSuccessful()); // ViewModel callback
             }
         });
@@ -208,6 +216,7 @@ public class DatabaseAdapter {
         ambitoData.put("color", ambito.getColor());
         ambitoData.put("selfID", ambito.getSelfID());
         ambitoData.put("userID", ambito.getUserID());
+        ambitoData.put("position", ambito.getPosition());
 
 
         ambitoRef.set(ambitoData).addOnCompleteListener(new OnCompleteListener(){
