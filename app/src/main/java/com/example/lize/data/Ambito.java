@@ -12,6 +12,7 @@ public class Ambito {
     private int color;
     private String selfID;
     private String userID;
+    private int position;
 
     private ArrayList<Note> notes;
     private final Map<String, Folder> folders;
@@ -56,6 +57,15 @@ public class Ambito {
 
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public ArrayList<Note> getNotes() { return this.notes; }

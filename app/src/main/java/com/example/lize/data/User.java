@@ -20,7 +20,7 @@ public class User {
         this.first = first;
         this.last = last;
         this.ambitos = new ArrayList<>();
-        ambitos.add(new Ambito(Ambito.BASE_AMBITO_NAME, Ambito.BASE_AMBITO_COLOR));
+        addAmbito(new Ambito(Ambito.BASE_AMBITO_NAME, Ambito.BASE_AMBITO_COLOR));
     }
 
     public String getMail() {
@@ -69,6 +69,7 @@ public class User {
 
     public void addAmbito(Ambito ambito){
         ambito.setUserID(selfID);
+        ambito.setPosition(ambitos.size());
         ambitos.add(ambito);
     }
 
@@ -80,6 +81,12 @@ public class User {
             ambitoColors.add(ambito.getColor());
         Collections.sort(ambitoColors);
         return ambitoColors;
+    }
+
+    public void swapAmbitos(int initialPosition, int finalPosition){
+        ambitos.get(initialPosition).setPosition(finalPosition);
+        ambitos.get(finalPosition).setPosition(initialPosition);
+        Collections.swap(ambitos, initialPosition, finalPosition);
     }
 
 }

@@ -1,21 +1,28 @@
 package com.example.lize.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chauthai.swipereveallayout.SwipeRevealLayout;
 import com.chauthai.swipereveallayout.ViewBinderHelper;
 import com.example.lize.R;
 import com.example.lize.data.Ambito;
+import com.google.android.material.color.MaterialColors;
+
 import java.util.ArrayList;
+
 
 public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHolder> {
 
@@ -27,7 +34,6 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
     /* Custom Ambito onClick Listener */
     public interface AmbitoListener{
         void onAmbitoSelected(String ambitoName);
-        void onAmbitoHold(View view);
     }
 
     /**
@@ -98,6 +104,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
     public class AmbitoHolder extends RecyclerView.ViewHolder {
 
         private TextView mTitleAmbito;
+        private LinearLayout mAmbitoSelectedLinearLayout;
         private ImageView mCancel;
         private ImageView mEdit;
         private ImageView mDelete;
@@ -111,6 +118,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
             super(itemView);
             //Inicializamos los componentes del Layout
             mTitleAmbito = itemView.findViewById(R.id.ambito_name);
+            mAmbitoSelectedLinearLayout = itemView.findViewById(R.id.ambitoSelectedLinearLayout);
             mCancel = itemView.findViewById(R.id.ambitoCancel);
             mEdit = itemView.findViewById(R.id.ambitoEdit);
             mDelete = itemView.findViewById(R.id.ambitoDelete);
@@ -152,12 +160,6 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
                         listener.onAmbitoSelected(mTitleAmbito.getText().toString());
                 }
             });
-
-            itemView.setOnLongClickListener(v -> {
-                for(AmbitoListener listener : ambitoListeners)
-                    listener.onAmbitoHold(v);
-                return false;
-            });
         }
 
         public TextView getmTitleAmbito() {
@@ -170,6 +172,44 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
          */
         public void bindTo(Ambito currentAmbito){
             mTitleAmbito.setText(currentAmbito.getName());
+            switch (currentAmbito.getColor()){
+                case 1:
+                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Red));
+                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Red));
+                    break;
+                case 2:
+                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Purple));
+                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Purple));
+                    break;
+                case 3:
+                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Indigo));
+                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Indigo));
+                    break;
+                case 4:
+                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Blue));
+                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Blue));
+                    break;
+                case 5:
+                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Teal));
+                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Teal));
+                    break;
+                case 6:
+                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Green));
+                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Green));
+                    break;
+                case 7:
+                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Yellow));
+                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Yellow));
+                    break;
+                case 8:
+                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Orange));
+                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Orange));
+                    break;
+                case 9:
+                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Brown));
+                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Brown));
+                    break;
+            }
         }
 
     }

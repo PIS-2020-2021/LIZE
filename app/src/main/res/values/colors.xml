@@ -85,6 +85,17 @@
     <color name="Presseed_Orange">@color/orange_700</color>
     <color name="Presseed_Brown">@color/brown_700</color>
 
+    <!-- Dafault Colors of Ambito Cards-->
+    <color name="Ambito_Red">#40EF5350</color>
+    <color name="Ambito_Purple">#40AB47BC</color>
+    <color name="Ambito_Indigo">#405C6BC0</color>
+    <color name="Ambito_Blue">#4029B6F6</color>
+    <color name="Ambito_Teal">#4026A69A</color>
+    <color name="Ambito_Green">#409CCC65</color>
+    <color name="Ambito_Yellow">#40FFEE58</color>
+    <color name="Ambito_Orange">#40FF7043</color>
+    <color name="Ambito_Brown">#408D6E63</color>
+
     <!-- google's material design colours from
     http://www.google.com/design/spec/style/color.html#color-ui-color-palette -->
     <!--reds-->

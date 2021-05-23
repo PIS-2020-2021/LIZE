@@ -46,18 +46,29 @@
     <LinearLayout
         android:id="@+id/ambitoCard"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/white"
-        android:padding="20dp">
+        android:layout_height="match_parent"
+        android:layout_marginTop="3dp"
+        android:orientation="vertical"
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/ambito_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:textAppearance="@style/TextAppearance.Lize.HeadLine6"
             android:textSize="18sp"
-            android:text="Medium Text"/>
+            android:text="Medium Text"
+            android:paddingTop="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="15dp"/>
+        <LinearLayout
+            android:id="@+id/ambitoSelectedLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:orientation="vertical"
+            android:visibility="visible"/>
 
     </LinearLayout>
 

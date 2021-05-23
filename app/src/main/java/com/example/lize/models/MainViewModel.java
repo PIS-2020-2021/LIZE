@@ -1,8 +1,10 @@
 package com.example.lize.models;
 
 
+import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -166,6 +168,48 @@ public class MainViewModel extends ViewModel{
             Log.w(TAG, "Exception message: " + exception.getMessage());
         }
     }
+
+    /**
+     * Actualizamos el contenido del Ambito editado
+     * @param ambitoName Nombre del Ambito editado.
+     * @param ambitoColor Color del Ámbito editado.
+     * @throws NullPointerException Si la Nota Editada no ha sido correctamente seleccionada.
+     */
+    public void editAmbito(String ambitoID, String ambitoName, int ambitoColor){
+        try {
+            Ambito selected = null;
+            for (Ambito ambito : mUserSelected.getValue().getAmbitos()){
+                if(ambito.getSelfID().equals(ambitoID)){
+                    selected = ambito;                                     // Editamos el Ambito seleccionado
+                }
+            }
+            selected.setName(ambitoName);
+            selected.setColor(ambitoColor);
+            if(mAmbitoSelected.getValue().getSelfID().equals(ambitoID)) mAmbitoSelected.setValue(selected);     // Actualizamos el Ambito editado
+            DatabaseAdapter.getInstance().saveAmbito(selected);                                                 // Guardamos el Ambito en DB
+            setToast("Ambito " + ambitoName + " correctly edited.");                                            // Creamos Toast Informativo
+
+        }catch(NullPointerException exception){
+            Log.w(TAG, "Failed to edit ambito " + ambitoName + ": null pointer exception.");
+            Log.w(TAG, "Exception message: " + exception.getMessage());
+        }
+    }
+
+    /**
+     * Actualizamos la posición de los Ambitos en el RecyclerView
+     * @throws NullPointerException Si la Nota Editada no ha sido correctamente seleccionada.
+     */
+    public void savePositionAmbitos(){
+        try {
+            for (Ambito ambito : mUserSelected.getValue().getAmbitos()){
+                DatabaseAdapter.getInstance().saveAmbito(ambito);
+            }
+        }catch(NullPointerException exception){
+            Log.w(TAG, "Failed to save positions: null pointer exception.");
+            Log.w(TAG, "Exception message: " + exception.getMessage());
+        }
+    }
+
 
     /**
      * Añadimos una nueva Carpeta a la lista de Carpetas del Ámbito actual.

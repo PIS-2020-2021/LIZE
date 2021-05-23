@@ -119,7 +119,7 @@
                 app:layout_constraintEnd_toStartOf="@id/note_copy_btn"
                 android:layout_width="30dp"
                 android:layout_height="40dp"
-                android:tint="?attr/colorSurface"
+                android:tint="?attr/colorOnSurface"
                 app:srcCompat="@drawable/ic_baseline_drive_file_move_24"
                 android:background="@android:color/transparent"/>
 
@@ -130,7 +130,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_width="30dp"
                 android:layout_height="40dp"
-                android:tint="?attr/colorSurface"
+                android:tint="?attr/colorOnSurface"
                 app:srcCompat="@drawable/ic_baseline_file_copy_24"
                 android:background="@android:color/transparent"/>
 
@@ -141,7 +141,7 @@
                 app:layout_constraintStart_toEndOf="@id/note_copy_btn"
                 android:layout_width="30dp"
                 android:layout_height="40dp"
-                android:tint="?attr/colorSurface"
+                android:tint="?attr/colorOnSurface"
                 app:srcCompat="@drawable/delete_icon"
                 android:background="@android:color/transparent"/>
 

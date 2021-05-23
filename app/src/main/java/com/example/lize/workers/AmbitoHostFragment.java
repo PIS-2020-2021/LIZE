@@ -3,11 +3,13 @@ package com.example.lize.workers;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,6 +61,8 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
             mAmbitosRecyclerView.swapAdapter(mAmbitosAdapter, false);
             mAmbitosAdapter.notifyDataSetChanged();
         });
+
+        //Seteamos los componentes para poder elegir el orden de los Ambitos
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(mAmbitosRecyclerView);
     }
@@ -70,16 +74,21 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
             int fromPosition = viewHolder.getAdapterPosition();
             int toPosition = target.getAdapterPosition();
 
-            Collections.swap(dataViewModel.getUserSelected().getValue().getAmbitos(), fromPosition, toPosition);
+            try {
+                dataViewModel.getUserSelected().getValue().swapAmbitos(fromPosition, toPosition);
+                recyclerView.getAdapter().notifyItemMoved(fromPosition,toPosition);
+            } catch (NullPointerException nullPointerException){
+                Log.w("AmbitoHostFragment", "Failed to drag an drop Ambitos: null user.");
+                Log.w("AmbitoHostFragment", "Exception message: " + nullPointerException.getMessage());
+            }
 
-            recyclerView.getAdapter().notifyItemMoved(fromPosition,toPosition);
 
             return false;
         }
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-
+            //Nothing to do it here
         }
     };
 
@@ -104,45 +113,6 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
         dataViewModel.selectAmbito(ambitoName);
     }
 
-    @Override
-    public void onAmbitoHold(View view) {
-        showMenuAmbitos(view);
-    }
-
-
-    @SuppressLint("RestrictedApi")
-    public void showMenuAmbitos(View view){
-        //noinspection RestrictedApi
-        MenuBuilder menuBuilder = new MenuBuilder(getContext());
-        MenuInflater inflater = new MenuInflater(getContext());
-        inflater.inflate(R.menu.ambito_menu, menuBuilder);
-        //noinspection RestrictedApi
-        MenuPopupHelper optionsMenu = new MenuPopupHelper(getContext(), menuBuilder, view);
-        //noinspection RestrictedApi
-        optionsMenu.setForceShowIcon(true);
-
-        // Set Item Click Listener
-        //noinspection RestrictedApi
-        menuBuilder.setCallback(new MenuBuilder.Callback() {
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuBuilder menu, @NonNull MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.edit_ambito:
-                        //TODO: EditarAmbito
-                        return true;
-                    case R.id.delete_ambito:
-                        //TODO: EliminarAmbito
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-
-            @Override
-            public void onMenuModeChange(@NonNull MenuBuilder menu){}
-        });
-        optionsMenu.show();
-    }
 
 
 
