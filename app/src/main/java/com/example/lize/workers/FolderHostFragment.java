@@ -105,6 +105,8 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
         }
     }
 
+
+
     /* Métodos deprecated de cambio de color. Misma funcionalidad mediante selectores de color.
     private void selectColorChange(Chip selectedChip){
         mContext.getTheme().resolveAttribute(R.attr.colorPrimaryDark, typedValue, true);

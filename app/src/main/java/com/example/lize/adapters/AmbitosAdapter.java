@@ -1,6 +1,5 @@
 package com.example.lize.adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,17 +8,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chauthai.swipereveallayout.SwipeRevealLayout;
 import com.chauthai.swipereveallayout.ViewBinderHelper;
 import com.example.lize.R;
 import com.example.lize.data.Ambito;
-import com.google.android.material.color.MaterialColors;
+import com.example.lize.utils.Preferences;
 
 import java.util.ArrayList;
 
@@ -33,7 +30,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
 
     /* Custom Ambito onClick Listener */
     public interface AmbitoListener{
-        void onAmbitoSelected(String ambitoName);
+        void onAmbitoSelected(AmbitoHolder ambitoHolder);
     }
 
     /**
@@ -103,7 +100,8 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
     // ViewHolder are used to to store the inflated views in order to recycle them
     public class AmbitoHolder extends RecyclerView.ViewHolder {
 
-        private TextView mTitleAmbito;
+        private final TextView mTitleAmbito;
+        private int mAmbitoColor;
         private LinearLayout mAmbitoSelectedLinearLayout;
         private ImageView mCancel;
         private ImageView mEdit;
@@ -156,8 +154,9 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
             mTitleAmbito.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(Preferences.getAmbitoColor(mAmbitoColor)));
                     for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
-                        listener.onAmbitoSelected(mTitleAmbito.getText().toString());
+                        listener.onAmbitoSelected(AmbitoHolder.this);
                 }
             });
         }
@@ -172,44 +171,13 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
          */
         public void bindTo(Ambito currentAmbito){
             mTitleAmbito.setText(currentAmbito.getName());
-            switch (currentAmbito.getColor()){
-                case 1:
-                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Red));
-                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Red));
-                    break;
-                case 2:
-                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Purple));
-                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Purple));
-                    break;
-                case 3:
-                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Indigo));
-                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Indigo));
-                    break;
-                case 4:
-                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Blue));
-                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Blue));
-                    break;
-                case 5:
-                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Teal));
-                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Teal));
-                    break;
-                case 6:
-                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Green));
-                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Green));
-                    break;
-                case 7:
-                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Yellow));
-                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Yellow));
-                    break;
-                case 8:
-                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Orange));
-                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Orange));
-                    break;
-                case 9:
-                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(R.color.Ambito_Brown));
-                    mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(R.color.Presseed_Brown));
-                    break;
-            }
+            mAmbitoColor = currentAmbito.getColor();
+            mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(Preferences.getAmbitoPressedColor(mAmbitoColor)));
+        }
+
+
+        public void reset(){
+            mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(Preferences.getDefaultAmbitoColor()));
         }
 
     }

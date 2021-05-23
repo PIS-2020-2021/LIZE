@@ -35,6 +35,8 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
     private AmbitosAdapter mAmbitosAdapter;
     private Context mContext;
 
+    private AmbitosAdapter.AmbitoHolder lastAmbitoSel;
+
     private MainViewModel dataViewModel;
 
     /** Inicializa el fragment contenedor de Ambitos. */
@@ -109,8 +111,11 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
 
 
     @Override
-    public void onAmbitoSelected(String ambitoName) {
-        dataViewModel.selectAmbito(ambitoName);
+    public void onAmbitoSelected(AmbitosAdapter.AmbitoHolder ambitoHolder) {
+        if (lastAmbitoSel != null && lastAmbitoSel != ambitoHolder) lastAmbitoSel.reset();
+        lastAmbitoSel = ambitoHolder;
+        dataViewModel.selectAmbito(ambitoHolder.getmTitleAmbito().getText().toString());
+
     }
 
 

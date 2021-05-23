@@ -32,4 +32,40 @@ public class Preferences {
     public static void applyTheme(ContextThemeWrapper contextThemeWrapper) {
         contextThemeWrapper.setTheme(theme);
     }
+
+    public static int getAmbitoColor(int ambitoColor){
+        switch (ambitoColor){
+            case 1: return  R.color.Ambito_Red;
+            case 2: return R.color.Ambito_Purple;
+            case 3: return R.color.Ambito_Indigo;
+            case 4: return R.color.Ambito_Blue;
+            case 5: return R.color.Ambito_Teal;
+            case 6: return R.color.Ambito_Green;
+            case 7: return R.color.Ambito_Yellow;
+            case 8: return R.color.Ambito_Orange;
+            case 9: return R.color.Ambito_Brown;
+
+            default: return  R.color.Ambito_Red;
+        }
+    }
+
+    public static int getAmbitoPressedColor(int ambitoColor){
+        switch (ambitoColor){
+            case 1: return  R.color.Presseed_Red;
+            case 2: return R.color.Presseed_Purple;
+            case 3: return R.color.Presseed_Indigo;
+            case 4: return R.color.Presseed_Blue;
+            case 5: return R.color.Presseed_Teal;
+            case 6: return R.color.Presseed_Green;
+            case 7: return R.color.Presseed_Yellow;
+            case 8: return R.color.Presseed_Orange;
+            case 9: return R.color.Presseed_Brown;
+
+            default: return  R.color.Presseed_Red;
+        }
+    }
+
+    public static int getDefaultAmbitoColor(){
+        return R.color.white;
+    }
 }
