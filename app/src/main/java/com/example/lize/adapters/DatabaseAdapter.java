@@ -55,6 +55,7 @@ public class DatabaseAdapter {
         FirebaseFirestore.setLoggingEnabled(true);
     }
 
+
     public static DatabaseAdapter getInstance() {
         if (databaseAdapter == null){
             synchronized (DatabaseAdapter.class){
@@ -66,6 +67,7 @@ public class DatabaseAdapter {
         return databaseAdapter;
     }
 
+
     // Métodos para reconstruir la jerarquía del modelo.
     public interface LoaderInterface{
         void getUserResult(User user);
@@ -74,6 +76,7 @@ public class DatabaseAdapter {
         void setToast(String s);
     }
 
+
     // Callbacks de operaciones de escritura.
     public interface SaverInterface {
         void saveUserResult(String userID, boolean result);
@@ -81,6 +84,7 @@ public class DatabaseAdapter {
         void saveNoteResult(String noteID, boolean result);
         void setToast(String s);
     }
+
 
     /* Firebase sign in */
     public void initFireBase() {
@@ -106,6 +110,7 @@ public class DatabaseAdapter {
         }
     }
 
+
     // Method for getting a base User from the 'users' collection
     public void getUser() {
         DocumentReference userRef = db.collection("users").document(user.getUid());
@@ -122,6 +127,7 @@ public class DatabaseAdapter {
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
+
 
     // Method for getting an Ambito from the 'ambitos' collection
     public void getAmbitos() {
@@ -146,6 +152,7 @@ public class DatabaseAdapter {
         });
     }
 
+
     // Method for getting a Note from the 'notes' collection
     public void getNotes(String ambitoID){
         Query notasRef = db.collection("notes").whereEqualTo("ambitoID", ambitoID);
@@ -166,6 +173,7 @@ public class DatabaseAdapter {
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
+
 
     /**
      * Guardamos un nuevo User en FireBase.
@@ -194,6 +202,7 @@ public class DatabaseAdapter {
             }
         });
     }
+
 
     /**
      * Guardamos un ambito en FireBase.
@@ -230,6 +239,7 @@ public class DatabaseAdapter {
             }
         });
     }
+
 
     /**
      * Guardamos una nota en FireBase.
@@ -268,11 +278,22 @@ public class DatabaseAdapter {
     }
 
 
-    public void deleteNota(String notaID){
+    /**
+     * Eliminamos una nota de FireBase.
+     * @param notaID ID del documento correspondiente a la nota a eliminar
+     */
+    public void deleteNote(String notaID){
         db.collection("notes").document(notaID).delete()
-        .addOnSuccessListener(aVoid -> Log.d(TAG, "Nota Eliminada Correctamente")).addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar la nota", e));
+            .addOnSuccessListener(aVoid -> Log.d(TAG, "Nota Eliminada Correctamente"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar la nota", e));
     }
 
+
+    /**
+     * Eliminamos la subcolección de notas cuyo valor del campo "folderTAG" sea el pasado por parámetro.
+     * Obtenemos cada documento de la subcolección y lo eliminamos.
+     * @param folderTAG valor del campo "folderTAG" de la subcolección de notas de la colección "notes".
+     */
     public void deleteFolder(String folderTAG) {
         Query notasRef = db.collection("notes").whereEqualTo("folderTAG", folderTAG);
 
@@ -280,7 +301,7 @@ public class DatabaseAdapter {
             if (task.isSuccessful()) {
                 try {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        deleteNota(document.getId());
+                        deleteNote(document.getId());
                     }
                     Log.d(TAG, "Colección de Notas de " + folderTAG + " eliminado correctamente");
                 } catch (NullPointerException exception){
@@ -290,6 +311,11 @@ public class DatabaseAdapter {
         });
     }
 
+    /**
+     * Eliminamos un Ámbito de Firebase. También eliminamos la subcolección de Notas cuyo valor del
+     * campo "ambitoID" sea el pasado por parámetro. Obtenemos cada documento de la subcolección y lo eliminamos.
+     * @param ambitoID ID del documento correspondiente al Ámbito a eliminar de la colección "ambitos".
+     */
     public void deleteAmbito(String ambitoID) {
         Query notasRef = db.collection("notes").whereEqualTo("ambitoID", ambitoID);
 
@@ -297,7 +323,7 @@ public class DatabaseAdapter {
             if (task.isSuccessful()) {
                 try {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        deleteNota(document.getId());
+                        deleteNote(document.getId());
                     }
                     Log.d(TAG, "Colección de Notas de " + ambitoID + " eliminado correctamente");
                 } catch (NullPointerException exception){
@@ -309,11 +335,21 @@ public class DatabaseAdapter {
         });
 
         db.collection("ambitos").document(ambitoID).delete()
-                .addOnSuccessListener(aVoid -> Log.d(TAG, "Ambito Eliminado Correctamente")).addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar el Ambito", e));
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Ambito Eliminado Correctamente"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar el Ambito " + ambitoID, e));
     }
 
-    public void deleteUser(String userID) {
-        Query ambitosRef = db.collection("ambitos").whereEqualTo("userID", userID);
+    /**
+     * Eliminamos el Usuario registrado de Firebase.
+     *
+     * También eliminamos la subcolección de Ámbitos del Usuario mediante el método
+     * {@link #deleteAmbito(String)}, eliminando también las Notas de cada Ámbito.
+     *
+     * IMPORTANTE: ese Usuario queda eliminado del Firebase.Authentication, de modo que no se podrá
+     * acceder mediante la cuenta asociada a su UID.
+     */
+    public void deleteUser() {
+        Query ambitosRef = db.collection("ambitos").whereEqualTo("userID", user.getUid());
 
         ambitosRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -321,20 +357,18 @@ public class DatabaseAdapter {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         deleteAmbito(document.getId());
                     }
-                    Log.d(TAG, "Colección de Ambitos de " + userID + " eliminado correctamente");
+                    Log.d(TAG, "Colección de Ambitos de " + user.getUid() + " eliminado correctamente");
                 } catch (NullPointerException exception){
-                    Log.w(TAG, "Failed to get Collection of ambitos of  " + userID + ": null pointer exception.");
+                    Log.w(TAG, "Failed to get Collection of ambitos of  " + user.getDisplayName() + ": null pointer exception.");
                 }
             } else Log.d(TAG, "Error al eliminar la coleccion de ambitos: ", task.getException());
         });
 
-        db.collection("users").document(userID).delete()
-            .addOnSuccessListener(aVoid -> Log.d(TAG, "Usuario Eliminado Correctamente")).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.w(TAG, "Error al Eliminar el Usuario", e);
-                }
-            });
+        db.collection("users").document(mAuth.getCurrentUser().getUid()).delete()
+            .addOnSuccessListener(aVoid -> Log.d(TAG, "Usuario Eliminado Correctamente"))
+            .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar el Usuario " + user, e));
+
+        user.delete();
     }
 
     public void saveNoteWithFile(String id, String description, String userid, String path) {

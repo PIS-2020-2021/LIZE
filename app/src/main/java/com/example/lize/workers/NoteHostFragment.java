@@ -162,10 +162,14 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
      * @param newCardNote cardNote seleccionado.
      */
     @Override
-    public void onCardNoteSelected(NoteAdapter.CardNote newCardNote) {
-        if (lastCardChecked != null && lastCardChecked != newCardNote) lastCardChecked.reset();
-        if (newCardNote.isSelected()) lastCardChecked = newCardNote;
-        else lastCardChecked = null;
+    public boolean onCardNoteSelected(NoteAdapter.CardNote newCardNote) {
+        newCardNote.select();
+        if (lastCardChecked != null && lastCardChecked != newCardNote) lastCardChecked.select();
+        if (newCardNote.isSelected()) {
+            dataViewModel.selectNote(newCardNote.getNoteID());
+            lastCardChecked = newCardNote;
+        } else lastCardChecked = null;
+        return true;
     }
 
     //TODO: Implement CardNote #MOVE, #COPY & #DELETE operations
@@ -179,9 +183,14 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
 
     }
 
+    /**
+     * Método para eliminar un CardNote de la colección de Notas de un Ámbito.
+     * @param cardNote cardNote seleccionado para eliminar
+     **/
     @Override
     public void onCardNoteDelete(NoteAdapter.CardNote cardNote) {
-
+        dataViewModel.deleteNote(cardNote.getNoteID());
+        lastCardChecked = null;
     }
 
 }

@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
 import com.example.lize.adapters.AmbitosAdapter;
+import com.example.lize.data.Ambito;
 import com.example.lize.data.User;
 import com.example.lize.models.MainViewModel;
 import com.example.lize.utils.Preferences;
@@ -37,7 +38,6 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
     private Context mContext;
 
     private AmbitosAdapter.AmbitoHolder lastAmbitoSel;
-
     private MainViewModel dataViewModel;
 
     /** Inicializa el fragment contenedor de Ambitos. */
@@ -65,6 +65,10 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
             mAmbitosAdapter.notifyDataSetChanged();
         });
 
+        dataViewModel.getAmbitoSelected().observe(getViewLifecycleOwner(), (@NonNull Ambito ambito) ->{
+            Preferences.setSelectedTheme(ambito.getColor());
+        });
+
         //Seteamos los componentes para poder elegir el orden de los Ambitos
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(mAmbitosRecyclerView);
@@ -84,7 +88,6 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
                 Log.w("AmbitoHostFragment", "Failed to drag an drop Ambitos: null user.");
                 Log.w("AmbitoHostFragment", "Exception message: " + nullPointerException.getMessage());
             }
-
 
             return false;
         }

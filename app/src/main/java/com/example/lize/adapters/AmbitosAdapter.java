@@ -83,7 +83,6 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
         viewBinderHelper.bind(holder.swipeRevealLayout, String.valueOf(currentAmbito.getSelfID()));
         viewBinderHelper.closeLayout(String.valueOf(currentAmbito.getSelfID()));
 
-
         holder.bindTo(currentAmbito);
     }
 
@@ -155,12 +154,13 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
             mTitleAmbito.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(Preferences.getAmbitoColor(mAmbitoColor)));
+                    select();
                     for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
                         listener.onAmbitoSelected(AmbitoHolder.this);
                 }
             });
         }
+
 
         public TextView getmTitleAmbito() {
             return mTitleAmbito;
@@ -180,6 +180,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
             mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(Preferences.getAmbitoPressedColor(mAmbitoColor)));
         }
 
+        public void select(){ mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(Preferences.getAmbitoColor(mAmbitoColor)));}
 
         public void reset(){
             mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(Preferences.getDefaultAmbitoColor()));
