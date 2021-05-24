@@ -1,6 +1,7 @@
 package com.example.lize.workers;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.fragment.app.Fragment;
 
@@ -15,6 +16,9 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -77,6 +81,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
     @Override
     public void onViewCreated(@NonNull View root, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(root, savedInstanceState);
+        setHasOptionsMenu(true);
         mContext = root.getContext();
 
         dataViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
@@ -91,9 +96,9 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
                 try {
                     if (folder == null) {
                         Ambito ambito = dataViewModel.getAmbitoSelected().getValue();
-                        mNoteAdapter = new NoteAdapter(root.getContext(), ambito.getNotes(), cardNoteType);
+                        mNoteAdapter = new NoteAdapter(root.getContext(),  new ArrayList<>(ambito.getNotes()), cardNoteType);
                     } else
-                        mNoteAdapter = new NoteAdapter(root.getContext(), folder.getNotes(), cardNoteType);
+                        mNoteAdapter = new NoteAdapter(root.getContext(), new ArrayList<>(folder.getNotes()), cardNoteType);
 
                     mNoteAdapter.registerCardNoteListener(this);
                     mNotesRecyclerView.swapAdapter(mNoteAdapter, false);
@@ -111,6 +116,23 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
             }
         });
 
+    }
+
+
+    public void searchNote(MenuItem menuItem){
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mNoteAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
     }
 
     /**

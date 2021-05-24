@@ -16,27 +16,18 @@
 
         <ImageButton
             android:id="@+id/ambitoCancel"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:tint="?attr/colorSurface"
-            app:srcCompat="@drawable/ic_cross"
-            android:background="@color/white"/>
+            style="@style/Cancel"
+            app:srcCompat="@drawable/ic_cross"/>
 
         <ImageButton
             android:id="@+id/ambitoEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:tint="?attr/colorSurface"
-            app:srcCompat="@drawable/edit_icon"
-            android:background="@color/md_green_800"/>
+            style="@style/Edit"
+            app:srcCompat="@drawable/edit_icon" />
 
         <ImageButton
             android:id="@+id/ambitoDelete"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:tint="?attr/colorSurface"
-            app:srcCompat="@drawable/delete_icon"
-            android:background="@color/md_red_800"/>
+            style="@style/Delete"
+            app:srcCompat="@drawable/delete_icon"/>
 
 
     </LinearLayout>
@@ -49,7 +40,8 @@
         android:layout_height="match_parent"
         android:layout_marginTop="3dp"
         android:orientation="vertical"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:foreground="?attr/selectableItemBackground">
 
         <TextView
             android:id="@+id/ambito_name"
@@ -66,7 +58,7 @@
         <LinearLayout
             android:id="@+id/ambitoSelectedLinearLayout"
             android:layout_width="match_parent"
-            android:layout_height="5dp"
+            android:layout_height="3dp"
             android:orientation="vertical"
             android:visibility="visible"/>
 

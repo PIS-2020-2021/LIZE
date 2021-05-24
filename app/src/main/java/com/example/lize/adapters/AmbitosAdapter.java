@@ -155,7 +155,6 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
             mTitleAmbito.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(Preferences.getAmbitoColor(mAmbitoColor)));
                     for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
                         listener.onAmbitoSelected(AmbitoHolder.this);
                 }
@@ -178,6 +177,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
             mTitleAmbito.setText(currentAmbito.getName());
             mAmbitoColor = currentAmbito.getColor();
             mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(Preferences.getAmbitoPressedColor(mAmbitoColor)));
+            mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(Preferences.getAmbitoColor(mAmbitoColor)));
         }
 
 

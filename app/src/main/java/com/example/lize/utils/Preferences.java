@@ -10,6 +10,7 @@ import com.example.lize.R;
 public class Preferences {
 
     private static int selectedTheme = R.style.Theme_Red;
+    private static int selectedAmbito;
 
     public static int getTheme(int color){
         switch (color){
@@ -38,6 +39,7 @@ public class Preferences {
             case 8:     selectedTheme = R.style.Theme_Orange; break;
             case 9:     selectedTheme = R.style.Theme_Brown; break;
         }
+        selectedAmbito = color;
     }
 
     public static int getSelectedTheme() {
@@ -48,23 +50,28 @@ public class Preferences {
         contextThemeWrapper.setTheme(selectedTheme);
     }
 
-    public static int getAmbitoColor(int ambitoColor){
-        switch (ambitoColor){
-            case 1: return  R.color.Ambito_Red;
-            case 2: return R.color.Ambito_Purple;
-            case 3: return R.color.Ambito_Indigo;
-            case 4: return R.color.Ambito_Blue;
-            case 5: return R.color.Ambito_Teal;
-            case 6: return R.color.Ambito_Green;
-            case 7: return R.color.Ambito_Yellow;
-            case 8: return R.color.Ambito_Orange;
-            case 9: return R.color.Ambito_Brown;
+    public static int getAmbitoColor(int ambitoColor) {
+        if (ambitoColor == selectedAmbito) {
+            switch (ambitoColor) {
+                case 1:  return R.color.Ambito_Red;
+                case 2:  return R.color.Ambito_Purple;
+                case 3:  return R.color.Ambito_Indigo;
+                case 4:  return R.color.Ambito_Blue;
+                case 5:  return R.color.Ambito_Teal;
+                case 6:  return R.color.Ambito_Green;
+                case 7:  return R.color.Ambito_Yellow;
+                case 8:  return R.color.Ambito_Orange;
+                case 9:  return R.color.Ambito_Brown;
 
-            default: return  R.color.Ambito_Red;
+                default: return R.color.Ambito_Red;
+            }
+        } else {
+            return R.color.white;
         }
     }
 
     public static int getAmbitoPressedColor(int ambitoColor){
+
         switch (ambitoColor){
             case 1: return  R.color.Presseed_Red;
             case 2: return R.color.Presseed_Purple;
@@ -79,6 +86,7 @@ public class Preferences {
             default: return  R.color.Presseed_Red;
         }
     }
+
 
     public static int getDefaultAmbitoColor(){
         return R.color.white;

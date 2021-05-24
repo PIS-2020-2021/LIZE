@@ -24,6 +24,8 @@
         <item name="floatingActionButtonStyle">@style/Widget.Lize.FAB</item>
         <item name="hintTextColor">@style/Theme.hint</item>
         <item name="android:windowDisablePreview">true</item>
+        <item name="searchViewStyle">@style/SearchViewStyle</item>
+
 
     </style>
 
@@ -111,6 +113,47 @@
         <item name="android:background">@drawable/side_nav_bar</item>
     </style>
 
+    <!-- Menu Ambitos (Edit, Delete, Exit) -->
+    <style name="MeuAmbitos" parent="">
+        <item name="android:layout_width">50dp</item>
+        <item name="elevation">5dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/md_grey_300</item>
+    </style>
+
+    <style name="Cancel" parent="MeuAmbitos">
+        <item name="tint">@color/md_blue_700</item>
+    </style>
+    <style name="Edit" parent="MeuAmbitos">
+        <item name="tint">@color/md_green_800</item>
+    </style>
+    <style name="Delete" parent="MeuAmbitos">
+        <item name="tint">@color/md_red_800</item>
+    </style>
+
+    <style name="SearchViewStyle" parent="Widget.AppCompat.Light.SearchView">
+
+        <!-- Gets rid of the search icon -->
+        <item name="searchIcon">@drawable/ic_baseline_search_24</item>
+        <!-- Gets rid of the search icon when the SearchView is expanded -->
+        <!--<item name="searchHintIcon">@drawable/ic_baseline_search_24</item>-->
+        <!-- The hint text that appears when the user has not typed anything -->
+        <item name="color">@color/white</item>
+        <item name="queryHint">Search Note</item>
+        <item name="android:textColorHint">@color/white</item>
+        <item name="editTextColor">@color/white</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textColorPrimary">?attr/colorOnPrimarySurface</item>
+        <item name="android:textColorSecondary">?attr/colorOnPrimarySurface</item>
+        <item name="colorControlNormal">?attr/colorOnPrimarySurface</item>
+        <item name="colorControlHighlight">?attr/colorOnPrimarySurface</item>
+
+
+
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.SearchResult.Title</item>
+    </style>
+
+
     <!-- Text Appearance Body -->
     <style name="TextAppearance.Lize.HeadLine6" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="fontFamily">@font/rubik_medium</item>
@@ -148,6 +191,7 @@
 
         <item name="colorSurface">@color/md_red_400</item>
         <item name="colorOnSurface">@color/white</item>
+        <item name="colorOnPrimarySurface">@color/md_red_100</item>
 
         <item name="colorAccent">@color/md_orange_700</item>
 
@@ -168,6 +212,7 @@
 
         <item name="colorSurface">@color/md_purple_400</item>
         <item name="colorOnSurface">@color/white</item>
+        <item name="colorOnPrimarySurface">@color/md_purple_100</item>
 
         <item name="colorAccent">@color/md_pink_A400</item>
 
@@ -188,6 +233,7 @@
 
         <item name="colorSurface">@color/md_indigo_400</item>
         <item name="colorOnSurface">@color/white</item>
+        <item name="colorOnPrimarySurface">@color/md_indigo_100</item>
 
         <item name="colorAccent">@color/md_blue_A400</item>
 
@@ -208,6 +254,7 @@
 
         <item name="colorSurface">@color/md_light_blue_400</item>
         <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
 
         <item name="colorAccent">@color/md_teal_A400</item>
 
@@ -228,6 +275,7 @@
 
         <item name="colorSurface">@color/md_teal_400</item>
         <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
 
         <item name="colorAccent">@color/md_green_A400</item>
 
@@ -248,6 +296,7 @@
 
         <item name="colorSurface">@color/md_light_green_400</item>
         <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
 
         <item name="colorAccent">@color/md_lime_A400</item>
 
@@ -268,6 +317,7 @@
 
         <item name="colorSurface">@color/md_amber_400</item>
         <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
 
         <item name="colorAccent">@color/md_deep_orange_A400</item>
 
@@ -288,6 +338,7 @@
 
         <item name="colorSurface">@color/md_deep_orange_400</item>
         <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
 
         <item name="colorAccent">@color/md_red_700</item>
 
@@ -308,6 +359,7 @@
 
         <item name="colorSurface">@color/md_brown_400</item>
         <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
 
         <item name="colorAccent">@color/md_light_blue_A400</item>
 

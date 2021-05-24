@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -24,6 +26,7 @@ import com.google.android.material.card.MaterialCardView;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Adaptador del RecyclerView de Notas, en la actividad principal. Enlaza los datos del dataSet
@@ -34,12 +37,15 @@ import java.util.ArrayList;
  * </ul>
  * Puesto que solo el height es modificado, nos basta con un único tipo de ViewHolder {@link CardNote}.
  */
-public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
+public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> implements Filterable {
 
     private final Context mContext;
     private final ArrayList<Note> mNotesData;
+    private final ArrayList<Note> mNotesSearch;
     private NoteAdapter.CardNoteListener customListener;
     private boolean cardNoteType;
+
+
 
     /* Custom CardNote onClick Listener */
     public interface CardNoteListener{
@@ -65,6 +71,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
      */
     public NoteAdapter(Context context, ArrayList<Note> notesData, boolean cardNoteType) {
         this.mNotesData = notesData;
+        this.mNotesSearch = (ArrayList<Note>) this.mNotesData.clone();
         this.mContext = context;
         this.cardNoteType = cardNoteType;
     }
@@ -111,6 +118,44 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote>{
     public int getItemCount() {
         return mNotesData.size();
     }
+
+
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
+
+    Filter filter = new Filter() {
+        //Runs on background thread
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+
+            ArrayList<Note> filteredList = new ArrayList<>();
+
+            if(constraint.toString().isEmpty()){
+                filteredList.addAll(mNotesSearch);
+            } else{
+                for(Note note: mNotesSearch){
+                    if(note.getTitle().toLowerCase().contains(constraint.toString().toLowerCase()) |
+                    note.getText_plain().contains(constraint.toString().toLowerCase())){
+                        filteredList.add(note);
+                    }
+                }
+            }
+
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filteredList;
+            return filterResults;
+        }
+
+        //Runs on a UI thread
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            mNotesData.clear();
+            mNotesData.addAll((Collection<? extends Note>) results.values);
+            notifyDataSetChanged();
+        }
+    };
 
     /**
      * ViewHolder class que se corresponde con los Cards de las notas

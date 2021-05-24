@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
 import com.example.lize.adapters.AmbitosAdapter;
+import com.example.lize.data.Ambito;
 import com.example.lize.data.User;
 import com.example.lize.models.MainViewModel;
 import com.example.lize.utils.Preferences;
@@ -63,6 +64,10 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
             mAmbitosAdapter.registerAmbitoListener(this);
             mAmbitosRecyclerView.swapAdapter(mAmbitosAdapter, false);
             mAmbitosAdapter.notifyDataSetChanged();
+        });
+
+        dataViewModel.getAmbitoSelected().observe(getViewLifecycleOwner(), (@NonNull Ambito ambito) ->{
+            Preferences.setSelectedTheme(ambito.getColor());
         });
 
         //Seteamos los componentes para poder elegir el orden de los Ambitos
@@ -117,11 +122,7 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
      */
     @Override
     public void onAmbitoSelected(AmbitosAdapter.AmbitoHolder ambitoHolder) {
-        Preferences.setSelectedTheme(ambitoHolder.getAmbitomColor());
-        if (lastAmbitoSel != null && lastAmbitoSel != ambitoHolder) lastAmbitoSel.reset();
-        lastAmbitoSel = ambitoHolder;
         dataViewModel.selectAmbito(ambitoHolder.getmTitleAmbito().getText().toString());
-
     }
 
 }

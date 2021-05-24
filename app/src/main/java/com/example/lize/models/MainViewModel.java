@@ -14,6 +14,7 @@ import com.example.lize.data.Ambito;
 import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
+import com.example.lize.utils.Preferences;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -376,6 +377,7 @@ public class MainViewModel extends ViewModel{
                     setToast("User " + currentUser.getMail() + " correctly logged.");
                     mUserSelected.setValue(currentUser);
                     selectAmbito(Ambito.BASE_AMBITO_NAME);
+                    Preferences.setSelectedTheme(mAmbitoSelected.getValue().getColor());
                 }
             }
         }

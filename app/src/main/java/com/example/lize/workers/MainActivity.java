@@ -18,6 +18,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Bundle;
 import android.view.View;
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         Preferences.applySelectedTheme(this);
 
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_drawable_nav);
 
         /*Asignamos el objeto toolBar de la view*/
@@ -142,6 +144,13 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         observeLiveData();
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        return true;
+    }
+
     /**
      * Inicializamos el ViewModel del MainActivity y seteamos los observadores de los LivesData.
      */
@@ -176,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.search:
+                noteHostFragment.searchNote(item);
                 searchNote();
                 break;
             case R.id.sandwich:
