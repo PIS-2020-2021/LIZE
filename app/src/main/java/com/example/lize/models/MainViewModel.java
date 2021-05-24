@@ -14,7 +14,6 @@ import com.example.lize.data.Ambito;
 import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
-import com.example.lize.utils.Preferences;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -298,31 +297,88 @@ public class MainViewModel extends ViewModel{
         }
     }
 
-    /* Deletes a Note of the current Folder mFolderSelected. */
-    //TODO:Eliminar bien las notas de todas las carpetas
+    /** Eliminamos una nota de la colección de notas del Ámbito seleccionado. La nota se elimina del Ámbito
+     * y de la carpeta contenedora, en caso de que haya alguna.
+     * @param noteID ID de la nota a eliminar.
+     * @throws NullPointerException Si el Ámbito de la Nota no ha sido correctamente seleccionado.
+     * */
     public void deleteNote(String noteID) {
         try{
-            for (Folder folder : mAmbitoSelected.getValue().getFolders()){
-                for(Note note : folder.getNotes()){
-                    if(note.getSelfID().equals(noteID)){
-                        folder.getNotes().remove(note);
-                    }
+            for (Note note :mAmbitoSelected.getValue().getNotes()) {
+                if (note.getSelfID().equals(noteID)) {
+                    mAmbitoSelected.getValue().removeNote(note);                    // Eliminamos esa Nota del Ámbito seleccionado
+                    mFolderSelected.setValue(mFolderSelected.getValue());           // Actualizamos la colección de Notas de la Folder seleccionada
+                    if (mNoteSelected.getValue().getSelfID().equals(noteID))        // Si la Nota eliminada es la seleccionada, la deseleccionamos.
+                        mNoteSelected.setValue(null);
+                    DatabaseAdapter.getInstance().deleteNote(note.getSelfID());     // Eliminamos la Nota de DB
+                    setToast("Note " + note.getTitle() + " correctly deleted.");    // Creamos Toast Informativo
+                    return;
                 }
             }
+            Log.w(TAG, "Failed to delete note " + noteID + ": invalid ID.");
 
-            Log.w(TAG, "Failed to select note " + noteID + ": invalid ID.");
         }catch(NullPointerException exception){
-            Log.w(TAG, "Failed to select note " + noteID + ": null pointer exception.");
+            Log.w(TAG, "Failed to delete note " + noteID + ": null pointer exception.");
             Log.w(TAG, "Exception message: " + exception.getMessage());
         }
     }
 
     /**
-     * Deletes a Folder of the current Ambito mAmbitoSelected
+     * Eliminamos todas las notas de la colección de notas de la carpeta seleccionada. Estas son eliminadas
+     * tanto del Ámbito como de la Carpeta. Además, eliminamos la carpeta de la colección de Carpetas del
+     * Ámbito seleccionado.
      * @param folderName Carpeta Seleccionada
+     * @throws NullPointerException Si el Ámbito de la Carpeta no ha sido correctamente seleccionado.
      */
     public void deleteFolder(String folderName) {
-        DatabaseAdapter.getInstance().deleteFolder(folderName);
+        try{
+            if (mAmbitoSelected.getValue().getFolder(folderName) != null) {
+                mAmbitoSelected.getValue().removeFolder(folderName);            // Eliminamos la Carpeta  del Ámbito seleccionado en modo local
+                mAmbitoSelected.setValue(mAmbitoSelected.getValue());           // Actualizamos la colección de carpetas del Ámbito seleccionado
+                if (mFolderSelected.getValue().getName().equals(folderName))    // Si la carpeta eliminada es la carpeta seleccionada, la deseleccionamos.
+                    mFolderSelected.setValue(null);
+                DatabaseAdapter.getInstance().deleteFolder(folderName);         // Eliminamos las Notas de la Carpeta de DB
+                setToast("Folder " + folderName + " correctly deleted.");       // Creamos Toast informativo
+                return;
+            }
+            Log.w(TAG, "Failed to delete folder " + folderName + ": folder not founded.");
+
+        }catch(NullPointerException exception){
+            Log.w(TAG, "Failed to delete folder " + folderName + ": null pointer exception.");
+            Log.w(TAG, "Exception message: " + exception.getMessage());
+        }
+    }
+
+    /**
+     * Eliminamos un Ámbito del Usuario. Ello implica eliminar TODAS las notas que contiene, así como sus Carpetas.
+     * Solo podemos eliminar un Ámbito en caso que el Usuario tenga más de uno.
+     *
+     * @param ambitoID ID del Ámbito a eliminar.
+     * @throws NullPointerException Si el Usuario del Ámbito no ha sido correctamente registrado.
+     */
+    public void deleteAmbito(String ambitoID) {
+        try{
+            if (mUserSelected.getValue().getAmbitos().size() > 1) {
+
+                for (Ambito ambito : mUserSelected.getValue().getAmbitos()) {
+                    if (ambito.getSelfID().equals(ambitoID)) {
+                        mUserSelected.getValue().getAmbitos().remove(ambito);                       // Eliminamos el Ámbito del Usuario registrado en modo Local.
+                        mUserSelected.setValue(mUserSelected.getValue());                           // Actualizamos el listado de Ámbitos del Usuario registrado.
+                        DatabaseAdapter.getInstance().deleteAmbito(ambitoID);                       // Eliminamos el Ámbito de DB
+
+                        setToast("Ambito " + ambito.getName() + " correctly deleted.");             // Creamos Toast informativo
+                        if (mAmbitoSelected.getValue().getSelfID().equals(ambitoID))                // Finalmente, si el Ámbito eliminado es el seleccionado, lo deseleccionamos.
+                            selectAmbito(mUserSelected.getValue().getAmbitos().get(0).getName());   // Seleccionamos el primer Ámbito de la colección de Ámbitos del Usuario.
+                        return;
+                    }
+                } Log.w(TAG, "Failed to delete ambito " + ambitoID + ": ambito note founded. ");
+
+            } else Log.w(TAG, "Failed to delete ambito " + ambitoID + ": can't delete last User's Ambito");
+
+        }catch(NullPointerException exception){
+            Log.w(TAG, "Failed to add ambito " + ambitoID + ": null pointer exception.");
+            Log.w(TAG, "Exception message: " + exception.getMessage());
+        }
     }
 
     private void setToast(String s) {
@@ -376,8 +432,7 @@ public class MainViewModel extends ViewModel{
                     Log.w("UserBuilder", "Step 3 succes: all notes of user " + currentUser.getSelfID() + " correctly loaded from Database.");
                     setToast("User " + currentUser.getMail() + " correctly logged.");
                     mUserSelected.setValue(currentUser);
-                    selectAmbito(Ambito.BASE_AMBITO_NAME);
-                    Preferences.setSelectedTheme(mAmbitoSelected.getValue().getColor());
+                    selectAmbito(currentUser.getAmbitos().get(0).getName());
                 }
             }
         }

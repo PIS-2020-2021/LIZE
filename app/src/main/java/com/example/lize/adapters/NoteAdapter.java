@@ -50,7 +50,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
     /* Custom CardNote onClick Listener */
     public interface CardNoteListener{
         void onCardNoteClicked(NoteAdapter.CardNote cardNote);
-        void onCardNoteSelected(NoteAdapter.CardNote cardNote);
+        boolean onCardNoteSelected(NoteAdapter.CardNote cardNote);
         void onCardNoteMoved(NoteAdapter.CardNote cardNote);
         void onCardNoteCopy(NoteAdapter.CardNote cardNote);
         void onCardNoteDelete(NoteAdapter.CardNote cardNote);
@@ -190,8 +190,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
             mButtonGroup = itemView.findViewById(R.id.button_group);
 
             if (customListener != null){
-                holder.setOnClickListener((v) -> performClick());
-                holder.setOnLongClickListener((v) -> performLongClick());
+                holder.setOnClickListener((v) -> customListener.onCardNoteClicked(this));
+                holder.setOnLongClickListener((v) -> customListener.onCardNoteSelected(this));
                 mMoveBtn.setOnClickListener((v) -> customListener.onCardNoteMoved(this));
                 mCopyBtn.setOnClickListener((v) -> customListener.onCardNoteCopy(this));
                 mDeleteBtn.setOnClickListener((v) -> customListener.onCardNoteDelete(this));
@@ -226,11 +226,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
             mNoteID = currentNote.getSelfID();
         }
 
-        public void performClick() {
-            customListener.onCardNoteClicked(this);
-        }
-
-        public boolean performLongClick() {
+        public void select() {
             holder.setChecked(!holder.isChecked());
             if ((holder.isChecked())){
                 holder.setCardElevation(mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_selected_elevation));
@@ -241,16 +237,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
                 holder.setCardElevation(mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_default_elevation));
                 holder.setStrokeWidth(mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_default_stroke_width));
             }
-            customListener.onCardNoteSelected(this);
-            return true;
         }
 
         public boolean isSelected() { return holder.isChecked(); }
 
-        public void select(){ holder.setChecked(!holder.isChecked()); }
-
         public void reset() {
-            hideButtonGroup();
+            mButtonGroup.setAlpha(0.0f);
+            mButtonGroup.setVisibility(View.GONE);
             holder.setCardElevation(mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_default_elevation));
             holder.setStrokeWidth(mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_default_stroke_width));
             holder.setChecked(false);

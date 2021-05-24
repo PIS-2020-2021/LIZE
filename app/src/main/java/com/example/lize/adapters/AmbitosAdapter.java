@@ -83,7 +83,6 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
         viewBinderHelper.bind(holder.swipeRevealLayout, String.valueOf(currentAmbito.getSelfID()));
         viewBinderHelper.closeLayout(String.valueOf(currentAmbito.getSelfID()));
 
-
         holder.bindTo(currentAmbito);
     }
 
@@ -160,6 +159,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
                 }
             });
         }
+
 
         public TextView getmTitleAmbito() {
             return mTitleAmbito;

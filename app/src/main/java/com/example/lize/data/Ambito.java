@@ -92,4 +92,15 @@ public class Ambito {
         }
     }
 
+    public void removeNote(Note note){
+        this.notes.remove(note);
+        String folderName = note.getFolderTAG();
+        if (folderName != null && folders.containsKey(folderName))
+            folders.get(folderName).getNotes().remove(note);
+        }
+
+    public void removeFolder(String folderName) {
+        Folder removed = this.folders.remove(folderName);
+        if (removed != null) for (Note note : removed.getNotes()) this.notes.remove(note);
+    }
 }
