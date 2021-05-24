@@ -106,6 +106,17 @@
     <string name="editar_ambito">Editar Ambito</string>
     <string name="eliminar_ambito">Eliminar Ambito</string>
     <string name="note_default_metadata">ambitoID - folderTag - last connection</string>
+    <string name="numero_notas">Nº notas</string>
+    <string name="numero_total_de_notas">numero total de notas</string>
+    <string name="n_de_mbitos">Nº de ámbitos</string>
+    <string name="numero_de_ambitos">Numero de ambitos</string>
+    <string name="password">Password</string>
+    <string name="surnames">Surnames</string>
+    <string name="lize">LIZE</string>
+    <string name="foto_de_perfil">foto de perfil</string>
+    <string name="email">Email</string>
+    <string name="name">Name</string>
+    <string name="guardar_cambios">Guardar cambios</string>
 
 
 </resources>

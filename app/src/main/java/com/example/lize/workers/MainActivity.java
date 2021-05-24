@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private ActionBarDrawerToggle mDrawerToggle;    //Declaramos Toggle
     private Button addAmbito;                       //Declaramos Botones
     private Button signOut;
+    private Button settings;
 
     private Toast toastReference;
 
@@ -120,6 +121,12 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             Intent intent = new Intent(getApplicationContext(), NewAmbitoActivity.class);
             intent.putIntegerArrayListExtra("Ambitos", dataViewModel.getUserSelected().getValue().getColorsTaken());
             startActivityForResult(intent, REQUEST_CODE_ADD_AMBITO);
+        });
+
+        //Asignamos Boton y Listener a settings
+        this.settings = findViewById(R.id.settingsButton);
+        settings.setOnClickListener(v -> {
+            startActivity(new Intent(this, AjustesActivity.class));
         });
 
         //Asignamos Boton y Listener a signOut
