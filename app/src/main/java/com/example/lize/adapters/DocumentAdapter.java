@@ -8,12 +8,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.lize.R;
-import com.example.lize.data.Documento;
+import com.example.lize.data.Document;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHolder> {
-    private final ArrayList<Documento> localDataSet;
+    private final ArrayList<Document> localDataSet;
     private final OnDocumentListener mOnNoteListener;
     /**
      * Provide a reference to the type of views that you are using
@@ -32,12 +34,16 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
             imageView = (ImageView) view.findViewById(R.id.DocImage);
             imageView.setOnCreateContextMenuListener(this);
             this.onDocumentListener = onDocumentListener;
-            view.setOnClickListener(this);
+            imageView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view){
-            onDocumentListener.onDocumentClick(getAdapterPosition());
+            try {
+                onDocumentListener.onDocumentClick(getAdapterPosition());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
 
         public TextView getTextView() {
@@ -55,14 +61,8 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
 
     }
 
-    /**
-     * Initialize the dataset of the Adapter.
-     *
-     * @param dataSet String[] containing the data to populate views to be used
-     * by RecyclerView.
-     */
-    public DocumentAdapter(ArrayList<Documento> dataSet, OnDocumentListener onDocumentListener){
-        localDataSet = dataSet;
+    public DocumentAdapter(OnDocumentListener onDocumentListener){
+        localDataSet = new ArrayList<>();
         this.mOnNoteListener = onDocumentListener;
     }
 
@@ -91,12 +91,22 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
         return localDataSet.size();
     }
 
+    public void addDocument(Document document){
+        localDataSet.add(document);
+        notifyDataSetChanged();
+    }
     public void removeDocument(int position) {
         localDataSet.remove(position);
         notifyDataSetChanged();
     }
 
+    public Document getDocument(int position){
+        return localDataSet.get(position);
+    }
+
+
+
     public interface OnDocumentListener {
-        void onDocumentClick(int position);
+        void onDocumentClick(int position) throws FileNotFoundException;
     }
 }

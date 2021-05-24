@@ -5,6 +5,7 @@
     package="com.example.lize">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="false"
@@ -15,11 +16,27 @@
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
         android:theme="@style/Theme.Lize">
+        <provider
+            tools:replace="android:authorities"
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.authority"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
         <activity android:name=".workers.NewAmbitoActivity" />
+
         <activity
             android:name=".workers.NotasActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
         </activity>
         <activity android:name=".workers.SplashScreen"
             android:theme="@style/SplashScreenStyle">

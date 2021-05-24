@@ -104,6 +104,8 @@
     <string name="barra">|</string>
     <string name="editar_ambito">Editar Ambito</string>
     <string name="eliminar_ambito">Eliminar Ambito</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

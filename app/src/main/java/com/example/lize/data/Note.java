@@ -1,8 +1,7 @@
 package com.example.lize.data;
 
-import android.widget.ImageView;
+import android.net.Uri;
 
-import java.io.File;
 import java.util.ArrayList;
 
 // Note Model Class
@@ -15,8 +14,10 @@ public class Note {
     private String ambitoID;
     private String folderTAG;
 
-    private ArrayList<ImageView> images;
-    private ArrayList<File> files;
+    private String documentsID;
+    private String imagesID;
+    private Boolean haveImages;
+    private Boolean haveDocuments;
 
     public Note(String title, String text_plain, String text_html) {
         this.title = title;
@@ -52,14 +53,6 @@ public class Note {
         this.folderTAG = folderTAG;
     }
 
-    public ArrayList<ImageView> getImages() {
-        return images;
-    }
-
-    public void setImages(ArrayList<ImageView> images) {
-        this.images = images;
-    }
-
     public String getSelfID() { return selfID; }
 
     public void setSelfID(String selfID) { this.selfID = selfID; }
@@ -70,5 +63,36 @@ public class Note {
 
     public void setText_html(String text_html) {
         this.text_html = text_html;
+    }
+
+    public Boolean getHaveImages() {
+        return haveImages;
+    }
+
+    public void setHaveImages(Boolean haveImages) {
+        this.haveImages = haveImages;
+    }
+
+    public Boolean getHaveDocuments() {
+        return haveDocuments;
+    }
+
+    public void setHaveDocuments(Boolean haveDocuments) {
+        this.haveDocuments = haveDocuments;
+    }
+
+    public void setDocumentsID(String documentsID) {
+        this.documentsID = documentsID;
+    }
+    public String getDocumentsID() {
+        return documentsID;
+    }
+
+    public String getImagesID() {
+        return imagesID;
+    }
+
+    public void setImagesID(String imagesID) {
+        this.imagesID = imagesID;
     }
 }

@@ -1,6 +1,8 @@
 package com.example.lize.models;
 
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -11,6 +13,7 @@ import com.example.lize.data.Ambito;
 import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
+import com.example.lize.workers.MainActivity;
 
 import java.util.ArrayList;
 
@@ -24,6 +27,7 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<Folder> mFolderSelected;
     private final MutableLiveData<Note> mNoteSelected;
     private final MutableLiveData<String> mToast;
+    private DocumentManager documentManager;
 
     public MainViewModel() {
         mUserSelected = new MutableLiveData<>();
@@ -32,6 +36,9 @@ public class MainViewModel extends ViewModel {
         mNoteSelected = new MutableLiveData<>();
         mToast = new MutableLiveData<>();
         DatabaseAdapter da = DatabaseAdapter.getInstance();
+        documentManager = documentManager.getInstance();
+
+
         da.setListener(new UserBuilder());
         da.initFireBase();
         da.getUser();           // Build User process
@@ -176,6 +183,22 @@ public class MainViewModel extends ViewModel {
         setToast("Note " + title + " correctly edited.");           // Creamos Toast Informativo
     }
 
+    public void editNote(String title, String plainText, String htmlText,boolean images,boolean documents, String documentsID,String imagesID){
+        Note selected = mNoteSelected.getValue();                   // Editamos la Nota seleccionada
+        selected.setTitle(title);
+        selected.setText_plain(plainText);
+        selected.setText_html(htmlText);
+        selected.setDocumentsID(documentsID);
+        selected.setImagesID(imagesID);
+        selected.setHaveImages(images);
+        selected.setHaveDocuments(documents);
+        mNoteSelected.setValue(mNoteSelected.getValue());           // Actualizamos la Nota seleccionada
+        mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos colección de la carpeta seleccionada
+        DatabaseAdapter.getInstance().saveNote(selected);           // Guardamos la Nota en DB
+        setToast("Note " + title + " correctly edited.");           // Creamos Toast Informativo
+    }
+
+
     /* Deletes a Note of the current Folder mFolderSelected. */
     //TODO:Eliminar bien las notas de todas las carpetas
     public void deleteNote(String noteID) {
@@ -206,6 +229,21 @@ public class MainViewModel extends ViewModel {
     public void setToast(String s) {
         Log.w(TAG, s);
         mToast.setValue(s);
+    }
+
+    public void addNote(String title, String plainText, String htmlText,Boolean images,Boolean documents, String documentsID,String imagesID) {
+        Note newNote = new Note(title, plainText, htmlText);   // Creamos una nueva Nota
+        newNote.setFolderTAG(mFolderSelected.getValue().getName()); // Asignamos esa Nota a la Carpeta seleccionada
+        newNote.setDocumentsID(documentsID);
+        newNote.setImagesID(imagesID);
+        newNote.setHaveDocuments(documents);
+        newNote.setHaveImages(images);
+        mAmbitoSelected.getValue().putNote(newNote);                // Añadimos esa Nota a la Carpeta BASE del Ámbito y a la Carpeta asignada
+        mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos colección de la carpeta seleccionada
+        DatabaseAdapter.getInstance().saveNote(newNote);            // Guardamos la Nota en DB
+        setToast("Note " + title + " correctly created.");       // Creamos Toast Informativo
+
+
     }
 
     /* BUILDER PATTERN FOR DATABASE INTERFACE */
@@ -243,7 +281,16 @@ public class MainViewModel extends ViewModel {
             else{
                 for (Ambito ambito : currentUser.getAmbitos()) {
                     if (ambito.getSelfID().equals(ambitoID)) {
-                        for (Note note : ambitoNotes) ambito.putNote(note);
+                        for (Note note : ambitoNotes){
+                            if(note.getHaveImages() && note.getImagesID() != null) {
+                                documentManager.getImagesNote(note.getImagesID());
+                            }
+                            if(note.getHaveDocuments() && note.getDocumentsID() != null) {
+                                documentManager.getDocuments(note.getDocumentsID());
+                            }
+
+                            ambito.putNote(note);
+                        }
                         loadingCounter++;
                         break;
                     }

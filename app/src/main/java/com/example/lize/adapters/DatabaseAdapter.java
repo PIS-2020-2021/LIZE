@@ -1,6 +1,22 @@
 package com.example.lize.adapters;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
+
+import com.example.lize.data.Document;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 import androidx.annotation.NonNull;
 import com.example.lize.data.Ambito;
 import com.example.lize.data.Note;
@@ -19,20 +35,31 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import androidx.appcompat.app.AppCompatActivity;
 
 
-public class DatabaseAdapter {
+public class DatabaseAdapter extends AppCompatActivity  {
     public static final String TAG = "DatabaseAdapter";
-
     public static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser user;
+    private StorageReference mStorageRef = storage.getReference();
 
+
+    private Context context;
+    private StorageTask mUploadTask;
     private static DatabaseAdapter databaseAdapter;  // Singleton implementation
 
     private vmInterface listener;
@@ -45,6 +72,8 @@ public class DatabaseAdapter {
         FirebaseFirestore.setLoggingEnabled(true);
     }
 
+
+
     public static DatabaseAdapter getInstance() {
         if (databaseAdapter == null){
             synchronized (DatabaseAdapter.class){
@@ -54,6 +83,7 @@ public class DatabaseAdapter {
             }
         }
         return databaseAdapter;
+
     }
 
     public interface vmInterface {
@@ -137,6 +167,10 @@ public class DatabaseAdapter {
                     note.setAmbitoID(document.getString("ambitoID"));
                     note.setFolderTAG(document.getString("folderTAG"));
                     note.setSelfID(document.getString("selfID"));
+                    note.setDocumentsID(document.getString("documentsID"));
+                    note.setImagesID(document.getString("imagesID"));
+                    note.setHaveImages(document.getBoolean("images"));
+                    note.setHaveDocuments(document.getBoolean("documents"));
                     ambitoNotes.add(note);
                 }
                 if(listener != null) listener.setAmbitoNotes(ambitoID, ambitoNotes);
@@ -229,6 +263,10 @@ public class DatabaseAdapter {
         notesData.put("selfID", note.getSelfID());
         notesData.put("ambitoID", note.getAmbitoID());
         notesData.put("folderTAG", note.getFolderTAG());
+        notesData.put("documentsID",note.getDocumentsID());
+        notesData.put("imagesID",note.getImagesID());
+        notesData.put("documents",note.getHaveDocuments());
+        notesData.put("images",note.getHaveImages());
 
         noteRef.set(notesData).addOnCompleteListener(new OnCompleteListener(){
             @Override
@@ -306,6 +344,15 @@ public class DatabaseAdapter {
                 }
             });
     }
+
+
+
+
+
+
+
+
+
 
     public void saveNoteWithFile(String id, String description, String userid, String path) {
     /*  Uri file = Uri.fromFile(new File(path));

@@ -1,12 +1,14 @@
 package com.example.lize.workers;
 
-import android.annotation.SuppressLint;
-
+import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -21,9 +23,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 
@@ -32,12 +38,19 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
 import com.example.lize.adapters.DocumentAdapter;
-import com.example.lize.data.Documento;
+import com.example.lize.data.Document;
+import com.example.lize.data.Image;
+import com.example.lize.models.DocumentManager;
+import com.example.lize.utils.FileUtils;
 import com.onegravity.rteditor.RTEditText;
 import com.onegravity.rteditor.RTManager;
 import com.onegravity.rteditor.RTToolbar;
@@ -48,67 +61,87 @@ import com.onegravity.rteditor.api.RTProxyImpl;
 import com.onegravity.rteditor.api.format.RTFormat;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ImageListener;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 
-public class NotasActivity extends AppCompatActivity implements  BitmapGeneratingAsyncTask.Callback ,DocumentAdapter.OnDocumentListener {
+public class NotasActivity extends AppCompatActivity implements DocumentAdapter.OnDocumentListener {
 
     private static final String DEFAULT_TITLE = "Titulo";
+
     private EditText inputNoteTitulo, inputNoteTexto;
     private CarouselView carouselView;
-    private ArrayList<Bitmap> images;
-    private ArrayList<Documento> documents;
-
+    private FileUtils fileUtils;
+    //private ArrayList<Document> documents;
     public static final int PICK_IMAGE = 1;
     public static final int REQUEST_DOCUMENT_GET = 2;
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private DocumentAdapter adapter;
-    private  RTApi rtApi;
-    private  RTManager rtManager;
+    private RTApi rtApi;
+    private RTManager rtManager;
     private ViewGroup toolbarContainer;
-    private  RTToolbar rtToolbar;
-    private  RTEditText rtEditText;
+    private RTToolbar rtToolbar;
+    private RTEditText rtEditText;
+    private CoordinatorLayout primaryLayout;
+    private ConstraintLayout cLayout;
+    private ScrollView scrollView;
+    private int NoteHeight;
+    boolean isKeyboardShowing = false;
+    private View root;
+    private DocumentManager documentManager;
+    private String documentsID;
+    private String imagesID;
+    private boolean initRecycleView = false;
 
-    @SuppressLint("ResourceAsColor")
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.RTE_ThemeLight);
         setContentView(R.layout.activity_notas);
+        setTheme(R.style.RTE_ThemeLight);
 
         // Componentes
         inputNoteTitulo = findViewById(R.id.inputNoteTitulo);
         inputNoteTexto = findViewById(R.id.inputNota);
         carouselView = findViewById(R.id.carouselView);
-        //imageLayout = findViewById(R.id.imageNote);
         ImageView backBtn = findViewById(R.id.backBtn);
-
+        primaryLayout = findViewById(R.id.coordinator);
+        cLayout = findViewById(R.id.cLayout);
+        scrollView = findViewById(R.id.scrollView);
 
         // Apartado de documentos
         //ArrayList de imagenes y documentes
-        images = new ArrayList<>();
-        documents = new ArrayList<>();
-
+        fileUtils = new FileUtils(this);
+        documentManager = documentManager.getInstance();
+        //images = new ArrayList<>();
+        //documents = new ArrayList<>();
         //Onclick Listener botones
         backBtn.setOnClickListener(v -> saveNote());
-
-        recyclerView = (RecyclerView) findViewById(R.id.fileAttachView);
+        recyclerView =  (RecyclerView) findViewById(R.id.fileAttachView);
         layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new DocumentAdapter(documents,this);
+        adapter = new DocumentAdapter(this);
         recyclerView.setAdapter(adapter);
 
         // Crear RTManager para gestionar los botones de estilo
-          rtApi = new RTApi(this, new RTProxyImpl(this), new RTMediaFactoryImpl(this, true));
-          rtManager = new RTManager(rtApi, savedInstanceState);
+        rtApi = new RTApi(this, new RTProxyImpl(this), new RTMediaFactoryImpl(this, true));
+        rtManager = new RTManager(rtApi, savedInstanceState);
 
         // Asignamos el layout del toolbar de estilos
-          toolbarContainer = (ViewGroup) findViewById(R.id.toolbar_container);
-          rtToolbar = (RTToolbar) findViewById(R.id.rte_toolbar);
+        toolbarContainer = (ViewGroup) findViewById(R.id.toolbar_container);
+        rtToolbar = (RTToolbar) findViewById(R.id.rte_toolbar);
 
 
         if (rtToolbar != null) {
@@ -119,15 +152,77 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
         rtEditText = (RTEditText) findViewById(R.id.inputNota);
         rtManager.registerEditor(rtEditText, true);
         //rtEditText.setRichTextEditing(true, message);
+        try {
+            getBundleForEdit();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        getBundleForEdit();
+
+// ContentView is the root view of the layout of this activity/fragment
+        primaryLayout.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+
+                        Rect r = new Rect();
+                        primaryLayout.getWindowVisibleDisplayFrame(r);
+                        int screenHeight = primaryLayout.getRootView().getHeight();
+
+                        // r.bottom is the position above soft keypad or device button.
+                        // if keypad is shown, the r.bottom is smaller than that before.
+                        int keypadHeight = screenHeight - r.bottom;
+
+                        if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+                            // keyboard is opened
+                            if (!isKeyboardShowing) {
+                                isKeyboardShowing = true;
+                                onKeyboardVisibilityChanged(true);
+                            }
+                        } else {
+                            // keyboard is closed
+                            if (isKeyboardShowing) {
+                                isKeyboardShowing = false;
+                                onKeyboardVisibilityChanged(false);
+                            }
+                        }
+                    }
+                });
+
 
     }
 
+    void onKeyboardVisibilityChanged(boolean opened) {
+
+
+        if (opened) {
+            rtEditText.setMaxHeight(1000);
+            toolbarContainer.setVisibility(View.VISIBLE);
+            carouselView.setVisibility(View.GONE);
+            //rtEditText.setHeight(1000);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            if(rtEditText.getLineCount() <=2 ){
+                rtEditText.setMaxHeight(200);
+            }else{
+                rtEditText.setMaxHeight(primaryLayout.getHeight());
+            }
+            toolbarContainer.setVisibility(View.GONE);
+            //rtEditText.setHeight(rtEditText.getLineCount() * 100);
+            if (adapter.getItemCount() !=0/*&& !imagesUris.isEmpty()*/) {
+                recyclerView.setVisibility(View.VISIBLE);
+                 //showHideFragment(carouselFragment);
+            }
+            if(!documentManager.arrayImagesEmpty(imagesID)){
+                carouselView.setVisibility(View.VISIBLE);
+            }
+        }
+
+    }
 
     //Método para guardar la nota en caso de que el usuario presione el botón atrás del móvil
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
             saveNote();
             return true;
@@ -136,9 +231,11 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     }
 
     // Método para recuperar el contenido de la nota al editar.
-    private void getBundleForEdit() {
+    private void getBundleForEdit() throws IOException {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
+            documentsID = bundle.getString("documentsID");
+            imagesID = bundle.getString("imagesID");
             String title = bundle.getString("title");
             String html_text = bundle.getString("noteText_HTML");
             Log.d("Titulo", title);
@@ -146,12 +243,25 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
             inputNoteTitulo.setText(title);
             rtEditText.setRichTextEditing(true, html_text);
+            if(bundle.getBoolean("images")){
+                //images = documentManager.getImagesNote(documentsID);
+
+                    init_carousel();
+            }
+            if(bundle.getBoolean("documents")){
+
+                for(Document doc:  documentManager.getDocuments(documentsID)){
+                    adapter.addDocument(doc);
+                }
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+
         }
     }
 
     //Función para validar el contenido de la nota antes de agregarla a base de datos
     private int validateNote() {
-        if(inputNoteTitulo.getText().toString().isEmpty() && rtEditText.getText(RTFormat.PLAIN_TEXT).isEmpty())
+        if (inputNoteTitulo.getText().toString().isEmpty() && rtEditText.getText(RTFormat.PLAIN_TEXT).isEmpty() /*&&  imagesUris.isEmpty()*/)
             return RESULT_CANCELED;
         return RESULT_OK;
     }
@@ -182,7 +292,8 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
                     case R.id.add_audio: // Handle option2 Click
                         return true;
                     case R.id.share:
-                        updateBitmap();
+                        shareNote();
+                        //updateBitmap();
                         return true;
                     default:
                         return false;
@@ -190,7 +301,8 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
             }
 
             @Override
-            public void onMenuModeChange(MenuBuilder menu) {}
+            public void onMenuModeChange(MenuBuilder menu) {
+            }
         });
 
         // Display the menu
@@ -199,40 +311,37 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
     }
 
+    private void shareNote() {
+        Intent intent2 = new Intent();
+        intent2.setAction(Intent.ACTION_SEND);
+        intent2.setType("text/html");
+        intent2.putExtra(Intent.EXTRA_TEXT, rtEditText.getText(RTFormat.PLAIN_TEXT));
+        startActivity(Intent.createChooser(intent2, "Share via"));
+    }
+
     //Método para crear el intent para regresar los datos al Main activity
-    private void saveNote(){
+    private void saveNote() {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         Bundle nota = new Bundle();
         nota.putString("title", inputNoteTitulo.getText().toString());
         nota.putString("noteText_HTML", rtEditText.getText(RTFormat.HTML));
         nota.putString("noteText_PLAIN", rtEditText.getText(RTFormat.PLAIN_TEXT));
+        nota.putBoolean("images",!documentManager.arrayImagesEmpty(imagesID));
+        nota.putBoolean("documents",!(adapter.getItemCount() == 0));
+        nota.putString("documentsID", documentsID);
+        nota.putString("imagesID", imagesID);
         intent.putExtras(nota);
         setResult(validateNote(), intent);
         finish();
     }
 
-    //Este método se encarga de crear una imagén a partir del contenido del EditText de notas.
-    private void updateBitmap() {
-        getEnteredWidthOrDefault();
-        new BitmapGeneratingAsyncTask(this,rtEditText.getText(RTFormat.HTML), getEnteredWidthOrDefault(), this).execute();
-    }
 
-    //Intent para compartir el contenido de las imágenes
-    @Override
-    public void done(Bitmap bitmap) {
-        String path = MediaStore.Images.Media.insertImage(this.getApplicationContext().getContentResolver(), bitmap,"test", null);
-        Intent shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
-        shareIntent.setType("image/jpeg");
-        startActivity(Intent.createChooser(shareIntent,"Share with" ));
-    }
 
     //Este método calcula el tamaño por defecto que tendrá el editText
     public int getEnteredWidthOrDefault() {
         String enteredValue = rtEditText.getText(RTFormat.PLAIN_TEXT);
         if (!TextUtils.isEmpty(enteredValue)) {
-           return rtEditText.getWidth();
+            return rtEditText.getWidth();
         } else {
             return 150;
         }
@@ -254,29 +363,35 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     }
 
     // Carousel de imagenes de las notas
-   private void init_carousel() {
+    private void init_carousel() {
+
         ImageListener imageListener = (position, imageView) -> {
-            imageView.setImageBitmap(images.get(position));
+                Bitmap bitmap = BitmapFactory.decodeFile(documentManager.selectImageFromArray(imagesID,position));
+                imageView.setImageBitmap(bitmap);
+
             registerForContextMenu(imageView);
         };
 
-        carouselView.setPageCount(images.size());
+        carouselView.setPageCount(documentManager.imagesArraySize(imagesID));
         carouselView.setImageListener(imageListener);
 
-       if (images.isEmpty()) {
-           carouselView.setVisibility(View.GONE);
-       }else{
-           carouselView.setVisibility(View.VISIBLE);
-       }
+        if (documentManager.arrayImagesEmpty(imagesID)) {
+            carouselView.setVisibility(View.GONE);
+        } else {
+            carouselView.setVisibility(View.VISIBLE);
+        }
     }
 
 
+
+
     //Intent para seleccionar una imagen del dispositivo e insertarlo en el Carrusel
-   private void selectImage() {
+    private void selectImage() {
         Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickIntent.setType("image/*");
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         getIntent.setType("image/*");
+
         Intent chooserIntent = Intent.createChooser(getIntent, "Selecciona una imagen");
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
 
@@ -284,7 +399,7 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     }
 
     //Intent para seleccionar un documento y agregarlo al apartado documentos de la nota
-    private void selectDocument(){
+    private void selectDocument() {
         Intent pickIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         pickIntent.setType("*/*");
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -304,7 +419,8 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
             } else {
                 Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
             }
-        }if (requestCode == REQUEST_DOCUMENT_GET && grantResults.length > 0) {
+        }
+        if (requestCode == REQUEST_DOCUMENT_GET && grantResults.length > 0) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 selectDocument();
             } else {
@@ -325,18 +441,22 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
                     try {
                         InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        images.add(0,bitmap);
+                        Image i = documentManager.BitmapToImage(bitmap);
+                        //images.add(i);
+                        imagesID = documentManager.addImageToCloud(imagesID,i);
                         init_carousel();
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
             }
-        } else if(requestCode == REQUEST_DOCUMENT_GET && resultCode == RESULT_OK) {
+        } else if (requestCode == REQUEST_DOCUMENT_GET && resultCode == RESULT_OK) {
             Uri uri = data.getData();
             String uriString = uri.toString();
-            Documento myFile = new Documento(uriString);
-            String path = myFile.getAbsolutePath();
+            Document myFile = new Document(uri);
+
+
+            //String path = myFile.getAbsolutePath();
             String displayName = null;
 
             if (uriString.startsWith("content://")) {
@@ -349,16 +469,24 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
                 displayName = myFile.getName();
             }
 
-            myFile.setName(displayName.substring(0,10));
-            documents.add(myFile);
-            adapter.notifyDataSetChanged();
+            myFile.setName(displayName);
+            myFile.setId(displayName);
+
+            documentsID = documentManager.addDocumentToCloud(documentsID,  myFile);
+/*            if(!initRecycleView){
+                adapter = new DocumentAdapter(documentManager.getDocuments(documentsID), this);
+                recyclerView.setAdapter(adapter);
+                initRecycleView = true;
+            }*/
+            adapter.addDocument(myFile);
+            //adapter.notifyDataSetChanged();
             recyclerView.setVisibility(View.VISIBLE);
-         }
+        }
 
     }
 
     // Context Menu para estilos de texto e imagenes
-   @Override
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add(2, v.getId(), 0, "Eliminar");
@@ -369,11 +497,13 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getTitle().equals("Eliminar")) {
-            images.remove(carouselView.getCurrentItem());
+            documentManager.removeImageFromNote(imagesID,carouselView.getCurrentItem());
             init_carousel();
-        }else if(item.getTitle().equals("Eliminar documento")){
+        } else if (item.getTitle().equals("Eliminar documento")) {
+
+            documentManager.removeDocumentFromNote(documentsID,adapter.getDocument(item.getGroupId()));
             adapter.removeDocument(item.getGroupId());
-            if(adapter.getItemCount() == 0 ){
+            if (adapter.getItemCount() == 0) {
                 recyclerView.setVisibility(View.GONE);
             }
         }
@@ -382,24 +512,111 @@ public class NotasActivity extends AppCompatActivity implements  BitmapGeneratin
 
     //TODO funcionalidad de abrir documentos en aplicaciones externas
     @Override
-    public void onDocumentClick(int position) {
-
-        /*//File path = new File(getFilesDir(), "dl");
-        //File file = new File(  documents.get(position).getAbsolutePath());
-        File imagePath = new File(Context.getFilesDir(), "images");
-        File newFile = new File(imagePath, "default_image.jpg");
-        Uri contentUri = getUriForFile(this.getApplicationContext(), "com.mydomain.fileprovider", newFile);
-        // Get URI and MIME type of file
-
-        String mime = getContentResolver().getType(contentUri);
-
-        // Open file with user selected app
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(contentUri, mime);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(intent);*/
+    public void onDocumentClick(int position) throws FileNotFoundException {
+        Document d = documentManager.getDocuments(documentsID).get(position);
+        openFile(d.getUrl());
     }
 
+    public static String getMimeType(Context mContext, Uri uri) {
+        ContentResolver cR = mContext.getContentResolver();
+        String mimeType = cR.getType(uri);
+        if (mimeType == null) {
+            mimeType = getMimeType(uri.toString());
+        }
+        return mimeType;
+    }
+
+    public static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            MimeTypeMap mime = MimeTypeMap.getSingleton();
+            type = mime.getMimeTypeFromExtension(extension);
+        }
+        return type;
+    }
+
+    public void showHideFragment(Fragment fragment) {
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(android.R.animator.fade_in,
+                android.R.animator.fade_out);
+
+        if (fragment.isHidden()) {
+            ft.show(fragment);
+            Log.d("hidden", "Show");
+        } else {
+            ft.hide(fragment);
+            Log.d("Shown", "Hide");
+        }
+
+        ft.commit();
+    }
+
+    private void openFile(Uri url) {
+
+        try {
+
+            Uri uri =url;;
+            Log.d("NotasActivity", "openFile: " + url.toString());
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            if (url.toString().contains(".doc") || url.toString().contains(".docx")) {
+                // Word document
+                intent.setDataAndType(uri, "application/msword");
+            } else if (url.toString().contains(".pdf")) {
+                // PDF file
+                intent.setDataAndType(uri, "application/pdf");
+            } else if (url.toString().contains(".ppt") || url.toString().contains(".pptx")) {
+                // Powerpoint file
+                intent.setDataAndType(uri, "application/vnd.ms-powerpoint");
+            } else if (url.toString().contains(".xls") || url.toString().contains(".xlsx")) {
+                // Excel file
+                intent.setDataAndType(uri, "application/vnd.ms-excel");
+            } else if (url.toString().contains(".zip")) {
+                // ZIP file
+                intent.setDataAndType(uri, "application/zip");
+            } else if (url.toString().contains(".rar")){
+                // RAR file
+                intent.setDataAndType(uri, "application/x-rar-compressed");
+            } else if (url.toString().contains(".rtf")) {
+                // RTF file
+                intent.setDataAndType(uri, "application/rtf");
+            } else if (url.toString().contains(".wav") || url.toString().contains(".mp3")) {
+                // WAV audio file
+                intent.setDataAndType(uri, "audio/x-wav");
+            } else if (url.toString().contains(".gif")) {
+                // GIF file
+                intent.setDataAndType(uri, "image/gif");
+            } else if (url.toString().contains(".jpg") || url.toString().contains(".jpeg") || url.toString().contains(".png")) {
+                // JPG file
+                intent.setDataAndType(uri, "image/jpeg");
+            } else if (url.toString().contains(".txt")) {
+                // Text file
+                intent.setDataAndType(uri, "text/plain");
+            } else if (url.toString().contains(".3gp") || url.toString().contains(".mpg") ||
+                    url.toString().contains(".mpeg") || url.toString().contains(".mpe") || url.toString().contains(".mp4") || url.toString().contains(".avi")) {
+                // Video files
+                intent.setDataAndType(uri, "video/*");
+            } else {
+                intent.setDataAndType(uri, "*/*");
+            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            this.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No application found which can open the file", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public byte[] getBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
+    }
 }
 

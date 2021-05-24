@@ -8,7 +8,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -21,13 +23,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lize.R;
+import com.example.lize.models.DocumentManager;
 import com.example.lize.models.MainViewModel;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 
-;import java.util.Timer;
+;import java.util.ArrayList;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -40,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private FolderHostFragment folderHostFragment;           // Contenedor de Folders
     private AmbitoHostFragment ambitoHostFragment;           // Contenedor de Ambitos
     private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
-
+    private DocumentManager documentManager;
     public static final String TAG = "MainActivity";
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
 
     private MainViewModel dataViewModel;
+
     private FloatingActionButton addFAB, addNoteFAB, addFolderFAB;  // Floating Action Buttons
     private boolean isFABGroupExpanded = false;
     private final Handler handler = new Handler();        // Methods to create a simple animation
@@ -112,7 +117,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
         //Observamos el LiveData del ViewModel
         observeLiveData();
-    }
+
+        documentManager = documentManager.getInstance();
+        documentManager.setContext(this);
+     }
 
     /**
      * Inicializamos el ViewModel del MainActivity y seteamos los observadores
@@ -183,14 +191,28 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 Log.d("Titulo", title);
                 Log.d("Texto Plano", plainText);
                 Log.d("Texto HTML", htmlText);
-                dataViewModel.addNote(title, plainText, htmlText);
+
+                Boolean images = bundle.getBoolean("images");
+                Boolean documents = bundle.getBoolean("documents");
+                String documentsID =  bundle.getString("documentsID");
+                String imagesID =  bundle.getString("imagesID");
+
+                dataViewModel.addNote(title, plainText, htmlText, images, documents,documentsID,imagesID);
+
 
             } else if (requestCode == REQUEST_CODE_EDIT_NOTE && resultCode == RESULT_OK) {
                 Log.d(TAG, "Request Code for Note Editing OK");
                 String title = bundle.getString("title");
                 String plainText = bundle.getString("noteText_PLAIN");
                 String htmlText = bundle.getString("noteText_HTML");
-                dataViewModel.editNote(title, plainText, htmlText);
+                Boolean images = bundle.getBoolean("images");
+                String imagesID =  bundle.getString("imagesID");
+                Boolean documents = bundle.getBoolean("documents");
+                String documentsID =  bundle.getString("documentsID");
+
+
+
+                dataViewModel.editNote(title, plainText, htmlText, images, documents,documentsID,imagesID);
 
             } else if (requestCode == REQUEST_CODE_ADD_AMBITO && resultCode == RESULT_OK) {
                 String name = bundle.getString("name");
@@ -200,10 +222,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 ambitoHostFragment.addAmbito(name, color);
 
             } else Log.d(TAG, "Invalid RESULT from NoteActivity: " + resultCode);
+        }
+        else Log.d(TAG, "Null bundle");
 
-        } else Log.d(TAG, "Null bundle");
     }
-
     /**
      * Setea el Header de la MainActivity
      * @param name nombre del User

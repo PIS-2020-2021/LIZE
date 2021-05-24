@@ -19,6 +19,7 @@ import com.example.lize.R;
 import com.example.lize.adapters.NoteAdapter;
 import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
+import com.example.lize.models.DocumentManager;
 import com.example.lize.models.MainViewModel;
 
 
@@ -34,9 +35,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
     private GridLayoutManager mNotesManager;            // Recycle View Layout Manager
     private NoteAdapter mNoteAdapter;                   // NoteAdapter for the RecycleView
     private boolean cardNoteType;                       // boolean cardNote type
-
     private MainViewModel dataViewModel;                // Model Shared Data between Fragments
-
     /** Inicializa el fragment contenedor de Notas. */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.notes_host_view, container, false);
@@ -46,6 +45,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         mNotesManager = new GridLayoutManager(mContext, 2);
         mNotesRecyclerView.setLayoutManager(mNotesManager);
         this.cardNoteType = true;
+
         return root;
     }
 
@@ -106,9 +106,16 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         Bundle nota = new Bundle();
         nota.putString("title", selectedNote.getTitle());
         nota.putString("noteText_HTML", selectedNote.getText_html());
+        nota.putString("documentsID",selectedNote.getDocumentsID());
+        nota.putString("imagesID",selectedNote.getImagesID());
+        nota.putBoolean("images",selectedNote.getHaveImages());
+        nota.putBoolean("documents",selectedNote.getHaveDocuments());
         intent.putExtras(nota);
-
-        requireActivity().startActivityForResult(intent, REQUEST_CODE_EDIT_NOTE);
+         requireActivity().startActivityForResult(intent, REQUEST_CODE_EDIT_NOTE);
         //startActivityForResult(intent, REQUEST_CODE_EDIT_NOTE);
     }
+
+
+
+
 }

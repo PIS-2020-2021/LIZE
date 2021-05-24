@@ -5,159 +5,166 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".workers.NotasActivity">
+    tools:context=".workers.NotasActivity"
+    android:id="@+id/coordinator"
+
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/_45sdp"
         android:background="?attr/colorPrimaryDark">
+    <ImageView
+        android:id="@+id/backBtn"
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_marginStart="@dimen/_12sdp"
+        android:layout_marginTop="@dimen/_13sdp"
+        android:layout_marginEnd="@dimen/_12sdp"
+        android:layout_marginRight="@dimen/_12sdp"
+        android:contentDescription="@string/app_name"
+        app:srcCompat="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white"
+        android:clickable="true"
+        android:focusable="true"/>
 
-        <ImageView
-            android:id="@+id/backBtn"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_20sdp"
-            android:layout_marginStart="@dimen/_12sdp"
-            android:layout_marginTop="@dimen/_13sdp"
-            android:layout_marginEnd="@dimen/_12sdp"
-            android:layout_marginRight="@dimen/_12sdp"
-            android:contentDescription="@string/app_name"
-            app:srcCompat="@drawable/ic_back"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white"
-            android:clickable="true"
-            android:focusable="true"/>
-
-        <ImageButton
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="@dimen/_30sdp"
-            android:layout_marginTop="@dimen/_8sdp"
-            android:layout_marginLeft="@dimen/_270sdp"
-            android:contentDescription="@string/app_name"
-            app:srcCompat="@drawable/ic_baseline_more_vert_24"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="#00000000"
-            android:onClick="showMenu"
-            android:layout_marginRight="@dimen/_10sdp"
-            android:layout_marginStart="@dimen/_270sdp"
-            android:layout_marginEnd="@dimen/_10sdp" />
-
-        <EditText
-            android:id="@+id/inputNoteTitulo"
-            android:layout_width="@dimen/_200sdp"
-            android:layout_height="@dimen/_35sdp"
-            android:layout_marginStart="@dimen/_50sdp"
-            android:layout_marginTop="@dimen/_12sdp"
-            android:background="@null"
-            android:fontFamily="@font/ubuntu_bold"
-            android:hint="@string/note_title"
-            android:imeOptions="actionDone"
-            android:importantForAutofill="no"
-            android:textAlignment="center"
-            android:includeFontPadding="false"
-            android:inputType="text"
-            android:textColor="@color/white"
-            android:textColorHint="@color/white"
-            android:textSize="@dimen/_16ssp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginLeft="@dimen/_50sdp"
-            android:gravity="center_horizontal" />
-
+    <ImageButton
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginLeft="@dimen/_270sdp"
+        android:contentDescription="@string/app_name"
+        app:srcCompat="@drawable/ic_baseline_more_vert_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="#00000000"
+        android:onClick="showMenu"
+        android:layout_marginRight="@dimen/_10sdp" />
+    <EditText
+        android:id="@+id/inputNoteTitulo"
+        android:layout_width="@dimen/_200sdp"
+        android:layout_height="@dimen/_35sdp"
+        android:layout_marginStart="@dimen/_50sdp"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:background="@null"
+        android:fontFamily="@font/ubuntu_bold"
+        android:hint="@string/note_title"
+        android:imeOptions="actionDone"
+        android:importantForAutofill="no"
+        android:textAlignment="center"
+        android:includeFontPadding="false"
+        android:inputType="text"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textSize="@dimen/_16ssp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="@dimen/_50sdp"
+        android:gravity="center_horizontal" />
     </RelativeLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_50sdp">
+        android:layout_marginTop="@dimen/_50sdp"
+        android:id="@+id/scrollView"
+        android:fitsSystemWindows="true">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cLayout"
+        <include layout="@layout/document_recyle_view"
+            android:id="@+id/fileAttachView"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_30sdp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"
+            android:layout_height="@dimen/_55sdp"
+            android:layout_width="match_parent" />
+
+
+        <!-- <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true">
-
-            <include layout="@layout/document_recyle_view"
-                android:id="@+id/fileAttachView"
-                android:layout_marginLeft="@dimen/_10sdp"
-                android:layout_marginTop="@dimen/_30sdp"
-                app:layout_constraintTop_toTopOf="parent"
-                android:visibility="gone"
-                android:layout_height="@dimen/_55sdp"
-                android:layout_width="match_parent"
-                android:layout_marginStart="@dimen/_10sdp" />
-
-            <!-- <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/fileAttachView"
-                >-->
-                    <RelativeLayout
-                        android:id="@+id/imageNote"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_12sdp"
-                        android:layout_marginEnd="@dimen/_12sdp"
-                        android:layout_marginTop="@dimen/_30sdp"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                        tools:showIn="@layout/activity_notas"
-                        app:layout_constraintTop_toBottomOf="@id/fileAttachView">
-
-                        <com.synnapps.carouselview.CarouselView
-                            android:id="@+id/carouselView"
-                            android:layout_width="match_parent"
-                            android:layout_height="200dp"
-                            app:fillColor="#FFFFFFFF"
-                            app:pageColor="#00000000"
-                            app:radius="6dp"
-                            app:slideInterval="10000"
-                            app:strokeColor="#FF777777"
-                            app:strokeWidth="1dp"
-                            android:visibility="gone"/>
-
-                    </RelativeLayout>
-
-    <!--            <EditText
-                    android:id="@+id/inputNota"
+            app:layout_constraintTop_toBottomOf="@id/fileAttachView"
+            >-->
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:id="@+id/imageNote"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_12sdp"
-                    android:layout_marginTop="@dimen/_12sdp"
                     android:layout_marginEnd="@dimen/_12sdp"
-                    android:background="@null"
-                    android:fontFamily="@font/ubuntu"
-                    android:hint="@string/escribe_aqui"
-                    android:imeOptions="actionDone"
-                    android:importantForAutofill="no"
-                    android:includeFontPadding="false"
-                    android:inputType="textMultiLine"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/black"
-                    android:textSize="@dimen/_13ssp"
-                    app:layout_constraintTop_toBottomOf="@+id/imageNote" />-->
-                    <com.onegravity.rteditor.RTEditText
-                        android:id="@+id/inputNota"
+                    android:layout_marginTop="@dimen/_30sdp"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+
+                    tools:showIn="@layout/activity_notas"
+                    app:layout_constraintTop_toBottomOf="@id/fileAttachView"
+
+                    >
+
+                    <com.synnapps.carouselview.CarouselView
+                        android:id="@+id/carouselView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:imeOptions="actionDone|flagNoEnterAction"
-                        android:inputType="textMultiLine|textAutoCorrect|textCapSentences"
-                        android:layout_marginStart="@dimen/_12sdp"
-                        android:layout_marginEnd="@dimen/_12sdp"
-                        android:textSize="@dimen/_13ssp"
-                        app:layout_constraintTop_toBottomOf="@+id/imageNote" />
+                        android:layout_height="200dp"
+                        app:fillColor="#FFFFFFFF"
+                        app:pageColor="#00000000"
+                        app:radius="6dp"
+                        app:slideInterval="10000"
+                        app:strokeColor="#FF777777"
+                        app:strokeWidth="1dp"
+                        android:visibility="gone"/>
+
+                </RelativeLayout>
+
+<!--            <EditText
+                android:id="@+id/inputNota"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_12sdp"
+                android:layout_marginTop="@dimen/_12sdp"
+                android:layout_marginEnd="@dimen/_12sdp"
+                android:background="@null"
+                android:fontFamily="@font/ubuntu"
+                android:hint="@string/escribe_aqui"
+                android:imeOptions="actionDone"
+                android:importantForAutofill="no"
+                android:includeFontPadding="false"
+                android:inputType="textMultiLine"
+                android:textColor="@color/black"
+                android:textColorHint="@color/black"
+                android:textSize="@dimen/_13ssp"
+                app:layout_constraintTop_toBottomOf="@+id/imageNote" />-->
+                <com.onegravity.rteditor.RTEditText
+                    android:id="@+id/inputNota"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionDone|flagNoEnterAction"
+                    android:inputType="textMultiLine|textAutoCorrect|textCapSentences"
+                    android:layout_marginStart="@dimen/_12sdp"
+                    android:layout_marginEnd="@dimen/_12sdp"
+                    android:textSize="@dimen/_13ssp"
+                    app:layout_constraintTop_toBottomOf="@+id/imageNote" />
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <!--<include layout="@layout/bottom_menu_note"/>-->
 
-        <!-- layout="@layout/rte_toolbar" -->
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <!--<include layout="@layout/bottom_menu_note"/>-->
+
+    <!-- layout="@layout/rte_toolbar" -->
     </ScrollView>
 
     <include android:id="@+id/toolbar_container" layout="@layout/textv3"
         android:layout_gravity="bottom"
         android:layout_height="@dimen/_100sdp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_width="match_parent" />
+         android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
