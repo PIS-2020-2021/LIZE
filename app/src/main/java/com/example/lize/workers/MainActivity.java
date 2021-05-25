@@ -58,19 +58,20 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener{
 
-    private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
-    private NoteHostFragment noteHostFragment;               // Contenedor de Notas
-    private FolderHostFragment folderHostFragment;           // Contenedor de Folders
-    private AmbitoHostFragment ambitoHostFragment;           // Contenedor de Ambitos
-    private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
-    private DocumentManager documentManager;
     public static final String TAG = "MainActivity";
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private static final int REQUEST_CODE_ADD_AMBITO = 3;
     private static final int THEME_UPDATE_DURATION = 1000;
 
+    private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
+    private NoteHostFragment noteHostFragment;               // Contenedor de Notas
+    private FolderHostFragment folderHostFragment;           // Contenedor de Folders
+    private AmbitoHostFragment ambitoHostFragment;           // Contenedor de Ambitos
+    private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
+
     private MainViewModel dataViewModel;
+    private DocumentManager documentManager;
 
     private FloatingActionButton addFAB, addNoteFAB, addFolderFAB;  // Floating Action Buttons
     private boolean isFABGroupExpanded = false;
@@ -155,7 +156,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         return true;
     }
 
@@ -194,7 +194,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         switch (item.getItemId()) {
             case R.id.search:
                 noteHostFragment.searchNote(item);
-                searchNote();
                 break;
             case R.id.sandwich:
                 changeCardNoteType(item);
@@ -206,19 +205,12 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     }
 
     /**
-     * Método para buscar una Nota en el Ámbito en el que estamos.
-     * TODO: Implementación futura
-     */
-    private void searchNote() {}
-
-    /**
      * Método para modificar el icono del MenuItem de cambiar vista de Notas
      * @param item menú item de cambiar vista de notas (sandwich)
      */
     private void changeCardNoteType(MenuItem item){
         cardNoteType = !cardNoteType;
-        item.setIcon((cardNoteType) ? R.drawable.ic_baseline_table_rows_24 :
-                R.drawable.ic_baseline_view_module_24);
+        item.setIcon((cardNoteType) ? R.drawable.ic_baseline_table_rows_24 : R.drawable.ic_baseline_view_module_24);
     }
 
     /**
@@ -248,7 +240,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
                 dataViewModel.addNote(title, plainText, htmlText, images, documents,documentsID,imagesID);
 
-
             } else if (requestCode == REQUEST_CODE_EDIT_NOTE && resultCode == RESULT_OK) {
                 Log.d(TAG, "Request Code for Note Editing OK");
                 String title = bundle.getString("title");
@@ -259,8 +250,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 Boolean documents = bundle.getBoolean("documents");
                 String documentsID =  bundle.getString("documentsID");
 
-
-
                 dataViewModel.editNote(title, plainText, htmlText, images, documents,documentsID,imagesID);
 
             } else if (requestCode == REQUEST_CODE_ADD_AMBITO && resultCode == RESULT_OK) {
@@ -268,7 +257,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 int color = (int) bundle.getLong("color");
                 Log.d("Nombre", name);
                 Log.d("Color ", String.valueOf(color));
-                ambitoHostFragment.addAmbito(name, color);
+
+                dataViewModel.addAmbito(name, color);
+                // ambitoHostFragment.addAmbito(name, color);
 
             } else Log.d(TAG, "Invalid RESULT from NoteActivity: " + resultCode);
         }
@@ -363,6 +354,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
     }
 
+    /**
+     * Lógica de actualización de Vista. Realizamos una pequeña animación antes de recrear la actividad.
+     */
     protected void updateAmbito() {
         ViewGroup root = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
         CircularProgressIndicator circleProgress = findViewById(R.id.progress_circle);

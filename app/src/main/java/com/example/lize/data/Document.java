@@ -14,10 +14,10 @@ public class Document {//extends File{
     private String path;
     private byte[] bytes;
 
-
     public Document(Uri uri){
         this.Url = uri;
     }
+
     public Document(String name, Uri Url){
 
         if (name.trim().equals("")) {
@@ -27,9 +27,6 @@ public class Document {//extends File{
         this.name = name;
         this.Url = Url;
     }
-
-
-
 
     public String getName() {
         return name;

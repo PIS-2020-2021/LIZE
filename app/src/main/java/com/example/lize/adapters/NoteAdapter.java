@@ -46,7 +46,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
     private boolean cardNoteType;
 
 
-
     /* Custom CardNote onClick Listener */
     public interface CardNoteListener{
         void onCardNoteClicked(NoteAdapter.CardNote cardNote);

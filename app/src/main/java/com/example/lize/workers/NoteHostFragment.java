@@ -153,16 +153,6 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
     }
 
     /**
-     * Añadimos una nueva nota al DataSet del MainViewModel.
-     * @param noteName Nombre de la nueva nota a crear
-     * @param text_plain Texto Plano de la nueva nota a crear
-     * @param text_html Texto HTML de la nueva nota a crear
-     */
-    public void addCardNote(String noteName, String text_plain, String text_html) {
-        dataViewModel.addNote(noteName, text_plain, text_html);
-    }
-
-    /**
      * Cuando un card note sea clickeado, inicia la actividad NotasActivity.class mediante un Intent
      * @param cardNote cardNote clickeado
      */

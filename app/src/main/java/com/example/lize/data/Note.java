@@ -16,11 +16,11 @@ public class Note {
     private String ambitoID;
     private String folderTAG;
     private Date lastUpdate;
-
+    private Boolean haveDocuments;
+    private Boolean haveImages;
     private String documentsID;
     private String imagesID;
-    private Boolean haveImages;
-    private Boolean haveDocuments;
+
 
     public Note(String title, String text_plain, String text_html) {
         this.title = title;
@@ -88,6 +88,7 @@ public class Note {
     public void setDocumentsID(String documentsID) {
         this.documentsID = documentsID;
     }
+
     public String getDocumentsID() {
         return documentsID;
     }

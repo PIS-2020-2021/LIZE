@@ -38,31 +38,34 @@ import static com.onegravity.rteditor.api.RTApi.getApplicationContext;
 
 public class DocumentManager {
     private static final String TAG = "DocumentManager";
+    private static DocumentManager documentManager = null;
+
     public static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private StorageReference mStorageRef = storage.getReference();
+
     private Context context;
-    private static DocumentManager documentManager = null;
     private StorageTask mUploadTask;
     private Map<String, ArrayList<Image>> imagesNote;
     private Map<String, ArrayList<Document>> documentsNote;
+
     private synchronized static void createInstance() {
         if (documentManager == null) {
             documentManager = new DocumentManager();
-
         }
     }
+
     public static DocumentManager getInstance() {
         if (documentManager == null) createInstance();
         return documentManager;
     }
 
-
     public DocumentManager() {
         imagesNote = new HashMap<>();
         documentsNote = new HashMap<>();
     }
+
     public void setContext(Context context){
         this.context = context;
     }
@@ -71,6 +74,7 @@ public class DocumentManager {
 
         if (documentsNote.containsKey(documentsID)) {
             return documentsNote.get(documentsID);
+
         } else {
             ArrayList<Document> docs = new ArrayList<>();
             documentsNote.put(documentsID, docs);
@@ -125,7 +129,6 @@ public class DocumentManager {
             });
 
             return documentsNote.get(documentsID);
-
         }
     }
 
