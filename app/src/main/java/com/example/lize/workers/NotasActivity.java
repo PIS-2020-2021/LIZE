@@ -38,6 +38,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -156,7 +158,6 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
 // ContentView is the root view of the layout of this activity/fragment
         primaryLayout.getViewTreeObserver().addOnGlobalLayoutListener(
@@ -535,22 +536,6 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         return type;
     }
 
-    public void showHideFragment(Fragment fragment) {
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.setCustomAnimations(android.R.animator.fade_in,
-                android.R.animator.fade_out);
-
-        if (fragment.isHidden()) {
-            ft.show(fragment);
-            Log.d("hidden", "Show");
-        } else {
-            ft.hide(fragment);
-            Log.d("Shown", "Hide");
-        }
-
-        ft.commit();
-    }
 
     private void openFile(Uri url) {
 

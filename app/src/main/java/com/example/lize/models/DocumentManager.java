@@ -268,8 +268,6 @@ public class DocumentManager {
 
 
     public ArrayList<Image> getImagesNote(String imagesID) {
-
-
         if (imagesNote.containsKey(imagesID)) {
             return imagesNote.get(imagesID);
         } else {

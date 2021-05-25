@@ -411,20 +411,35 @@ public class MainViewModel extends ViewModel{
         mToast.setValue(s);
     }
 
-    public void addNote(String title, String plainText, String htmlText,Boolean images,Boolean documents, String documentsID,String imagesID) {
-        Note newNote = new Note(title, plainText, htmlText);   // Creamos una nueva Nota
-        newNote.setFolderTAG(mFolderSelected.getValue().getName()); // Asignamos esa Nota a la Carpeta seleccionada
-        newNote.setDocumentsID(documentsID);
-        newNote.setImagesID(imagesID);
-        newNote.setHaveDocuments(documents);
-        newNote.setHaveImages(images);
-        mAmbitoSelected.getValue().putNote(newNote);                // Añadimos esa Nota a la Carpeta BASE del Ámbito y a la Carpeta asignada
-        mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos colección de la carpeta seleccionada
-        DatabaseAdapter.getInstance().saveNote(newNote);            // Guardamos la Nota en DB
-        setToast("Note " + title + " correctly created.");       // Creamos Toast Informativo
+    /**
+     * Añadimos una nueva Nota a la lista de Notas del Ámbito actual (también en la Carpeta actual)
+     * @param noteName Título de la Nota a añadir.
+     * @param text_plain Texto plano de la Nota a añadir.
+     * @param text_html Texto en formato HTML de la Nota a añadir.
+     * @throws NullPointerException Si el Ámbito actual no ha sido correctamente seleccionado.
+     */
+    public void addNote(String noteName, String text_plain, String text_html,Boolean images,Boolean documents, String documentsID,String imagesID) {
+        try{
+            Note newNote = new Note(noteName, text_plain, text_html);   // Creamos una nueva Nota
+            newNote.setDocumentsID(documentsID);
+            newNote.setImagesID(imagesID);
+            newNote.setHaveDocuments(documents);
+            newNote.setHaveImages(images);
+            if (mFolderSelected.getValue() != null)                     // Si tenemos una carpeta seleccionada, la asignamos a la Nota
+                newNote.setFolderTAG(mFolderSelected.getValue().getName());
 
+            mAmbitoSelected.getValue().addNote(newNote);                // Añadimos esa Nota al Ámbito seleccionado
+            mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos la colección de Notas de la Folder seleccionada
+            DatabaseAdapter.getInstance().saveNote(newNote);            // Guardamos la Nota en DB
+            setToast("Note " + noteName + " correctly created.");       // Creamos Toast Informativo
 
+        }catch(NullPointerException exception){
+            Log.w(TAG, "Failed to add note " + noteName + ": null pointer exception.");
+            Log.w(TAG, "Exception message: " + exception.getMessage());
+        }
     }
+
+
 
     /* BUILDER PATTERN FOR DATABASE INTERFACE */
     protected class UserBuilder implements DatabaseAdapter.LoaderInterface{
@@ -470,7 +485,7 @@ public class MainViewModel extends ViewModel{
                                 documentManager.getDocuments(note.getDocumentsID());
                             }
 
-                            ambito.putNote(note);
+                            ambito.addNote(note);
                         }
                         loadingCounter++;
                         break;

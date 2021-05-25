@@ -55,7 +55,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private Context mContext;                           // Root context
     private RecyclerView mNotesRecyclerView;            // Recycle View of Card-Notes
-    private GridLayoutManager mNotesManager;            // Recycle View Layout Manager
+    private StaggeredGridLayoutManager mNotesManager;            // Recycle View Layout Manager
     private NoteAdapter mNoteAdapter;                   // NoteAdapter for the RecycleView
     private boolean cardNoteType;                       // boolean cardNote type
     private MainViewModel dataViewModel;                // Model Shared Data between Fragments
