@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.lize"
-        minSdkVersion 21
+        minSdkVersion 16
         targetSdkVersion 30
         multiDexEnabled true
         versionCode 1
@@ -87,5 +87,8 @@ dependencies {
 
     implementation 'com.github.ImaginativeShohag:Why-Not-Image-Carousel:v1.0.0'
 
+
+    //Swipe Motion of Cardviews
+    implementation 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.4.1'
 
 }

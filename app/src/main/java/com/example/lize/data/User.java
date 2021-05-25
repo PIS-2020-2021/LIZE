@@ -1,6 +1,7 @@
 package com.example.lize.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class User {
     private String first;
@@ -19,7 +20,7 @@ public class User {
         this.first = first;
         this.last = last;
         this.ambitos = new ArrayList<>();
-        ambitos.add(new Ambito(Ambito.BASE_AMBITO_NAME, Ambito.BASE_AMBITO_COLOR));
+        addAmbito(new Ambito(Ambito.BASE_AMBITO_NAME, Ambito.BASE_AMBITO_COLOR));
     }
 
     public String getMail() {
@@ -68,9 +69,24 @@ public class User {
 
     public void addAmbito(Ambito ambito){
         ambito.setUserID(selfID);
+        ambito.setPosition(ambitos.size());
         ambitos.add(ambito);
     }
 
     public void setAmbitos(ArrayList<Ambito> ambitos) { this.ambitos = ambitos; }
+
+    public ArrayList<Integer> getColorsTaken(){
+        ArrayList<Integer> ambitoColors = new ArrayList<>();
+        for (Ambito ambito: this.ambitos)
+            ambitoColors.add(ambito.getColor());
+        Collections.sort(ambitoColors);
+        return ambitoColors;
+    }
+
+    public void swapAmbitos(int initialPosition, int finalPosition){
+        ambitos.get(initialPosition).setPosition(finalPosition);
+        ambitos.get(finalPosition).setPosition(initialPosition);
+        Collections.swap(ambitos, initialPosition, finalPosition);
+    }
 
 }

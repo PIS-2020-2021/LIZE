@@ -3,11 +3,13 @@ package com.example.lize.workers;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,13 +17,18 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
 import com.example.lize.adapters.AmbitosAdapter;
+import com.example.lize.data.Ambito;
 import com.example.lize.data.User;
 import com.example.lize.models.MainViewModel;
+import com.example.lize.utils.Preferences;
+
+import java.util.Collections;
 
 public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.AmbitoListener {
 
@@ -30,6 +37,7 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
     private AmbitosAdapter mAmbitosAdapter;
     private Context mContext;
 
+    private AmbitosAdapter.AmbitoHolder lastAmbitoSel;
     private MainViewModel dataViewModel;
 
     /** Inicializa el fragment contenedor de Ambitos. */
@@ -49,13 +57,47 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
 
         this.dataViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-        dataViewModel.getUserSelected().observe(getViewLifecycleOwner(), (User user) ->{
+        // Actualizamos la lista de Ámbitos cuando se seleccione un Usuario
+        dataViewModel.getUserSelected().observe(getViewLifecycleOwner(), (@NonNull User user) ->{
             mAmbitosAdapter = new AmbitosAdapter(mContext, user.getAmbitos());
             mAmbitosAdapter.registerAmbitoListener(this);
             mAmbitosRecyclerView.swapAdapter(mAmbitosAdapter, false);
             mAmbitosAdapter.notifyDataSetChanged();
         });
+
+        dataViewModel.getAmbitoSelected().observe(getViewLifecycleOwner(), (@NonNull Ambito ambito) ->{
+            Preferences.setSelectedTheme(ambito.getColor());
+        });
+
+        //Seteamos los componentes para poder elegir el orden de los Ambitos
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(mAmbitosRecyclerView);
     }
+
+    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP |
+            ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END, 0) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            int fromPosition = viewHolder.getAdapterPosition();
+            int toPosition = target.getAdapterPosition();
+
+            try {
+                dataViewModel.getUserSelected().getValue().swapAmbitos(fromPosition, toPosition);
+                recyclerView.getAdapter().notifyItemMoved(fromPosition,toPosition);
+            } catch (NullPointerException nullPointerException){
+                Log.w("AmbitoHostFragment", "Failed to drag an drop Ambitos: null user.");
+                Log.w("AmbitoHostFragment", "Exception message: " + nullPointerException.getMessage());
+            }
+
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            //Nothing to do it here
+        }
+    };
+
 
     /**
      * Añadimos un nuevo ambito al DataSet del MainViewModel
@@ -72,49 +114,19 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
     public void deleteAmbito(String ambitoID){ }
 
 
+    /**
+     * Seleccionamos un ambito del DataSet del MainViewModel, y aplicamos un cambio de tema de la app.
+     * @param ambitoHolder Holder del ambito seleccionado.
+     */
     @Override
-    public void onAmbitoSelected(String ambitoName) {
-        dataViewModel.selectAmbito(ambitoName);
-    }
-
-    @Override
-    public void onAmbitoHold(View view) {
-        showMenuAmbitos(view);
-    }
-
-
-    @SuppressLint("RestrictedApi")
-    public void showMenuAmbitos(View view){
-        //noinspection RestrictedApi
-        MenuBuilder menuBuilder = new MenuBuilder(getContext());
-        MenuInflater inflater = new MenuInflater(getContext());
-        inflater.inflate(R.menu.ambito_menu, menuBuilder);
-        //noinspection RestrictedApi
-        MenuPopupHelper optionsMenu = new MenuPopupHelper(getContext(), menuBuilder, view);
-        //noinspection RestrictedApi
-        optionsMenu.setForceShowIcon(true);
-
-        // Set Item Click Listener
-        //noinspection RestrictedApi
-        menuBuilder.setCallback(new MenuBuilder.Callback() {
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuBuilder menu, @NonNull MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.edit_ambito:
-                        //TODO: EditarAmbito
-                        return true;
-                    case R.id.delete_ambito:
-                        //TODO: EliminarAmbito
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-
-            @Override
-            public void onMenuModeChange(@NonNull MenuBuilder menu){}
-        });
-        optionsMenu.show();
+    public void onAmbitoSelected(AmbitosAdapter.AmbitoHolder ambitoHolder) {
+        dataViewModel.selectAmbito(ambitoHolder.getmTitleAmbito().getText().toString());
     }
 
 }
+
+
+
+
+
+

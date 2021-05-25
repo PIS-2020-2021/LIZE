@@ -2,7 +2,9 @@ package com.example.lize.data;
 
 import android.net.Uri;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 
 // Note Model Class
 public class Note {
@@ -13,6 +15,7 @@ public class Note {
     private String selfID;
     private String ambitoID;
     private String folderTAG;
+    private Date lastUpdate;
 
     private String documentsID;
     private String imagesID;
@@ -23,6 +26,7 @@ public class Note {
         this.title = title;
         this.text_plain = text_plain;
         this.text_html = text_html;
+        this.lastUpdate = new Date();
     }
 
     public String getTitle() {
@@ -94,5 +98,11 @@ public class Note {
 
     public void setImagesID(String imagesID) {
         this.imagesID = imagesID;
+    }
+
+    public Date getLastUpdate() {return lastUpdate; }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 }

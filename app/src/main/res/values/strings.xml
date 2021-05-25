@@ -14,7 +14,8 @@
     <string name="cancelar">Cancelar</string>
     <string name="apellidos">Apellidos</string>
     <string name="nombre">Nombre</string>
-    <string name="errorColorAmbito">No ha seleccionado ningún color</string>
+    <string name="errorColorAmbitoNoSelection">No ha seleccionado ningún color</string>
+    <string name="errorColorAmbitoAlredySelected">Este Color ya ha sido seleccionado</string>
 
     <string name="search">find note</string>
     <string name="more">change view</string>
@@ -104,6 +105,7 @@
     <string name="barra">|</string>
     <string name="editar_ambito">Editar Ambito</string>
     <string name="eliminar_ambito">Eliminar Ambito</string>
+    <string name="note_default_metadata">ambitoID - folderTag - last connection</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

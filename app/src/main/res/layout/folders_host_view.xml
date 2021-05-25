@@ -3,34 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:maxHeight="50dp"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
-    <!--com.google.android.material.chip.Chip
-        android:id="@+id/root_folder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/folder_default_name"
-        android:layout_margin="5dp"
-        android:backgroundTint="?attr/colorPrimaryDark"
-        android:textColor="?attr/colorOnSurface"/-->
-
-    <!--View style="@style/Divider"
-        android:layout_width="1dp"
-        android:layout_height="match_parent"/-->
-
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/folder_recycler_view"
+        android:scrollbars="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/folder_recycler_view"
-            android:scrollbars="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+    <View style="@style/Divider"/>
 
-        <View style="@style/Divider" />
-
-    </LinearLayout>
-    
 </LinearLayout>

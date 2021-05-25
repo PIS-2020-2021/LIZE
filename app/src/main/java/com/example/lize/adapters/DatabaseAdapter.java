@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -18,6 +19,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+
 import com.example.lize.data.Ambito;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
@@ -36,6 +39,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,35 +47,36 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
-import androidx.appcompat.app.AppCompatActivity;
 
 
-public class DatabaseAdapter extends AppCompatActivity  {
+public class DatabaseAdapter {
     public static final String TAG = "DatabaseAdapter";
-    public static FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    public final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser user;
-    private StorageReference mStorageRef = storage.getReference();
 
-
-    private Context context;
-    private StorageTask mUploadTask;
     private static DatabaseAdapter databaseAdapter;  // Singleton implementation
 
-    private vmInterface listener;
+    private LoaderInterface loader;
+    private SaverInterface saver;
 
-    public void setListener(vmInterface listener) {
-        this.listener = listener;
+    public void setLoaderListener(LoaderInterface loader) {
+        this.loader = loader;
+    }
+    public void setSaverListener(SaverInterface saver) {
+        this.saver = saver;
     }
 
     public DatabaseAdapter() {
         FirebaseFirestore.setLoggingEnabled(true);
     }
-
 
 
     public static DatabaseAdapter getInstance() {
@@ -83,15 +88,26 @@ public class DatabaseAdapter extends AppCompatActivity  {
             }
         }
         return databaseAdapter;
-
     }
 
-    public interface vmInterface {
-        void setUser(User user);
-        void setUserAmbitos(ArrayList<Ambito> userAmbitos);
-        void setAmbitoNotes(String ambitoID, ArrayList<Note> ambitoNotes);
+
+    // Métodos para reconstruir la jerarquía del modelo.
+    public interface LoaderInterface{
+        void getUserResult(User user);
+        void getAmbitoCollectionResult(String userID, ArrayList<Ambito> userAmbitos);
+        void getNoteCollectionResult(String ambitoID, ArrayList<Note> ambitoNotes);
         void setToast(String s);
     }
+
+
+    // Callbacks de operaciones de escritura.
+    public interface SaverInterface {
+        void saveUserResult(String userID, boolean result);
+        void saveAmbitoResult(String ambitoID, boolean result);
+        void saveNoteResult(String noteID, boolean result);
+        void setToast(String s);
+    }
+
 
     /* Firebase sign in */
     public void initFireBase() {
@@ -103,23 +119,24 @@ public class DatabaseAdapter extends AppCompatActivity  {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInAnonymously:success");
-                            if(listener != null) listener.setToast("Authentication successful.");
+                            if(loader != null) loader.setToast("Authentication successful.");
                             user = mAuth.getCurrentUser();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInAnonymously:failure", task.getException());
-                            if(listener != null) listener.setToast("Authentication failed.");
+                            if(loader != null) loader.setToast("Authentication failed.");
 
                         }
                     });
         } else {
-            if(listener != null) listener.setToast("Authentication with current user.");
+            if(loader != null) loader.setToast("Authentication with current user.");
         }
     }
 
+
     // Method for getting a base User from the 'users' collection
     public void getUser() {
-        DocumentReference userRef = DatabaseAdapter.db.collection("users").document(user.getUid());
+        DocumentReference userRef = db.collection("users").document(user.getUid());
         Log.d(TAG, "Getting current user document...");
         userRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -129,14 +146,15 @@ public class DatabaseAdapter extends AppCompatActivity  {
                         document.getString("first"), document.getString("last"));
                 user.setSelfID(document.getString("selfID"));
 
-                if(listener != null) listener.setUser(user);
+                if(loader != null) loader.getUserResult(user);
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
 
+
     // Method for getting an Ambito from the 'ambitos' collection
     public void getAmbitos() {
-        Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", user.getUid());
+        Query ambitosRef = db.collection("ambitos").whereEqualTo("userID", user.getUid());
         Log.d(TAG, "Getting current user ambitos collection...");
         ambitosRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -147,16 +165,20 @@ public class DatabaseAdapter extends AppCompatActivity  {
                     Ambito ambito = new Ambito(document.getString("name"), document.getLong("color").intValue());
                     ambito.setUserID(document.getString("userID"));
                     ambito.setSelfID(document.getString("selfID"));
+                    ambito.setPosition(document.getLong("position").intValue());
                     userAmbitos.add(ambito);
                 }
-                if(listener != null) listener.setUserAmbitos(userAmbitos);
+
+                Collections.sort(userAmbitos, (Ambito a1, Ambito a2) -> a1.getPosition() - a2.getPosition());
+                if(loader != null) loader.getAmbitoCollectionResult(user.getUid(), userAmbitos);
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
 
+
     // Method for getting a Note from the 'notes' collection
     public void getNotes(String ambitoID){
-        Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("ambitoID", ambitoID);
+        Query notasRef = db.collection("notes").whereEqualTo("ambitoID", ambitoID);
         Log.d(TAG, "Getting ambito " + ambitoID + "'s notes collection...");
         notasRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -167,16 +189,18 @@ public class DatabaseAdapter extends AppCompatActivity  {
                     note.setAmbitoID(document.getString("ambitoID"));
                     note.setFolderTAG(document.getString("folderTAG"));
                     note.setSelfID(document.getString("selfID"));
+                    note.setLastUpdate(document.getDate("lastUpdate"));
                     note.setDocumentsID(document.getString("documentsID"));
                     note.setImagesID(document.getString("imagesID"));
                     note.setHaveImages(document.getBoolean("images"));
                     note.setHaveDocuments(document.getBoolean("documents"));
                     ambitoNotes.add(note);
                 }
-                if(listener != null) listener.setAmbitoNotes(ambitoID, ambitoNotes);
+                if(loader != null) loader.getNoteCollectionResult(ambitoID, ambitoNotes);
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
+
 
     /**
      * Guardamos un nuevo User en FireBase.
@@ -200,10 +224,12 @@ public class DatabaseAdapter extends AppCompatActivity  {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "User" + user.getSelfID() + " correctly saved.");
                     for (Ambito ambito: user.getAmbitos()) saveAmbito(ambito);
-                }else Log.d(TAG, "Error saving user " + user.getSelfID(), task.getException());
+                } else Log.d(TAG, "Error saving user " + user.getSelfID(), task.getException());
+                if (saver != null) saver.saveUserResult(user.getSelfID(), task.isSuccessful()); // ViewModel callback
             }
         });
     }
+
 
     /**
      * Guardamos un ambito en FireBase.
@@ -226,6 +252,7 @@ public class DatabaseAdapter extends AppCompatActivity  {
         ambitoData.put("color", ambito.getColor());
         ambitoData.put("selfID", ambito.getSelfID());
         ambitoData.put("userID", ambito.getUserID());
+        ambitoData.put("position", ambito.getPosition());
 
 
         ambitoRef.set(ambitoData).addOnCompleteListener(new OnCompleteListener(){
@@ -233,11 +260,13 @@ public class DatabaseAdapter extends AppCompatActivity  {
             public void onComplete(@NonNull Task task) {
                 if (task.isSuccessful()){
                     Log.d(TAG, "Ambito" + ambito.getSelfID() + " correctly saved.");
-                    for (Note note: ambito.getNotes()) saveNote(note);
+                    //for (Note note: ambito.getNotes()) saveNote(note);
                 } else Log.d(TAG, "Error saving ambito " + ambito.getSelfID(), task.getException());
+                if (saver != null) saver.saveAmbitoResult(ambito.getSelfID(), task.isSuccessful()); // ViewModel callback
             }
         });
     }
+
 
     /**
      * Guardamos una nota en FireBase.
@@ -250,7 +279,6 @@ public class DatabaseAdapter extends AppCompatActivity  {
         if(note.getSelfID() == null){
             noteRef= db.collection("notes").document();
             note.setSelfID(noteRef.getId());
-
         } else {
             noteRef= db.collection("notes").document(note.getSelfID());
         }
@@ -263,6 +291,7 @@ public class DatabaseAdapter extends AppCompatActivity  {
         notesData.put("selfID", note.getSelfID());
         notesData.put("ambitoID", note.getAmbitoID());
         notesData.put("folderTAG", note.getFolderTAG());
+        notesData.put("lastUpdate", note.getLastUpdate());
         notesData.put("documentsID",note.getDocumentsID());
         notesData.put("imagesID",note.getImagesID());
         notesData.put("documents",note.getHaveDocuments());
@@ -271,24 +300,39 @@ public class DatabaseAdapter extends AppCompatActivity  {
         noteRef.set(notesData).addOnCompleteListener(new OnCompleteListener(){
             @Override
             public void onComplete(@NonNull Task task) {
-                if (task.isSuccessful()) Log.d(TAG, "Note" + note.getSelfID() + " correctly saved.");
-                else Log.d(TAG, "Error saving note " + note.getSelfID(), task.getException());
+                if (task.isSuccessful()){
+                    Log.d(TAG, "Note" + note.getSelfID() + " correctly saved.");
+                } else Log.d(TAG, "Error saving note " + note.getSelfID(), task.getException());
+                if (saver != null) saver.saveNoteResult(note.getSelfID(), task.isSuccessful()); // ViewModel callback
             }
         });
     }
-    public void deleteNota(String notaID){
-        DatabaseAdapter.db.collection("notes").document(notaID).delete()
-        .addOnSuccessListener(aVoid -> Log.d(TAG, "Nota Eliminada Correctamente")).addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar la nota", e));
+
+
+    /**
+     * Eliminamos una nota de FireBase.
+     * @param notaID ID del documento correspondiente a la nota a eliminar
+     */
+    public void deleteNote(String notaID){
+        db.collection("notes").document(notaID).delete()
+            .addOnSuccessListener(aVoid -> Log.d(TAG, "Nota Eliminada Correctamente"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar la nota", e));
     }
 
+
+    /**
+     * Eliminamos la subcolección de notas cuyo valor del campo "folderTAG" sea el pasado por parámetro.
+     * Obtenemos cada documento de la subcolección y lo eliminamos.
+     * @param folderTAG valor del campo "folderTAG" de la subcolección de notas de la colección "notes".
+     */
     public void deleteFolder(String folderTAG) {
-        Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("folderTAG", folderTAG);
+        Query notasRef = db.collection("notes").whereEqualTo("folderTAG", folderTAG);
 
         notasRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 try {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        deleteNota(document.getId());
+                        deleteNote(document.getId());
                     }
                     Log.d(TAG, "Colección de Notas de " + folderTAG + " eliminado correctamente");
                 } catch (NullPointerException exception){
@@ -298,14 +342,19 @@ public class DatabaseAdapter extends AppCompatActivity  {
         });
     }
 
+    /**
+     * Eliminamos un Ámbito de Firebase. También eliminamos la subcolección de Notas cuyo valor del
+     * campo "ambitoID" sea el pasado por parámetro. Obtenemos cada documento de la subcolección y lo eliminamos.
+     * @param ambitoID ID del documento correspondiente al Ámbito a eliminar de la colección "ambitos".
+     */
     public void deleteAmbito(String ambitoID) {
-        Query notasRef = DatabaseAdapter.db.collection("notes").whereEqualTo("ambitoID", ambitoID);
+        Query notasRef = db.collection("notes").whereEqualTo("ambitoID", ambitoID);
 
         notasRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 try {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        deleteNota(document.getId());
+                        deleteNote(document.getId());
                     }
                     Log.d(TAG, "Colección de Notas de " + ambitoID + " eliminado correctamente");
                 } catch (NullPointerException exception){
@@ -316,12 +365,22 @@ public class DatabaseAdapter extends AppCompatActivity  {
             }
         });
 
-        DatabaseAdapter.db.collection("ambitos").document(ambitoID).delete()
-                .addOnSuccessListener(aVoid -> Log.d(TAG, "Ambito Eliminado Correctamente")).addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar el Ambito", e));
+        db.collection("ambitos").document(ambitoID).delete()
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Ambito Eliminado Correctamente"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar el Ambito " + ambitoID, e));
     }
 
-    public void deleteUser(String userID) {
-        Query ambitosRef = DatabaseAdapter.db.collection("ambitos").whereEqualTo("userID", userID);
+    /**
+     * Eliminamos el Usuario registrado de Firebase.
+     *
+     * También eliminamos la subcolección de Ámbitos del Usuario mediante el método
+     * {@link #deleteAmbito(String)}, eliminando también las Notas de cada Ámbito.
+     *
+     * IMPORTANTE: ese Usuario queda eliminado del Firebase.Authentication, de modo que no se podrá
+     * acceder mediante la cuenta asociada a su UID.
+     */
+    public void deleteUser() {
+        Query ambitosRef = db.collection("ambitos").whereEqualTo("userID", user.getUid());
 
         ambitosRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -329,30 +388,19 @@ public class DatabaseAdapter extends AppCompatActivity  {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         deleteAmbito(document.getId());
                     }
-                    Log.d(TAG, "Colección de Ambitos de " + userID + " eliminado correctamente");
+                    Log.d(TAG, "Colección de Ambitos de " + user.getUid() + " eliminado correctamente");
                 } catch (NullPointerException exception){
-                    Log.w(TAG, "Failed to get Collection of ambitos of  " + userID + ": null pointer exception.");
+                    Log.w(TAG, "Failed to get Collection of ambitos of  " + user.getDisplayName() + ": null pointer exception.");
                 }
             } else Log.d(TAG, "Error al eliminar la coleccion de ambitos: ", task.getException());
         });
 
-        DatabaseAdapter.db.collection("users").document(userID).delete()
-            .addOnSuccessListener(aVoid -> Log.d(TAG, "Usuario Eliminado Correctamente")).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.w(TAG, "Error al Eliminar el Usuario", e);
-                }
-            });
+        db.collection("users").document(mAuth.getCurrentUser().getUid()).delete()
+            .addOnSuccessListener(aVoid -> Log.d(TAG, "Usuario Eliminado Correctamente"))
+            .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar el Usuario " + user, e));
+
+        user.delete();
     }
-
-
-
-
-
-
-
-
-
 
     public void saveNoteWithFile(String id, String description, String userid, String path) {
     /*  Uri file = Uri.fromFile(new File(path));

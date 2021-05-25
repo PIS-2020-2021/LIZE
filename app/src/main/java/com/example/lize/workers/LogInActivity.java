@@ -5,15 +5,26 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.util.Patterns;
 import com.example.lize.R;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
 public class LogInActivity extends AppCompatActivity {
+
+    private static final String TAG = "LoginActivity";
+
     // Variables
     EditText email, password;
     Button login, signup;
@@ -21,7 +32,7 @@ public class LogInActivity extends AppCompatActivity {
     TextInputLayout emailError, passError;
 
     //Relacionado con la Autentificación de FireBase
-    private FirebaseAuth mAuth;
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -36,21 +47,51 @@ public class LogInActivity extends AppCompatActivity {
             passError = findViewById(R.id.passError);
 
             login.setOnClickListener(v -> {
-                if (SetValidation()) {
-                    FirebaseAuth.getInstance().signInWithEmailAndPassword(email.getText().toString(),
-                            password.getText().toString()).addOnCompleteListener(a -> {
-                                if(a.isSuccessful()){
+                if (setValidation()) {
+                    String email = this.email.getText().toString();
+                    String password = this.password.getText().toString();
+
+                    // SignIn process
+                    mAuth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getApplicationContext(), "¡Bienvenido a LIZE!", Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(this, MainActivity.class);
                                     startActivity(intent);
-                                } else {
-                                    showAlert();
+
+                                } else {    // Exception Procedure
+
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                                    builder.setPositiveButton("Aceptar", null);
+
+                                    try {
+                                        throw task.getException();
+
+                                    } catch (FirebaseAuthInvalidUserException userException) {
+                                        builder.setTitle("Autentificación inválida");
+                                        builder.setMessage("Se ha producido un error de autentificación. \nEstá registrado en la App?");
+                                        builder.create().show();
+
+                                    } catch( FirebaseAuthInvalidCredentialsException passwordExcept){
+                                        builder.setTitle("Contraseña inválida");
+                                        builder.setMessage("Se ha producido un error de credenciales. \nInténtelo de nuevo.");
+                                        builder.create().show();
+
+                                    } catch (FirebaseTooManyRequestsException requestExcept) {
+                                        builder.setTitle("Registro bloqueado");
+                                        builder.setMessage("Se han producido demasiados intentos de autentificación. \nPor favor, inténtelo más tarde. ");
+                                        builder.create().show();
+
+                                    } catch (Exception e) {
+                                        Log.w(TAG, "Unidentified EXCEPTION. \n\tClass: " + e.getClass() + " \n\tMessage: " + e.getMessage());
+                                    }
                                 }
-                    });
+                            });
                 }
             });
 
+            // Sign Up process
             signup.setOnClickListener(v -> {
-                // Vamos a crear un nuevo usuario
                 Intent intent = new Intent(this, SignUpActivity.class);
                 startActivity(intent);
             });
@@ -60,7 +101,7 @@ public class LogInActivity extends AppCompatActivity {
         /**
          *  Metodo para validar el incio de sesión en la APP
          */
-        public boolean SetValidation() {
+        public boolean setValidation() {
 
             // Primero validamos el email
             if (email.getText().toString().isEmpty()) {
@@ -94,21 +135,7 @@ public class LogInActivity extends AppCompatActivity {
                 passError.setErrorEnabled(false);
             }
 
-            if (isEmailValid && isPasswordValid) {
-                Toast.makeText(getApplicationContext(), "¡Bienvenido a LIZE!", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            return false;
-        }
-
-        //FireBase Alert
-        private void showAlert(){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Error");
-            builder.setMessage("Se ha producido un error autenticando al usuario\n ¿Está Registrado en la App?");
-            builder.setPositiveButton("Aceptar", null);
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            return isEmailValid && isPasswordValid;
         }
 
 

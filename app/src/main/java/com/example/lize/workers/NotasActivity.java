@@ -38,10 +38,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,6 +47,7 @@ import com.example.lize.data.Document;
 import com.example.lize.data.Image;
 import com.example.lize.models.DocumentManager;
 import com.example.lize.utils.FileUtils;
+import com.example.lize.utils.Preferences;
 import com.onegravity.rteditor.RTEditText;
 import com.onegravity.rteditor.RTManager;
 import com.onegravity.rteditor.RTToolbar;
@@ -107,6 +104,8 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setTheme(R.style.RTE_ThemeLight);
+        Preferences.applySelectedTheme(this);
         setContentView(R.layout.activity_notas);
         setTheme(R.style.RTE_ThemeLight);
 

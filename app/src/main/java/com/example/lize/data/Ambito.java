@@ -12,14 +12,16 @@ public class Ambito {
     private int color;
     private String selfID;
     private String userID;
+    private int position;
 
+    private ArrayList<Note> notes;
     private final Map<String, Folder> folders;
 
     public Ambito(String name, int color) {
         this.name = name;
         this.color = color;
+        this.notes = new ArrayList<>();
         this.folders = new HashMap<>();
-        folders.put(Folder.BASE_FOLDER_NAME, new Folder(Folder.BASE_FOLDER_NAME));
     }
 
     public String getName() {
@@ -38,24 +40,14 @@ public class Ambito {
         this.color = color;
     }
 
-    public Folder getFolder(String folderName) { return folders.get(folderName); }
-
-    public ArrayList<Folder> getFolders() { return new ArrayList(folders.values()); }
-
-    public void putFolder(Folder folder){
-        folder.setAmbitoID(selfID);
-        if (folders.get(folder.getName()) == null)
-            folders.put(folder.getName(), folder);
-    }
-
     public String getSelfID() {
         return selfID;
     }
 
     public void setSelfID(String selfID) {
         this.selfID = selfID;
-        for (Folder folder : this.folders.values()){
-            folder.setAmbitoID(selfID);
+        for (Note note : this.notes){
+            note.setAmbitoID(selfID);
         }
     }
 
@@ -67,22 +59,48 @@ public class Ambito {
         this.userID = userID;
     }
 
-    public ArrayList<Note> getNotes() {
-        return folders.get(Folder.BASE_FOLDER_NAME).getNotes();
+
+    public int getPosition() {
+        return position;
     }
 
-    /**
-     * Pone la note en el ámbito según la carpeta a la que pertenece. Si esta carpeta no figura en
-     * el mapa, la añade. Posteriormente, añade la nota tanto en la carpeta {@link Folder#BASE_FOLDER_NAME}
-     * como en la carpeta a la que pertenece {@link Folder#addNote(Note)}.
-     * @param note nota a añadir al ámbito.
-     */
-    public void putNote(Note note){
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public ArrayList<Note> getNotes() { return this.notes; }
+
+    public ArrayList<Folder> getFolders() { return new ArrayList<>(folders.values()); }
+
+    public Folder getFolder(String folderName) {
+        return folders.get(folderName);
+    }
+
+    public void addFolder(String folderName){
+        if (!folders.containsKey(folderName))
+            folders.put(folderName, new Folder(folderName));
+    }
+
+    public void addNote(Note note){
+        this.notes.add(note);
+        note.setAmbitoID(selfID);
+
         String folderName = note.getFolderTAG();
-        if (folderName == null) return;
-        if(!folders.containsKey(folderName)) folders.put(folderName, new Folder(folderName, selfID));
-        if (!Folder.BASE_FOLDER_NAME.equals(folderName)) folders.get(Folder.BASE_FOLDER_NAME).addNote(note);
-        folders.get(folderName).addNote(note);
+        if (folderName != null){
+            addFolder(folderName);
+            getFolder(folderName).addNote(note);
+        }
     }
 
+    public void removeNote(Note note){
+        this.notes.remove(note);
+        String folderName = note.getFolderTAG();
+        if (folderName != null && folders.containsKey(folderName))
+            folders.get(folderName).getNotes().remove(note);
+        }
+
+    public void removeFolder(String folderName) {
+        Folder removed = this.folders.remove(folderName);
+        if (removed != null) for (Note note : removed.getNotes()) this.notes.remove(note);
+    }
 }
