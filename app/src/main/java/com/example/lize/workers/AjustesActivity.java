@@ -3,6 +3,7 @@ package com.example.lize.workers;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.lize.R;
 
+import com.example.lize.models.MainViewModel;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -21,8 +23,8 @@ import java.util.ArrayList;
 
 public class AjustesActivity extends Activity {
 
-    private Button guardarCambios;
     private ArrayList<String> info;
+    private MainViewModel dataViewModel;
     private String name, surnames, email, psw, ambitos;
     private EditText editName, editSurnames, editPsw, editEmail;
     boolean isNameValid, areSurnamesValid, isEmailValid, isPasswordValid;
@@ -40,13 +42,18 @@ public class AjustesActivity extends Activity {
         editSurnames = (EditText) findViewById(R.id.surnamesSettings);
         editEmail = (EditText) findViewById(R.id.emailSettings);
         editPsw = (EditText) findViewById(R.id.pswSettings);
+        nameInput = findViewById(R.id.nameInput);
+        apellidosInput = findViewById(R.id.apellidosInput);
+        emailInput = findViewById(R.id.emailInput);
+        pswInput = findViewById(R.id.pswInput);
 
         MaterialToolbar topAppBar = findViewById(R.id.ambito_material_toolbar);
         topAppBar.setOnMenuItemClickListener(this::onMenuItemClick);
 
-        guardarCambios = findViewById(R.id.newAmbitoButton);
+        Button guardarCambios = findViewById(R.id.guardar_cambios);
         guardarCambios.setOnClickListener(v -> {
             if (validarDatos()){
+                /*
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 Bundle userChanges = new Bundle();
                 userChanges.putString("name", editName.getText().toString());
@@ -54,14 +61,9 @@ public class AjustesActivity extends Activity {
                 userChanges.putString("email", editEmail.getText().toString());
                 intent.putExtras(userChanges);
                 setResult(RESULT_OK, intent);
-                finish();
+                finish();*/
             }
         });
-
-
-
-
-
     }
 
     private void getInfo(){
@@ -119,7 +121,7 @@ public class AjustesActivity extends Activity {
             isNameValid = false;
         } else  {
             isNameValid = true;
-            nameInput.setErrorEnabled(false);
+            //nameInput.setErrorEnabled(false);
         }
 
         //Comprobamos los apellidos
@@ -170,6 +172,10 @@ public class AjustesActivity extends Activity {
 
         if (isNameValid && areSurnamesValid && isEmailValid && isPasswordValid) {
             Toast.makeText(getApplicationContext(), "Successfully", Toast.LENGTH_SHORT).show();
+            //dataViewModel.getUserSelected().getValue().setFirst(editName.getText().toString());
+            //dataViewModel.getUserSelected().getValue().setFirst(editSurnames.getText().toString());
+            //dataViewModel.getUserSelected().getValue().setFirst(editEmail.getText().toString());
+            //dataViewModel.getUserSelected().getValue().setFirst(editPsw.getText().toString());
             return true;
         }
         return false;
