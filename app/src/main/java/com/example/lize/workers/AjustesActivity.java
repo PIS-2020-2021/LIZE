@@ -2,33 +2,44 @@ package com.example.lize.workers;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.MediaStore;
 import android.util.Patterns;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.example.lize.R;
 
-import com.example.lize.models.MainViewModel;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class AjustesActivity extends Activity {
 
+    public static final int PICK_IMAGE = 1;
     private ArrayList<String> info;
-    private MainViewModel dataViewModel;
     private String name, surnames, email, psw, ambitos;
     private EditText editName, editSurnames, editPsw, editEmail;
     boolean isNameValid, areSurnamesValid, isEmailValid, isPasswordValid;
     TextInputLayout nameInput, apellidosInput, emailInput, pswInput;
+    ImageButton profilePicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +53,8 @@ public class AjustesActivity extends Activity {
         editSurnames = (EditText) findViewById(R.id.surnamesSettings);
         editEmail = (EditText) findViewById(R.id.emailSettings);
         editPsw = (EditText) findViewById(R.id.pswSettings);
+        profilePicture = (ImageButton) findViewById(R.id.foto_de_perfil);
+
         nameInput = findViewById(R.id.nameInput);
         apellidosInput = findViewById(R.id.apellidosInput);
         emailInput = findViewById(R.id.emailInput);
@@ -64,6 +77,10 @@ public class AjustesActivity extends Activity {
                 finish();
             }
         });
+
+        profilePicture.setOnClickListener(v -> {
+            selectImage();
+        });
     }
 
     private void getInfo(){
@@ -82,6 +99,50 @@ public class AjustesActivity extends Activity {
         TextView userFullName = (TextView) findViewById(R.id.user_full_name);
         String fullName = name + ' ' + surnames;
         if (name != null) userFullName.setText(fullName);
+    }
+
+    //Método para el tratamiento de los permisos de la aplicación
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PICK_IMAGE && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                selectImage();
+            } else {
+                Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    //Intent para seleccionar una imagen del dispositivo para ponerla de perfil
+    private void selectImage() {
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickIntent.setType("image/*");
+        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        getIntent.setType("image/*");
+        Intent chooserIntent = Intent.createChooser(getIntent, "Selecciona una imagen");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
+
+        startActivityForResult(chooserIntent, PICK_IMAGE);
+    }
+
+    // Tratamiento de los datos de Intents de imagenes y documentos.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                Uri selectedImageUri = data.getData();
+                if (selectedImageUri != null) {
+                    try {
+                        profilePicture.setImageURI(selectedImageUri);
+
+                    } catch (Exception e) {
+                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
     }
 
     /**
