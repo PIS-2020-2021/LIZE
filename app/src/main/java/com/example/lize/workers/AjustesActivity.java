@@ -22,13 +22,19 @@ import androidx.annotation.Nullable;
 
 import com.example.lize.R;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
-import java.io.InputStream;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
-import de.hdodenhof.circleimageview.CircleImageView;
+
 
 
 public class AjustesActivity extends Activity {
@@ -40,6 +46,7 @@ public class AjustesActivity extends Activity {
     boolean isNameValid, areSurnamesValid, isEmailValid, isPasswordValid;
     TextInputLayout nameInput, apellidosInput, emailInput, pswInput;
     ImageButton profilePicture;
+    StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +66,7 @@ public class AjustesActivity extends Activity {
         apellidosInput = findViewById(R.id.apellidosInput);
         emailInput = findViewById(R.id.emailInput);
         pswInput = findViewById(R.id.pswInput);
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         MaterialToolbar topAppBar = findViewById(R.id.ambito_material_toolbar);
         topAppBar.setOnMenuItemClickListener(this::onMenuItemClick);
@@ -136,6 +144,7 @@ public class AjustesActivity extends Activity {
                 if (selectedImageUri != null) {
                     try {
                         profilePicture.setImageURI(selectedImageUri);
+                        uploadImageToFirebase(selectedImageUri);
 
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -144,6 +153,14 @@ public class AjustesActivity extends Activity {
             }
         }
     }
+
+    private void uploadImageToFirebase(Uri selectedImageUri) {
+        StorageReference fileRef = storageReference.child("profile.png");
+        fileRef.putFile(selectedImageUri)
+                .addOnSuccessListener(taskSnapshot -> Toast.makeText(AjustesActivity.this, "Imagen actualizada.", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(AjustesActivity.this, "Fallo al actualizar la imagen.", Toast.LENGTH_SHORT).show());
+    }
+
 
     /**
      * Setea el Header de la MainActivity
