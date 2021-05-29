@@ -322,7 +322,8 @@
                     android:layout_height="wrap_content"
                     android:theme="@style/Theme.hint"
                     android:background="@android:color/transparent"
-                    android:layout_marginTop="5dp">
+                    android:layout_marginTop="5dp"
+                    app:passwordToggleEnabled="true">
 
                     <EditText
                         android:id="@+id/pswSettings"
