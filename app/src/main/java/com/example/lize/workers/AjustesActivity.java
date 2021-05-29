@@ -3,8 +3,6 @@ package com.example.lize.workers;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,19 +20,14 @@ import androidx.annotation.Nullable;
 
 import com.example.lize.R;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-
-
 
 
 public class AjustesActivity extends Activity {
@@ -53,6 +46,9 @@ public class AjustesActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        MaterialToolbar topAppBar = findViewById(R.id.ambito_material_toolbar);
+        topAppBar.setOnMenuItemClickListener(this::onMenuItemClick);
+
         getInfo();
         setInfoSettings();
 
@@ -68,8 +64,10 @@ public class AjustesActivity extends Activity {
         pswInput = findViewById(R.id.pswInput);
         storageReference = FirebaseStorage.getInstance().getReference();
 
-        MaterialToolbar topAppBar = findViewById(R.id.ambito_material_toolbar);
-        topAppBar.setOnMenuItemClickListener(this::onMenuItemClick);
+        String photoName = "profileUser_" + email + ".png";
+        StorageReference profileRef = storageReference.child(photoName);
+        profileRef.getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).into(profilePicture));
+
 
         Button guardarCambios = findViewById(R.id.guardar_cambios);
         guardarCambios.setOnClickListener(v -> {
@@ -86,9 +84,7 @@ public class AjustesActivity extends Activity {
             }
         });
 
-        profilePicture.setOnClickListener(v -> {
-            selectImage();
-        });
+        profilePicture.setOnClickListener(v -> selectImage());
     }
 
     private void getInfo(){
@@ -143,7 +139,6 @@ public class AjustesActivity extends Activity {
                 Uri selectedImageUri = data.getData();
                 if (selectedImageUri != null) {
                     try {
-                        profilePicture.setImageURI(selectedImageUri);
                         uploadImageToFirebase(selectedImageUri);
 
                     } catch (Exception e) {
@@ -155,10 +150,12 @@ public class AjustesActivity extends Activity {
     }
 
     private void uploadImageToFirebase(Uri selectedImageUri) {
-        StorageReference fileRef = storageReference.child("profile.png");
-        fileRef.putFile(selectedImageUri)
-                .addOnSuccessListener(taskSnapshot -> Toast.makeText(AjustesActivity.this, "Imagen actualizada.", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(AjustesActivity.this, "Fallo al actualizar la imagen.", Toast.LENGTH_SHORT).show());
+        String photoName = "profileUser_" + email + ".png";
+        StorageReference fileRef = storageReference.child(photoName);
+        fileRef.putFile(selectedImageUri).addOnSuccessListener(taskSnapshot -> {
+            Toast.makeText(AjustesActivity.this, "Imagen actualizada.", Toast.LENGTH_SHORT).show();
+            fileRef.getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).into(profilePicture));
+        }).addOnFailureListener(e -> Toast.makeText(AjustesActivity.this, "Fallo al actualizar la imagen.", Toast.LENGTH_SHORT).show());
     }
 
 

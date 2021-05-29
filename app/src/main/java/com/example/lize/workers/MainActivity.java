@@ -15,6 +15,7 @@ import android.animation.TimeInterpolator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -40,11 +41,15 @@ import android.widget.Toast;
 import com.example.lize.R;
 import com.example.lize.models.MainViewModel;
 import com.example.lize.utils.Preferences;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 ;import java.util.ArrayList;
 import java.util.Objects;
@@ -179,7 +184,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
 
         // Observador del Usuario seleccionado. Inicializa el HeaderNavigationView.
-        dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), 0));
+        dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail()));
+
 
         // Observador del Ámbito seleccionado.
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
@@ -270,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 Log.d("Email", email);
                 Log.d("Contraseña", psw);
                 dataViewModel.editUser(name, surnames, email, psw);
-                dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), 0));
+                dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail()));
 
 
             } else Log.d(TAG, "Invalid RESULT from NoteActivity: " + resultCode);
@@ -282,18 +288,21 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      * Setea el Header de la MainActivity
      * @param name nombre del User
      * @param eMail email del User
-     * @param imgProfile Imagen del User
      */
-    private void initHeaderNavigationView(String name, String eMail, int imgProfile){
+    private void initHeaderNavigationView(String name, String eMail){
         View header = (View) findViewById(R.id.headerView);
 
         TextView headerName = (TextView) header.findViewById(R.id.name_header);
         TextView headerEMail = (TextView) header.findViewById(R.id.email_header);
         CircleImageView headerImgProfile = header.findViewById(R.id.circleImageView_header);
 
+
         if(name != null) headerName.setText(name);
         if(eMail != null)  headerEMail.setText(eMail);
-        //if(imgProfile != -1) headerImgProfile.setImageResource(imgProfile);
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+        StorageReference profileRef = storageReference.child("/profileUser_" + eMail + ".png");
+        profileRef.getDownloadUrl().addOnSuccessListener(downloadUrl -> Picasso.get().load(downloadUrl).into(headerImgProfile));
+
     }
 
     /**
