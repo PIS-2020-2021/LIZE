@@ -53,15 +53,15 @@ public class AjustesActivity extends Activity {
         Button guardarCambios = findViewById(R.id.guardar_cambios);
         guardarCambios.setOnClickListener(v -> {
             if (validarDatos()){
-                /*
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 Bundle userChanges = new Bundle();
                 userChanges.putString("name", editName.getText().toString());
                 userChanges.putString("surnames", editSurnames.getText().toString());
                 userChanges.putString("email", editEmail.getText().toString());
+                userChanges.putString("psw", editPsw.getText().toString());
                 intent.putExtras(userChanges);
                 setResult(RESULT_OK, intent);
-                finish();*/
+                finish();
             }
         });
     }
@@ -172,10 +172,6 @@ public class AjustesActivity extends Activity {
 
         if (isNameValid && areSurnamesValid && isEmailValid && isPasswordValid) {
             Toast.makeText(getApplicationContext(), "Successfully", Toast.LENGTH_SHORT).show();
-            //dataViewModel.getUserSelected().getValue().setFirst(editName.getText().toString());
-            //dataViewModel.getUserSelected().getValue().setFirst(editSurnames.getText().toString());
-            //dataViewModel.getUserSelected().getValue().setFirst(editEmail.getText().toString());
-            //dataViewModel.getUserSelected().getValue().setFirst(editPsw.getText().toString());
             return true;
         }
         return false;

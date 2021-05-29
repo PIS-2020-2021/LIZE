@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private static final int REQUEST_CODE_ADD_AMBITO = 3;
+    private static final int REQUEST_CODE_UPDATE_USER = 4;
     private static final int THEME_UPDATE_DURATION = 1000;
 
     private MainViewModel dataViewModel;
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         settings.setOnClickListener(v -> {
             Intent intent_Settings = new Intent(this, AjustesActivity.class);
             intent_Settings.putStringArrayListExtra("Info_User", dataViewModel.getUserSelected().getValue().getInfoUser());
-            startActivity(intent_Settings);
+            startActivityForResult(intent_Settings, REQUEST_CODE_UPDATE_USER);
         });
 
         //Asignamos Boton y Listener a signOut
@@ -258,6 +259,19 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 Log.d("Nombre", name);
                 Log.d("Color ", String.valueOf(color));
                 ambitoHostFragment.addAmbito(name, color);
+
+            } else if (requestCode == REQUEST_CODE_UPDATE_USER && resultCode == RESULT_OK) {
+                String name = bundle.getString("name");
+                String surnames = bundle.getString("surnames");
+                String email = bundle.getString("email");
+                String psw = bundle.getString("psw");
+                Log.d("Nombre", name);
+                Log.d("Apellidos", surnames);
+                Log.d("Email", email);
+                Log.d("Contraseña", psw);
+                dataViewModel.editUser(name, surnames, email, psw);
+                dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), 0));
+
 
             } else Log.d(TAG, "Invalid RESULT from NoteActivity: " + resultCode);
 
