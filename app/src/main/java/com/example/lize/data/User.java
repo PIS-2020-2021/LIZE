@@ -83,6 +83,16 @@ public class User {
         return ambitoColors;
     }
 
+    public ArrayList<String> getInfoUser(){
+        ArrayList<String> info = new ArrayList<>();
+        info.add(getFirst());
+        info.add(getLast());
+        info.add(getMail());
+        info.add(getPassword());
+        info.add(String.valueOf(ambitos.size()));
+        return info;
+    }
+
     public void swapAmbitos(int initialPosition, int finalPosition){
         ambitos.get(initialPosition).setPosition(finalPosition);
         ambitos.get(finalPosition).setPosition(initialPosition);

@@ -46,7 +46,9 @@ import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 
-;import java.util.Timer;
+;import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -126,7 +128,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         //Asignamos Boton y Listener a settings
         this.settings = findViewById(R.id.settingsButton);
         settings.setOnClickListener(v -> {
-            startActivity(new Intent(this, AjustesActivity.class));
+            Intent intent_Settings = new Intent(this, AjustesActivity.class);
+            intent_Settings.putStringArrayListExtra("Info_User", dataViewModel.getUserSelected().getValue().getInfoUser());
+            startActivity(intent_Settings);
         });
 
         //Asignamos Boton y Listener a signOut

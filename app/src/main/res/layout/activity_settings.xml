@@ -40,7 +40,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tv_name"
+            android:id="@+id/user_full_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/imgUser"
@@ -56,7 +56,7 @@
             android:id="@+id/tv_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_name"
+            android:layout_below="@+id/user_full_name"
             android:layout_centerHorizontal="true"
             android:fontFamily="sans-serif"
             android:text="@string/lize"
@@ -104,6 +104,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/numNotas"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
@@ -141,6 +142,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/numAmbitos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
@@ -175,92 +177,13 @@
             android:layout_centerInParent="true"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/email"
-                    android:textColor="#3797CF"
-                    android:textSize="13sp" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/emailInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:theme="@style/Theme.hint"
-                    android:background="@android:color/transparent"
-                    android:layout_marginTop="5dp">
-
-                    <EditText
-                        android:id="@+id/emailSettings"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:autofillHints=""
-                        android:background="#33FFFFFF"
-                        android:text="@string/email"
-                        android:inputType="textEmailAddress"
-                        android:maxLines="1"
-                        android:paddingStart="5dp"
-                        android:paddingRight="5dp"
-                        android:singleLine="true"
-                        android:paddingLeft="5dp" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/password"
-                    android:textColor="#3797CF"
-                    android:textSize="13sp" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/pswInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:theme="@style/Theme.hint"
-                    android:background="@android:color/transparent"
-                    android:layout_marginTop="5dp"
-                    app:passwordToggleEnabled="true">
-
-                    <EditText
-                        android:id="@+id/contraseña"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:autofillHints=""
-                        android:background="#33FFFFFF"
-                        android:text="@string/password"
-                        android:inputType="textPassword"
-                        android:maxLines="1"
-                        android:paddingStart="5dp"
-                        android:singleLine="true"
-                        android:paddingLeft="5dp" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="10dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -301,7 +224,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_margin="5dp"
+                android:layout_marginTop="10dp"
                 android:background="@android:color/transparent"
                 android:orientation="vertical">
 
@@ -322,7 +245,7 @@
                     android:layout_marginTop="5dp">
 
                     <EditText
-                        android:id="@+id/apellidos"
+                        android:id="@+id/surnamesSettings"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
@@ -333,6 +256,86 @@
                         android:maxLines="1"
                         android:paddingStart="5dp"
                         android:paddingRight="5dp"
+                        android:singleLine="true"
+                        android:paddingEnd="5dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/email"
+                    android:textColor="#3797CF"
+                    android:textSize="13sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/emailInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/Theme.hint"
+                    android:background="@android:color/transparent"
+                    android:layout_marginTop="5dp">
+
+                    <EditText
+                        android:id="@+id/emailSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:autofillHints=""
+                        android:background="#33FFFFFF"
+                        android:text="@string/email"
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1"
+                        android:paddingStart="5dp"
+                        android:paddingRight="5dp"
+                        android:singleLine="true"
+                        android:paddingLeft="5dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/password"
+                    android:textColor="#3797CF"
+                    android:textSize="13sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/pswInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/Theme.hint"
+                    android:background="@android:color/transparent"
+                    android:layout_marginTop="5dp">
+
+                    <EditText
+                        android:id="@+id/pswSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:autofillHints=""
+                        android:background="#33FFFFFF"
+                        android:text="@string/password"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp"
                         android:singleLine="true"
                         android:paddingLeft="5dp" />
 
