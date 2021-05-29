@@ -126,7 +126,7 @@ public class LogInActivity extends AppCompatActivity {
                 isPasswordValid = false;
 
             } else if (password.getText().length() < 8) {
-                passError.setError(getResources().getString(R.string.error_invalid_pwd));
+                passError.setError(getResources().getString(R.string.error_invalid_pwd_Login));
                 Toast.makeText(getApplicationContext(), passError.getError(), Toast.LENGTH_SHORT).show();
                 isPasswordValid = false;
 

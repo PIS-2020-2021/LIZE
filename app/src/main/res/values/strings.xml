@@ -3,6 +3,8 @@
     <string name="error_campo_vacio">Rellene todos los campos.</string>
     <string name="error_invalid_email">Introduzca un email válido.</string>
     <string name="error_invalid_pwd">La contraseña debe tener 8 caracteres mínimo.</string>
+    <string name="error_invalid_pwd_Login">La contraseña es incorrecta.</string>
+    <string name="error_invalid_pwd_Signup">Ambas contraseñas deben coincidir.</string>
     <string name="LOGIN">Login</string>
     <string name="create_new" />
     <string name="prompt_password">Contraseña</string>
@@ -117,6 +119,7 @@
     <string name="email">Email</string>
     <string name="name">Name</string>
     <string name="guardar_cambios">Guardar cambios</string>
+    <string name="repetir_la_contrasena">Repetir la contraseña</string>
 
 
 </resources>
