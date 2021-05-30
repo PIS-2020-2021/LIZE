@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
@@ -59,6 +60,8 @@ public class DatabaseAdapter {
 
     public final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
+    private final StorageReference mStorageRef = storage.getReference();
+
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser user;
 
@@ -198,7 +201,7 @@ public class DatabaseAdapter {
                     note.setAudiosID(document.getString("audiosID"));
                     ambitoNotes.add(note);
                 }
-                if(loader != null) loader.getNoteCollectionResult(ambitoID, ambitoNotes);
+                if (loader != null) loader.getNoteCollectionResult(ambitoID, ambitoNotes);
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
@@ -323,6 +326,56 @@ public class DatabaseAdapter {
                 .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar la nota", e));
     }
 
+    /**
+     * Eliminamos las imagenes asociadas a una imageID
+     * @param imagesID ID del array de imagenes asociada a la DB
+     */
+    public void deleteImages(String imagesID){
+        DocumentReference imagesRef = db.collection("images").document(imagesID);
+        imagesRef.get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                try {
+                    DocumentSnapshot document = task.getResult();
+                    List<String> group = (List<String>) document.get("images");
+                    for (String stringAux: group) {
+                        StorageReference singleDoc = mStorageRef.child(stringAux);
+                        singleDoc.delete();
+                    }
+                } catch (NullPointerException exception){
+                    Log.w(TAG, "Failed to get Collection of images of  " + imagesID + ": null pointer exception.");
+                }
+            } else Log.d(TAG, "Error al eliminar la coleccion de imagenes: ", task.getException());
+        });
+
+        imagesRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + imagesID, e));
+    }
+
+    /**
+     * Eliminamos las imagenes asociadas a una imageID
+     * @param documentsID ID del array de imagenes asociada a la DB
+     */
+    public void deleteDocuments(String documentsID){
+        DocumentReference documentsRef = db.collection("documents").document(documentsID);
+        documentsRef.get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                try {
+                    DocumentSnapshot document = task.getResult();
+                    List<String> group = (List<String>) document.get("files");
+                    for (String stringAux: group) {
+                        StorageReference singleDoc = mStorageRef.child(stringAux);
+                        singleDoc.delete();
+                    }
+                } catch (NullPointerException exception){
+                    Log.w(TAG, "Failed to get Collection of images of  " + documentsID + ": null pointer exception.");
+                }
+            } else Log.d(TAG, "Error al eliminar la coleccion de imagenes: ", task.getException());
+        });
+
+        documentsRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + documentsID, e));
+    }
+
 
     /**
      * Eliminamos la subcolección de notas cuyo valor del campo "folderTAG" sea el pasado por parámetro.
@@ -359,6 +412,10 @@ public class DatabaseAdapter {
                 try {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         deleteNote(document.getId());
+                        boolean hey = (boolean) document.get("images");
+                        String heyy = (String) document.get("imagesID");
+                        if((boolean) document.get("images")) deleteImages((String) document.get("imagesID"));
+                        if((boolean) document.get("documents")) deleteDocuments((String) document.get("documentsID"));
                     }
                     Log.d(TAG, "Colección de Notas de " + ambitoID + " eliminado correctamente");
                 } catch (NullPointerException exception){

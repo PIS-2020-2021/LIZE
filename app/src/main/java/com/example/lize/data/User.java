@@ -9,7 +9,7 @@ public class User {
     private String mail;
     private String password;
     private String selfID;
-    // TODO: Imagen de User
+
     // TODO: username implementation! private String username;
 
     private ArrayList<Ambito> ambitos;
@@ -75,12 +75,32 @@ public class User {
 
     public void setAmbitos(ArrayList<Ambito> ambitos) { this.ambitos = ambitos; }
 
+    public String getTotalNotes() {
+        int totalNotes = 0;
+        for (Ambito ambito: this.ambitos) {
+            totalNotes += ambito.getNumberOfNotes();
+        }
+        return String.valueOf(totalNotes);
+    }
+
     public ArrayList<Integer> getColorsTaken(){
         ArrayList<Integer> ambitoColors = new ArrayList<>();
         for (Ambito ambito: this.ambitos)
             ambitoColors.add(ambito.getColor());
         Collections.sort(ambitoColors);
         return ambitoColors;
+    }
+
+    public ArrayList<String> getInfoUser(){
+        ArrayList<String> info = new ArrayList<>();
+        info.add(getFirst());
+        info.add(getLast());
+        info.add(getMail());
+        info.add(getPassword());
+        info.add(String.valueOf(ambitos.size()));
+        info.add(getSelfID());
+        info.add(getTotalNotes());
+        return info;
     }
 
     public void swapAmbitos(int initialPosition, int finalPosition){

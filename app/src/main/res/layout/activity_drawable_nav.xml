@@ -37,52 +37,46 @@
     android:layout_height="match_parent"
     android:layout_gravity="start">
 
-        <ScrollView
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
-            android:fillViewport="true">
+            android:orientation="vertical">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <include
+                layout="@layout/header" />
+
+
+            <fragment
+                android:layout_below="@+id/headerView"
+                android:id="@+id/ambitos_host_fragment"
+                android:name="com.example.lize.workers.AmbitoHostFragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/layoutSignOut" />
 
-                <include
-                    layout="@layout/header" />
+            <LinearLayout
+                android:layout_alignParentBottom="true"
+                android:id="@+id/layoutSignOut"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:background="#ffffff"
+                android:gravity="bottom"
+                android:paddingTop="3dp"
+                android:paddingBottom="6dp">
 
-                <fragment
-                    app:layout_constraintTop_toBottomOf="@id/headerView"
-                    android:id="@+id/ambitos_host_fragment"
-                    android:name="com.example.lize.workers.AmbitoHostFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <LinearLayout
-                    app:layout_constraintBottom_toBottomOf="parent"
+                <Button
+                    android:id="@+id/sign_out"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:orientation="vertical"
-                    android:background="#ffffff"
-                    android:gravity="bottom"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="6dp">
+                    android:layout_gravity="center"
+                    android:radius="50dip"
+                    android:text="@string/salir"
+                    app:cornerRadius="50dp"
+                    app:elevation="7dp" />
 
-                    <Button
-                        android:id="@+id/sign_out"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:radius="50dip"
-                        android:text="@string/salir"
-                        app:cornerRadius="50dp"
-                        app:elevation="7dp" />
-
-                </LinearLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </ScrollView>
-
-
+            </LinearLayout>
+        </RelativeLayout>
 
     </com.google.android.material.navigation.NavigationView>
 

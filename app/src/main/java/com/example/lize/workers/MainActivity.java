@@ -1,22 +1,15 @@
 package com.example.lize.workers;
 
-import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.TimeInterpolator;
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -25,15 +18,8 @@ import android.view.MenuItem;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.Transformation;
-import android.widget.Adapter;
+
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -48,20 +34,23 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
-
-;import java.util.ArrayList;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
-public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener{
+public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
 
     public static final String TAG = "MainActivity";
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private static final int REQUEST_CODE_ADD_AMBITO = 3;
+    public static final int REQUEST_CODE_EDIT_AMBITO = 4;
+    private static final int REQUEST_CODE_UPDATE_USER = 5;
     private static final int THEME_UPDATE_DURATION = 1000;
 
     private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
@@ -80,7 +69,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private DrawerLayout drawerLayout;              //Declaramos DrawerLayout
     private ActionBarDrawerToggle mDrawerToggle;    //Declaramos Toggle
     private Button addAmbito;                       //Declaramos Botones
+    private Button darkMode;
     private Button signOut;
+    private Button settings;
 
     private Toast toastReference;
 
@@ -126,6 +117,24 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             Intent intent = new Intent(getApplicationContext(), NewAmbitoActivity.class);
             intent.putIntegerArrayListExtra("Ambitos", dataViewModel.getUserSelected().getValue().getColorsTaken());
             startActivityForResult(intent, REQUEST_CODE_ADD_AMBITO);
+        });
+
+        //Asignamos Boton y Listener a addAmbito
+        this.darkMode = findViewById(R.id.darkModeButton);
+        darkMode.setOnClickListener(v -> {
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            }
+        });
+
+        //Asignamos Boton y Listener a settings
+        this.settings = findViewById(R.id.settingsButton);
+        settings.setOnClickListener(v -> {
+            Intent intent_Settings = new Intent(this, AjustesActivity.class);
+            intent_Settings.putStringArrayListExtra("Info_User", dataViewModel.getUserSelected().getValue().getInfoUser());
+            startActivityForResult(intent_Settings, REQUEST_CODE_UPDATE_USER);
         });
 
         //Asignamos Boton y Listener a signOut
@@ -175,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
 
         // Observador del Usuario seleccionado. Inicializa el HeaderNavigationView.
-        dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), 0));
+        dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), user.getSelfID()));
 
         // Observador del Ámbito seleccionado.
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
@@ -188,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     /**
      * Implementación del método OnMenuItemClick para definir las acciones de los items del Toolbar.
      * @param item item del Toolbar: search, sandwich
+     * @return True si se ha hecho click en alguno de ellos, False si no
      */
     @Override
     public boolean onMenuItemClick(MenuItem item) {
@@ -222,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //assert data != null;
         Bundle bundle = data.getExtras();
         if (bundle != null) {
             Log.d(TAG, "Received new Bundle Data: " + bundle.toString());
@@ -264,6 +275,28 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 dataViewModel.addAmbito(name, color);
                 // ambitoHostFragment.addAmbito(name, color);
 
+            } else if(requestCode == REQUEST_CODE_EDIT_AMBITO && resultCode == RESULT_OK) {
+                String name = bundle.getString("name");
+                int color = (int) bundle.getLong("color");
+                String selfID = bundle.getString("selfID");
+                Log.d("Nombre", name);
+                Log.d("Color ", String.valueOf(color));
+                Log.d("SelfID ", String.valueOf(selfID));
+
+                dataViewModel.editAmbito(selfID, name, color);
+
+            } else if (requestCode == REQUEST_CODE_UPDATE_USER && resultCode == RESULT_OK) {
+                String name = bundle.getString("name");
+                String surnames = bundle.getString("surnames");
+                String email = bundle.getString("email");
+                String psw = bundle.getString("psw");
+                Log.d("Nombre", name);
+                Log.d("Apellidos", surnames);
+                Log.d("Email", email);
+                Log.d("Contraseña", psw);
+                dataViewModel.editUser(name, surnames, email, psw);
+                dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), user.getSelfID()));
+
             } else Log.d(TAG, "Invalid RESULT from NoteActivity: " + resultCode);
         }
         else Log.d(TAG, "Null bundle");
@@ -273,18 +306,21 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      * Setea el Header de la MainActivity
      * @param name nombre del User
      * @param eMail email del User
-     * @param imgProfile Imagen del User
      */
-    private void initHeaderNavigationView(String name, String eMail, int imgProfile){
-        View header = (View) findViewById(R.id.headerView);
+    private void initHeaderNavigationView(String name, String eMail, String userID){
+        View header = findViewById(R.id.headerView);
 
-        TextView headerName = (TextView) header.findViewById(R.id.name_header);
-        TextView headerEMail = (TextView) header.findViewById(R.id.email_header);
+        TextView headerName = header.findViewById(R.id.name_header);
+        TextView headerEMail = header.findViewById(R.id.email_header);
         CircleImageView headerImgProfile = header.findViewById(R.id.circleImageView_header);
+
 
         if(name != null) headerName.setText(name);
         if(eMail != null)  headerEMail.setText(eMail);
-        //if(imgProfile != -1) headerImgProfile.setImageResource(imgProfile);
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+        StorageReference profileRef = storageReference.child("/profileUser_" + userID + ".png");
+        profileRef.getDownloadUrl().addOnSuccessListener(downloadUrl -> Picasso.get().load(downloadUrl).into(headerImgProfile));
+
     }
 
     /**

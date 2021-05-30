@@ -20,11 +20,11 @@ import android.widget.EditText;
 
 public class SignUpActivity extends AppCompatActivity {
         // Variables
-        EditText nombre, apellidos, email, psw;
+        EditText nombre, apellidos, email, psw, pswCheck;
         Button signup;
         TextView login;
         boolean isNameValid, isEmailValid, isPasswordValid;
-        TextInputLayout nameError,surnameError, emailError, passError;
+        TextInputLayout nameError,surnameError, emailError, passError, passErrorCheck;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +35,14 @@ public class SignUpActivity extends AppCompatActivity {
             apellidos = findViewById(R.id.apellidos);
             email = findViewById(R.id.email_header);
             psw = findViewById(R.id.password_login);
+            pswCheck = findViewById(R.id.password_login_second);
             login = findViewById(R.id.login);
             signup = findViewById(R.id.signup);
             nameError = findViewById(R.id.nameError);
             surnameError = findViewById(R.id.surnameError);
             emailError = findViewById(R.id.emailError);
             passError = findViewById(R.id.passError);
+            passErrorCheck = findViewById(R.id.passErrorCheck);
 
             signup.setOnClickListener(v ->
             {
@@ -73,7 +75,7 @@ public class SignUpActivity extends AppCompatActivity {
             nameError.setError(getResources().getString(R.string.demasiados_caracteres));
             Toast.makeText(getApplicationContext(), nameError.getError(), Toast.LENGTH_SHORT).show();
             isNameValid = false;
-        } else  {
+        } else {
             isNameValid = true;
             nameError.setErrorEnabled(false);
         }
@@ -87,7 +89,7 @@ public class SignUpActivity extends AppCompatActivity {
             surnameError.setError(getResources().getString(R.string.demasiados_caracteres));
             Toast.makeText(getApplicationContext(), surnameError.getError(), Toast.LENGTH_SHORT).show();
             isNameValid = false;
-        } else  {
+        } else {
             isNameValid = true;
             surnameError.setErrorEnabled(false);
         }
@@ -101,7 +103,7 @@ public class SignUpActivity extends AppCompatActivity {
             emailError.setError(getResources().getString(R.string.error_invalid_email));
             isEmailValid = false;
             Toast.makeText(getApplicationContext(), emailError.getError(), Toast.LENGTH_SHORT).show();
-        } else  {
+        } else {
             isEmailValid = true;
             emailError.setErrorEnabled(false);
         }
@@ -115,9 +117,14 @@ public class SignUpActivity extends AppCompatActivity {
             passError.setError(getResources().getString(R.string.error_invalid_pwd));
             isPasswordValid = false;
             Toast.makeText(getApplicationContext(), passError.getError(), Toast.LENGTH_SHORT).show();
-        } else  {
+        } else if (!psw.getText().toString().equals(pswCheck.getText().toString())) {
+            passErrorCheck.setError(getResources().getString(R.string.error_invalid_pwd_Signup));
+            isPasswordValid = false;
+            Toast.makeText(getApplicationContext(), passErrorCheck.getError(), Toast.LENGTH_SHORT).show();
+        }else  {
             isPasswordValid = true;
             passError.setErrorEnabled(false);
+            passErrorCheck.setErrorEnabled(false);
         }
 
         if (isNameValid && isEmailValid && isPasswordValid) {

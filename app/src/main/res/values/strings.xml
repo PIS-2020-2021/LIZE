@@ -3,6 +3,8 @@
     <string name="error_campo_vacio">Rellene todos los campos.</string>
     <string name="error_invalid_email">Introduzca un email válido.</string>
     <string name="error_invalid_pwd">La contraseña debe tener 8 caracteres mínimo.</string>
+    <string name="error_invalid_pwd_Login">La contraseña es incorrecta.</string>
+    <string name="error_invalid_pwd_Signup">Ambas contraseñas deben coincidir.</string>
     <string name="LOGIN">Login</string>
     <string name="create_new" />
     <string name="prompt_password">Contraseña</string>
@@ -90,6 +92,7 @@
     <string name="naranja">Naranja</string>
     <string name="marr_n">Marrón</string>
     <string name="nuevo_ambito">Nuevo Ambito</string>
+    <string name="editar_ambito">Editar Ambito</string>
     <string name="introduce_aqu_el_nombre">Introduce aquí el nombre</string>
     <string name="salir">Salir</string>
     <string name="boton_redondo">boton redondo</string>
@@ -103,9 +106,20 @@
     <string name="textview">TextView</string>
     <string name="documents">documents</string>
     <string name="barra">|</string>
-    <string name="editar_ambito">Editar Ambito</string>
     <string name="eliminar_ambito">Eliminar Ambito</string>
     <string name="note_default_metadata">ambitoID - folderTag - last connection</string>
+    <string name="numero_notas">Nº notas</string>
+    <string name="numero_total_de_notas">numero total de notas</string>
+    <string name="n_de_mbitos">Nº de ámbitos</string>
+    <string name="numero_de_ambitos">Numero de ambitos</string>
+    <string name="password">Password</string>
+    <string name="surnames">Surnames</string>
+    <string name="lize">LIZE</string>
+    <string name="foto_de_perfil">foto de perfil</string>
+    <string name="email">Email</string>
+    <string name="name">Name</string>
+    <string name="guardar_cambios">Guardar cambios</string>
+    <string name="repetir_la_contrasena">Repetir la contraseña</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="save_audio">Save Audio</string>
