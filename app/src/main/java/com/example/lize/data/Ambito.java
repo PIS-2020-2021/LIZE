@@ -59,7 +59,6 @@ public class Ambito {
         this.userID = userID;
     }
 
-
     public int getPosition() {
         return position;
     }
@@ -67,8 +66,6 @@ public class Ambito {
     public void setPosition(int position) {
         this.position = position;
     }
-
-    public ArrayList<Note> getNotes() { return this.notes; }
 
     public ArrayList<Folder> getFolders() { return new ArrayList<>(folders.values()); }
 
@@ -80,6 +77,10 @@ public class Ambito {
         if (!folders.containsKey(folderName))
             folders.put(folderName, new Folder(folderName));
     }
+
+    public ArrayList<Note> getNotes() { return this.notes; }
+
+    public int getNumberOfNotes() { return this.notes.size(); }
 
     public void addNote(Note note){
         this.notes.add(note);

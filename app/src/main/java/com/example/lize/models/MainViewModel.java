@@ -16,6 +16,8 @@ import com.example.lize.data.Ambito;
 import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.example.lize.workers.MainActivity;
 
 import java.util.ArrayList;
@@ -194,9 +196,9 @@ public class MainViewModel extends ViewModel{
      * Actualizamos el contenido del Ambito editado
      * @param ambitoName Nombre del Ambito editado.
      * @param ambitoColor Color del Ámbito editado.
-     * @throws NullPointerException Si la Nota Editada no ha sido correctamente seleccionada.
+     * @throws NullPointerException Si el Ambito editado no ha sido correctamente seleccionado.
      */
-    public void editAmbito(String ambitoID, String ambitoName, int ambitoColor){
+    public void editAmbito(String ambitoID, String ambitoName, int ambitoColor) {
         try {
             for (Ambito ambito : mUserSelected.getValue().getAmbitos()){
                 if(ambito.getSelfID().equals(ambitoID)){
@@ -207,14 +209,49 @@ public class MainViewModel extends ViewModel{
                     setToast("Ambito " + ambitoName + " correctly edited.");                                          // Creamos Toast Informativo
                     return;
                 }
-            } Log.w(TAG, "Failed to select ambito " + ambitoID + ": invalid ID.");
+            }
+            selected.setName(ambitoName);
+            selected.setColor(ambitoColor);
+            if (mAmbitoSelected.getValue().getSelfID().equals(ambitoID)) mAmbitoSelected.setValue(selected);     // Actualizamos el Ambito editado
+            DatabaseAdapter.getInstance().saveAmbito(selected);                                                 // Guardamos el Ambito en DB
+            setToast("Ambito " + ambitoName + " correctly edited.");                                            // Creamos Toast Informativo
+           
 
-        }catch(NullPointerException exception){
+        }catch (NullPointerException exception) {
             Log.w(TAG, "Failed to edit ambito " + ambitoName + ": null pointer exception.");
             Log.w(TAG, "Exception message: " + exception.getMessage());
         }
     }
 
+
+    /**
+     * Actualizamos el contenido del Ambito editado
+     * @param name Nombre del user editado.
+     * @param apellidos Apellidos del user editado.
+     * @param email Mail del user editado.
+     * @param password Contraseña del user editado.
+     * @throws NullPointerException Si el User editado no ha sido correctamente seleccionado.
+     */
+    public void editUser(String name, String apellidos, String email, String password){
+        try {
+            User selected = mUserSelected.getValue();
+
+            FirebaseAuth.getInstance().getCurrentUser().updateEmail(email);
+            FirebaseAuth.getInstance().getCurrentUser().updatePassword(password);
+
+            selected.setFirst(name);
+            selected.setLast(apellidos);
+            selected.setMail(email);
+            selected.setPassword(password);
+
+            DatabaseAdapter.getInstance().saveUser(selected);                                                 // Guardamos el Ambito en DB
+            setToast("User " + name + " correctly edited.");    // Creamos Toast Informativo
+
+        } catch (NullPointerException exception) {
+            Log.w(TAG, "Failed to edit user " + name + ": null pointer exception.");
+            Log.w(TAG, "Exception message: " + exception.getMessage());
+        }
+    }
 
     /**
      * Actualizamos la posición de los Ambitos en el RecyclerView
