@@ -4,6 +4,7 @@
 
     package="com.example.lize">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -16,16 +17,20 @@
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
         android:theme="@style/Theme.Lize">
+
         <provider
-            tools:replace="android:authorities"
+
             android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.authority"
+            android:authorities="com.example.lize.fileprovider"
+            android:grantUriPermissions="true"
             android:exported="false"
-            android:grantUriPermissions="true">
+            tools:replace="android:authorities">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+
         <activity android:name=".workers.NewAmbitoActivity" />
 
         <activity
