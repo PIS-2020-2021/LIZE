@@ -14,6 +14,8 @@ import com.example.lize.data.Ambito;
 import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -215,10 +217,17 @@ public class MainViewModel extends ViewModel{
         try {
             User selected = mUserSelected.getValue();
 
+            String userUID = FirebaseAuth.getInstance().getUid();
+            FirebaseAuth.getInstance().getCurrentUser().updateEmail(email);
+            FirebaseAuth.getInstance().getCurrentUser().updatePassword(password);
+
             selected.setFirst(name);
             selected.setLast(apellidos);
             selected.setMail(email);
             selected.setPassword(password);
+
+
+
 
             DatabaseAdapter.getInstance().saveUser(selected);                                                 // Guardamos el Ambito en DB
             setToast("User " + name + " correctly edited.");    // Creamos Toast Informativo
