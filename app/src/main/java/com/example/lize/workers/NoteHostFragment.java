@@ -211,7 +211,6 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
                 popupWindow.dismiss();
             }
         });
-
     }
 
     /**
