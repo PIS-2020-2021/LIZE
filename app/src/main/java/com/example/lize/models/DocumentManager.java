@@ -2,6 +2,7 @@ package com.example.lize.models;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 
@@ -50,7 +51,7 @@ public class DocumentManager {
     private StorageTask mUploadTask;
     private Map<String, ArrayList<Image>> imagesNote;
     private Map<String, ArrayList<Document>> documentsNote;
-    private Map<String, ArrayList<String>> audiosNote;
+    private Map<String, ArrayList<Audio>> audiosNote;
 
     private synchronized static void createInstance() {
         if (documentManager == null) {
@@ -475,16 +476,15 @@ public class DocumentManager {
             noteRef = db.collection("audios").document(AudiosID);
         }
         if (audiosNote.containsKey(AudiosID)) {
-            audiosNote.get(AudiosID).add(a.getAddress());
+            audiosNote.get(AudiosID).add(a);
         } else {
-            ArrayList<String> audios = new ArrayList<>();
-            audios.add(a.getAddress());
+            ArrayList<Audio> audios = new ArrayList<>();
+            audios.add(a);
             audiosNote.put(AudiosID, audios);
-            //notas.get(DocumentsID).getDocuments().add(doc);
         }
 
         if(audiosNote.get(AudiosID).size() == 1) {
-            String ref = a.getAddress();// "-img-" + notas.get(DocumentsID).getBitmaps().indexOf(image);
+            String ref = a.getID();// "-img-" + notas.get(DocumentsID).getBitmaps().indexOf(image);
             uploadAudio(a);
             Map<String, Object> noteAudios = new HashMap<>();
             ArrayList<String> files = new ArrayList<>();
@@ -509,9 +509,9 @@ public class DocumentManager {
             notasRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    List<String> group = (List<String>) document.get("audios");
+                    List<String> group = (List<String>) document.get("files");
                     ArrayList<String> files = (ArrayList<String>) group;
-                    String ref = a.getAddress();//+ "-img-" + (notas.get(finalDocumentsID2).getBitmaps().indexOf(image)) ;
+                    String ref = a.getID();//+ "-img-" + (notas.get(finalDocumentsID2).getBitmaps().indexOf(image)) ;
 
                     files.add(ref);
                     uploadAudio(a);
@@ -542,7 +542,7 @@ public class DocumentManager {
         //byte[] data = baos.toByteArray();
 
 
-        StorageReference file = mStorageRef.child(audio.getAddress());
+        StorageReference file = mStorageRef.child(audio.getID());
         mUploadTask = file.putFile(Uri.fromFile(new File(audio.getAddress()))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -554,14 +554,14 @@ public class DocumentManager {
     }
 
     public void removeAudioFromNote(String AudiosID, Audio currentItem) {
-        String ref = currentItem.getAddress();//+ "-img-" + (currentItem);
+        String ref = currentItem.getID();//+ "-img-" + (currentItem);
         DocumentReference notasRef = db.collection("audios").document(AudiosID);
 
         audiosNote.get(AudiosID).remove(currentItem);
         notasRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
-                List<String> group = (List<String>) document.get("audios");
+                List<String> group = (List<String>) document.get("files");
                 ArrayList<String> audios = (ArrayList<String>) group;
                 audios.remove(ref);
 
@@ -583,13 +583,13 @@ public class DocumentManager {
     }
 
 
-    public ArrayList<String> getAudios(String AudiosID) {
+    public ArrayList<Audio> getAudios(String AudiosID) {
 
-        if (audiosNote.containsKey( AudiosID)) {
+        if (audiosNote.containsKey(AudiosID)) {
             return audiosNote.get(AudiosID);
 
         } else {
-            ArrayList<String> audios = new ArrayList<>();
+            ArrayList<Audio> audios = new ArrayList<>();
 
             DocumentReference notasRef = db.collection("audios").document(AudiosID);
             notasRef.get().addOnCompleteListener(task -> {
@@ -598,21 +598,34 @@ public class DocumentManager {
                     List<String> group = (List<String>) document.get("files");
                     ArrayList<String> files = (ArrayList<String>) group;
                     for(String audio :files){
-                        audios.add(audio);
+                        String filename = context.getExternalCacheDir().getAbsolutePath() + File.separator + audio + ".3gp";
                         StorageReference singleDoc = mStorageRef.child(audio);
-                        File file = new File(audio);
-                        singleDoc.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                // Local temp file has been created
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Handle any errors
-                            }
-                        });
 
+                        File file = new File(filename);
+                        if(!file.exists()){
+                            singleDoc.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                    // Local temp file has been created
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle any errors
+                                }
+                            });
+                        }
+                        int duration = 1;
+                        MediaPlayer mp = new MediaPlayer();
+                        try {
+                            mp.setDataSource(filename);
+                             duration = mp.getDuration();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        audios.add(new Audio(audio,filename,duration));
                 }
 
             }});

@@ -194,6 +194,8 @@ public class DatabaseAdapter {
                     note.setImagesID(document.getString("imagesID"));
                     note.setHaveImages(document.getBoolean("images"));
                     note.setHaveDocuments(document.getBoolean("documents"));
+                    note.setHaveAudios(document.getBoolean("audios"));
+                    note.setAudiosID(document.getString("AudioID"));
                     ambitoNotes.add(note);
                 }
                 if(loader != null) loader.getNoteCollectionResult(ambitoID, ambitoNotes);
@@ -296,6 +298,8 @@ public class DatabaseAdapter {
         notesData.put("imagesID",note.getImagesID());
         notesData.put("documents",note.getHaveDocuments());
         notesData.put("images",note.getHaveImages());
+        notesData.put("audiosID",note.getAudiosID());
+        notesData.put("audios",note.getHaveAudios());
 
         noteRef.set(notesData).addOnCompleteListener(new OnCompleteListener(){
             @Override

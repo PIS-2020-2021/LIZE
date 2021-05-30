@@ -24,7 +24,6 @@ import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -79,8 +78,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -115,11 +112,12 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     private DocumentManager documentManager;
     private String documentsID;
     private String imagesID;
-    private String AudioID;
+    private String audiosID;
     private boolean initRecycleView = false;
     private MediaRecorder recorder;
     private boolean isRecording = false;
     private String fileName = new String();
+    private String singleAudioID;
     private long startAudio;
     private long endAudio;
     private Dialog recordDialog;
@@ -266,6 +264,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         if (bundle != null) {
             documentsID = bundle.getString("documentsID");
             imagesID = bundle.getString("imagesID");
+            audiosID = bundle.getString("audiosID");
             String title = bundle.getString("title");
             String html_text = bundle.getString("noteText_HTML");
             Log.d("Titulo", title);
@@ -284,6 +283,12 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
                     documentAdapter.addDocument(doc);
                 }
                 documentRecycleView.setVisibility(View.VISIBLE);
+            }
+            if(bundle.getBoolean("audios")){
+                for(Audio s: documentManager.getAudios(audiosID)){
+                    audioAdapter.addAudio(s);
+                }
+                audioAdapter.notifyDataSetChanged();
             }
 
         }
@@ -361,8 +366,11 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         nota.putString("noteText_PLAIN", rtEditText.getText(RTFormat.PLAIN_TEXT));
         nota.putBoolean("images", !documentManager.arrayImagesEmpty(imagesID));
         nota.putBoolean("documents", !(documentAdapter.getItemCount() == 0));
+        nota.putBoolean("audios", !(audioAdapter.getItemCount() == 0));
         nota.putString("documentsID", documentsID);
         nota.putString("imagesID", imagesID);
+        nota.putString("audiosID", audiosID);
+
         intent.putExtras(nota);
         setResult(validateNote(), intent);
         finish();
@@ -698,6 +706,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         DateFormat df = new SimpleDateFormat("yyMMddHHmmss", Locale.ITALY);
         String date = df.format(Calendar.getInstance().getTime());
         fileName = getExternalCacheDir().getAbsolutePath() + File.separator + date + ".3gp";
+        singleAudioID = date;
         Log.d("startRecording", fileName);
 
         recorder.setOutputFile(fileName);
@@ -721,8 +730,8 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         recorder.stop();
         recorder.release();
 
-        Audio a = new Audio(fileName,(endAudio-startAudio));
-        documentManager.addAudioToCloud(AudioID,a);
+        Audio a = new Audio(singleAudioID,fileName,(endAudio-startAudio));
+        audiosID = documentManager.addAudioToCloud(audiosID,a);
         audioAdapter.addAudio(a);
         recorder = null;
         isRecording = false;
@@ -767,7 +776,6 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     public void pausePlaying(int position) {
         try {
             player.pause();
-
             //notifyItemChanged(position);
 
         }catch (IllegalStateException e){
@@ -777,7 +785,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
     @Override
     public void removeAudio(int position) {
-
+        documentManager.removeAudioFromNote(audiosID,audioAdapter.getAudio(position));
     }
 }
 

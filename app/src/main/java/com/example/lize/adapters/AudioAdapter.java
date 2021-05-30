@@ -205,9 +205,9 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
     public void removeAudio(int position) {
-        localDataSet.remove(position);
         stateReproduction.remove(position);
         listener.removeAudio(position);
+        localDataSet.remove(position);
         notifyDataSetChanged();
     }
 

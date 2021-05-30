@@ -235,10 +235,12 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
                 Boolean images = bundle.getBoolean("images");
                 Boolean documents = bundle.getBoolean("documents");
-                String documentsID =  bundle.getString("documentsID");
-                String imagesID =  bundle.getString("imagesID");
+                Boolean audios = bundle.getBoolean("audios");
+                String  documentsID =  bundle.getString("documentsID");
+                String  imagesID =  bundle.getString("imagesID");
+                String  audiosID = bundle.getString("audiosID");
 
-                dataViewModel.addNote(title, plainText, htmlText, images, documents,documentsID,imagesID);
+                dataViewModel.addNote(title, plainText, htmlText, images, documents,audios,documentsID,imagesID,audiosID);
 
             } else if (requestCode == REQUEST_CODE_EDIT_NOTE && resultCode == RESULT_OK) {
                 Log.d(TAG, "Request Code for Note Editing OK");
@@ -249,8 +251,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 String imagesID =  bundle.getString("imagesID");
                 Boolean documents = bundle.getBoolean("documents");
                 String documentsID =  bundle.getString("documentsID");
-
-                dataViewModel.editNote(title, plainText, htmlText, images, documents,documentsID,imagesID);
+                Boolean audios = bundle.getBoolean("audios");
+                String  audiosID = bundle.getString("audiosID");
+                dataViewModel.editNote(title, plainText, htmlText, images, documents,audios,documentsID,imagesID,audiosID);
 
             } else if (requestCode == REQUEST_CODE_ADD_AMBITO && resultCode == RESULT_OK) {
                 String name = bundle.getString("name");

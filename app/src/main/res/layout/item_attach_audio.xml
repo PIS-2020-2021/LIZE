@@ -5,10 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="@dimen/_12sdp"
+    android:layout_marginLeft="@dimen/_10sdp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:gravity="center_vertical"
+
     android:padding="@dimen/_5sdp"
     android:layout_marginBottom="@dimen/_5sdp"
     tools:layout_editor_absoluteX="8dp"
