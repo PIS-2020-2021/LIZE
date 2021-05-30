@@ -217,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      * @param resultCode Resultado del Code
      * @param data Intent de retorno
      */
+    // TODO: Ojo que peta al acceder a un documento! data.getExtras con data null.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -249,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 Boolean documents = bundle.getBoolean("documents");
                 String documentsID =  bundle.getString("documentsID");
 
-                dataViewModel.editNote(title, plainText, htmlText, images, documents,documentsID,imagesID);
+                dataViewModel.editNote(title, plainText, htmlText, images, documents, documentsID, imagesID);
 
             } else if (requestCode == REQUEST_CODE_ADD_AMBITO && resultCode == RESULT_OK) {
                 String name = bundle.getString("name");
@@ -298,7 +299,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         TextView headerName = header.findViewById(R.id.name_header);
         TextView headerEMail = header.findViewById(R.id.email_header);
         CircleImageView headerImgProfile = header.findViewById(R.id.circleImageView_header);
-
 
         if(name != null) headerName.setText(name);
         if(eMail != null)  headerEMail.setText(eMail);
@@ -364,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      * @param v fab de nueva carpeta
      */
     private void showFolderMenu(View v) {
-        View popupView = getLayoutInflater().inflate(R.layout.popup_layout, null);
+        View popupView = getLayoutInflater().inflate(R.layout.popup_add, null);
         PopupWindow popupWindow = new PopupWindow(popupView, 800, 600);
         popupWindow.setFocusable(true);
         popupWindow.setBackgroundDrawable(new ColorDrawable());

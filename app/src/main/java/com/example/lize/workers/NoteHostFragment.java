@@ -2,6 +2,7 @@ package com.example.lize.workers;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.widget.PopupWindowCompat;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.fragment.app.Fragment;
 
@@ -12,9 +13,11 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,10 +29,14 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.Interpolator;
 import android.view.animation.Transformation;
+import android.widget.Button;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -41,6 +48,7 @@ import com.example.lize.data.Note;
 import com.example.lize.models.DocumentManager;
 import com.example.lize.models.MainViewModel;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 
@@ -189,15 +197,29 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         return true;
     }
 
-    //TODO: Implement CardNote #MOVE, #COPY & #DELETE operations
     @Override
     public void onCardNoteMoved(NoteAdapter.CardNote cardNote) {
+        View moveView = getLayoutInflater().inflate(R.layout.popup_move, null);
+        MoveWindow popupWindow = new MoveWindow( mContext, moveView,
+                dataViewModel.getUserSelected().getValue().getAmbitos());
 
+        popupWindow.showAtLocation(requireView(), Gravity.CENTER, 0, 0);
+        popupWindow.setWindowListener(new MoveWindow.MoveWindowListener() {
+            @Override
+            public void moveNote(String ambitoID, String folderID) {
+                dataViewModel.moveNote(ambitoID, folderID, cardNote.getNoteID());
+                popupWindow.dismiss();
+            }
+        });
     }
 
+    /**
+     * Método listener para duplicar la nota seleccionada (cardNote).
+     * @param cardNote cardNote seleccionado para duplicar.
+     */
     @Override
     public void onCardNoteCopy(NoteAdapter.CardNote cardNote) {
-
+        dataViewModel.copyNote(cardNote.getNoteID());
     }
 
     /**

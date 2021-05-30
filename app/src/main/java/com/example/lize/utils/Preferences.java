@@ -10,7 +10,7 @@ import com.example.lize.R;
 public class Preferences {
 
     private static int selectedTheme = R.style.Theme_Red;
-    private static int selectedAmbito;
+    private static int selectedColor;
 
     public static int getTheme(int color){
         switch (color){
@@ -28,7 +28,8 @@ public class Preferences {
     }
 
     public static void setSelectedTheme(int color){
-        switch (color){
+        selectedColor = color;
+        switch (selectedColor){
             case 1:     selectedTheme = R.style.Theme_Red; break;
             case 2:     selectedTheme = R.style.Theme_Purple; break;
             case 3:     selectedTheme = R.style.Theme_Indigo; break;
@@ -39,34 +40,31 @@ public class Preferences {
             case 8:     selectedTheme = R.style.Theme_Orange; break;
             case 9:     selectedTheme = R.style.Theme_Brown; break;
         }
-        selectedAmbito = color;
     }
 
     public static int getSelectedTheme() {
         return selectedTheme;
     }
 
+    public static int getSelectedColor() { return selectedColor; }
+
     public static void applySelectedTheme(ContextThemeWrapper contextThemeWrapper) {
         contextThemeWrapper.setTheme(selectedTheme);
     }
 
     public static int getAmbitoColor(int ambitoColor) {
-        if (ambitoColor == selectedAmbito) {
-            switch (ambitoColor) {
-                case 1:  return R.color.Ambito_Red;
-                case 2:  return R.color.Ambito_Purple;
-                case 3:  return R.color.Ambito_Indigo;
-                case 4:  return R.color.Ambito_Blue;
-                case 5:  return R.color.Ambito_Teal;
-                case 6:  return R.color.Ambito_Green;
-                case 7:  return R.color.Ambito_Yellow;
-                case 8:  return R.color.Ambito_Orange;
-                case 9:  return R.color.Ambito_Brown;
+        switch (ambitoColor) {
+            case 1:  return R.color.Ambito_Red;
+            case 2:  return R.color.Ambito_Purple;
+            case 3:  return R.color.Ambito_Indigo;
+            case 4:  return R.color.Ambito_Blue;
+            case 5:  return R.color.Ambito_Teal;
+            case 6:  return R.color.Ambito_Green;
+            case 7:  return R.color.Ambito_Yellow;
+            case 8:  return R.color.Ambito_Orange;
+            case 9:  return R.color.Ambito_Brown;
 
-                default: return R.color.Ambito_Red;
-            }
-        } else {
-            return R.color.white;
+            default: return R.color.white;
         }
     }
 
