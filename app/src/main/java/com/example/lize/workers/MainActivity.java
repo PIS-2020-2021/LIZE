@@ -1,22 +1,14 @@
 package com.example.lize.workers;
 
-import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.TimeInterpolator;
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -25,15 +17,7 @@ import android.view.MenuItem;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.Transformation;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -49,7 +33,7 @@ import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 
-;import java.util.ArrayList;
+;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -219,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      * @param resultCode Resultado del Code
      * @param data Intent de retorno
      */
+    // TODO: Ojo que peta al acceder a un documento! data.getExtras con data null.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -250,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 Boolean documents = bundle.getBoolean("documents");
                 String documentsID =  bundle.getString("documentsID");
 
-                dataViewModel.editNote(title, plainText, htmlText, images, documents,documentsID,imagesID);
+                dataViewModel.editNote(title, plainText, htmlText, images, documents, documentsID, imagesID);
 
             } else if (requestCode == REQUEST_CODE_ADD_AMBITO && resultCode == RESULT_OK) {
                 String name = bundle.getString("name");
@@ -340,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      * @param v fab de nueva carpeta
      */
     private void showFolderMenu(View v) {
-        View popupView = getLayoutInflater().inflate(R.layout.popup_layout, null);
+        View popupView = getLayoutInflater().inflate(R.layout.popup_add, null);
         PopupWindow popupWindow = new PopupWindow(popupView, 800, 600);
         popupWindow.setFocusable(true);
         popupWindow.setBackgroundDrawable(new ColorDrawable());

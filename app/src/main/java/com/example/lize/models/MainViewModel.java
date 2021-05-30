@@ -268,7 +268,7 @@ public class MainViewModel extends ViewModel{
      * @param text_html Texto en formato HTML de la Nota a añadir.
      * @throws NullPointerException Si el Ámbito actual no ha sido correctamente seleccionado.
      */
-    public void addNote(String noteName, String text_plain, String text_html,Boolean images,Boolean documents, String documentsID,String imagesID) {
+    public void addNote(String noteName, String text_plain, String text_html, Boolean images, Boolean documents, String documentsID, String imagesID) {
         try{
             Note newNote = new Note(noteName, text_plain, text_html);   // Creamos una nueva Nota
             newNote.setDocumentsID(documentsID);
@@ -314,6 +314,80 @@ public class MainViewModel extends ViewModel{
         setToast("Note " + title + " correctly edited.");           // Creamos Toast Informativo
     }
 
+
+    /**
+     * Duplicamos una nota de la colección de notas de la Carpeta seleccionada.
+     * Añadimos una nueva nota con los mismos atributos que la nota con ID 'noteID' (excepto el mismo ID)
+     * @param noteID ID de la nota a duplicar.
+     * @throws NullPointerException Si el Ámbito actual no ha sido correctamente seleccionado.
+     */
+    public void copyNote(String noteID) {
+        try{
+            for (Note note :mAmbitoSelected.getValue().getNotes()) {
+                if (note.getSelfID().equals(noteID)) {
+                    Note duplicated = new Note(note.getTitle(), note.getText_plain(), note.getText_html());
+                    duplicated.setDocumentsID(note.getDocumentsID());
+                    duplicated.setImagesID(note.getImagesID());
+                    duplicated.setHaveDocuments(note.getHaveDocuments());
+                    duplicated.setHaveImages(note.getHaveImages());
+                    duplicated.setFolderTAG(note.getFolderTAG());
+
+                    mAmbitoSelected.getValue().addNote(duplicated);                 // Añadimos esa Nota al Ámbito seleccionado
+                    mFolderSelected.setValue(mFolderSelected.getValue());           // Actualizamos la colección de Notas de la Folder seleccionada
+                    databaseAdapter.saveNote(duplicated);                           // Guardamos la Nota en DB
+                    setToast("Note " + note.getTitle() + " correctly duplicated."); // Creamos Toast Informativo
+                    return;
+                }
+            }
+            Log.w(TAG, "Failed to copy note " + noteID + ": invalid ID.");
+
+        }catch(NullPointerException exception){
+            Log.w(TAG, "Failed to copy note " + noteID + ": null pointer exception.");
+            Log.w(TAG, "Exception message: " + exception.getMessage());
+        }
+    }
+
+    /**
+     * Mueve la nota definida por el ID 'noteID', del Ámbito seleccionado al Ámbito dado por 'ambitoID'.
+     * Además, la añade a la Carpeta 'folderTAG' del Ámbito de destino 'ambitoID'.
+     * @param ambitoID ID del Ámbito de destino de la nota 'noteID'.
+     * @param folderTAG Nombre de la Carpeta de destino, dentro del ÁmbitoID, de la nota 'noteID'.
+     * @param noteID ID de la nota a mover.
+     * @throws NullPointerException Si el Ámbito actual no ha sido correctamente seleccionado.
+     */
+    public void moveNote(String ambitoID, String folderTAG, String noteID){
+        try{
+            Note selectedNote = null;
+            Ambito selectedAmbito = null;
+
+            // Obtenemos el Ámbito del Usuario seleccionado
+            for (Ambito ambito : mUserSelected.getValue().getAmbitos())
+                if (ambito.getSelfID().equals(ambitoID)){ selectedAmbito = ambito; break; }
+
+            // Obtenemos la Nota del Ámbito seleccionado
+            for (Note note :mAmbitoSelected.getValue().getNotes())
+                if (note.getSelfID().equals(noteID)) { selectedNote = note; break; }
+
+            if (selectedNote != null && selectedAmbito != null) {
+                mAmbitoSelected.getValue().removeNote(selectedNote);        // Quitamos la Nota de la colección de Notas del Ámbito seleccionado.
+                selectedNote.setFolderTAG(folderTAG);                       // Seteamos el TAG de la Carpeta de destino de la Nota.
+                selectedAmbito.addNote(selectedNote);                       // Añadimos la Nota al Ámbito de destino.
+
+                mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos la colección de Notas de la Folder seleccionada
+                if (mNoteSelected.getValue().getSelfID().equals(noteID))    // Si la Nota movida es la seleccionada, la deseleccionamos.
+                    mNoteSelected.setValue(null);
+                databaseAdapter.saveNote(selectedNote);                     // Finalmente, guardamos la Nota en DB
+
+                setToast("Note " + selectedNote.getTitle() + " correctly moved");   // Toast informativo
+
+            } else Log.w(TAG, "Failed to move note " + noteID + ": invalid "
+                    + ((selectedAmbito == null) ? "AmbitoID" : "NoteID"));
+
+        }catch(NullPointerException exception){
+            Log.w(TAG, "Failed to move note " + noteID + ": null pointer exception.");
+            Log.w(TAG, "Exception message: " + exception.getMessage());
+        }
+    }
 
     /** Eliminamos una nota de la colección de notas del Ámbito seleccionado. La nota se elimina del Ámbito
      * y de la carpeta contenedora, en caso de que haya alguna.
