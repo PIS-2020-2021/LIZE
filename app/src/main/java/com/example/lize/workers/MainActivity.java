@@ -50,7 +50,8 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private static final int REQUEST_CODE_ADD_AMBITO = 3;
-    private static final int REQUEST_CODE_UPDATE_USER = 4;
+    public static final int REQUEST_CODE_EDIT_AMBITO = 4;
+    private static final int REQUEST_CODE_UPDATE_USER = 5;
     private static final int THEME_UPDATE_DURATION = 1000;
 
     private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
@@ -221,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        assert data != null;
+        //assert data != null;
         Bundle bundle = data.getExtras();
         if (bundle != null) {
             Log.d(TAG, "Received new Bundle Data: " + bundle.toString());
@@ -261,6 +262,16 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 dataViewModel.addAmbito(name, color);
                 // ambitoHostFragment.addAmbito(name, color);
 
+            } else if(requestCode == REQUEST_CODE_EDIT_AMBITO && resultCode == RESULT_OK) {
+                String name = bundle.getString("name");
+                int color = (int) bundle.getLong("color");
+                String selfID = bundle.getString("selfID");
+                Log.d("Nombre", name);
+                Log.d("Color ", String.valueOf(color));
+                Log.d("SelfID ", String.valueOf(selfID));
+
+                dataViewModel.editAmbito(selfID, name, color);
+
             } else if (requestCode == REQUEST_CODE_UPDATE_USER && resultCode == RESULT_OK) {
                 String name = bundle.getString("name");
                 String surnames = bundle.getString("surnames");
@@ -272,7 +283,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 Log.d("Contraseña", psw);
                 dataViewModel.editUser(name, surnames, email, psw);
                 dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), user.getSelfID()));
-
 
             } else Log.d(TAG, "Invalid RESULT from NoteActivity: " + resultCode);
         }

@@ -4,9 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -18,40 +16,40 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.lize.R;
-import com.example.lize.data.Ambito;
 import com.example.lize.utils.Preferences;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 
-public class NewAmbitoActivity extends AppCompatActivity {
+public class EditAmbitoActivity extends AppCompatActivity {
 
     private EditText nombre;
-    private int colorAmbito = 0;
+    private CardView red, morado, indigo, azul, teal, verde, amarillo, naranja, marron;
     private TextInputLayout nombreError, colorAmbitoError;
 
     private ArrayList<Integer> colors;
-    private CardView red, morado, indigo, azul, teal, verde, amarillo, naranja, marron;
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    private int colorAmbito;
+    private String oldname;
+    private String selfID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         Preferences.applySelectedTheme(this);
-        setContentView(R.layout.activity_new_ambito);
+        setContentView(R.layout.activity_edit_ambito);
 
-        getColors();
+        getValues();
 
-        red = findViewById(R.id.cardRojo);
-        morado = findViewById(R.id.cardMorado);
-        indigo = findViewById(R.id.cardIndigo);
-        azul = findViewById(R.id.cardAzul);
-        teal = findViewById(R.id.cardTeal);
-        verde = findViewById(R.id.cardVerde);
-        amarillo = findViewById(R.id.cardAmarillo);
-        naranja = findViewById(R.id.cardNaranja);
-        marron = findViewById(R.id.cardMarron);
+        red = findViewById(R.id.cardRojoEdit);
+        morado = findViewById(R.id.cardMoradoEdit);
+        indigo = findViewById(R.id.cardIndigoEdit);
+        azul = findViewById(R.id.cardAzulEdit);
+        teal = findViewById(R.id.cardTealEdit);
+        verde = findViewById(R.id.cardVerdeEdit);
+        amarillo = findViewById(R.id.cardAmarilloEdit);
+        naranja = findViewById(R.id.cardNaranjaEdit);
+        marron = findViewById(R.id.cardMarronEdit);
 
         setColorOfCardViews();
 
@@ -59,22 +57,24 @@ public class NewAmbitoActivity extends AppCompatActivity {
         colorAmbitoError = findViewById(R.id.colorAmbitoError);
         nombreError = findViewById(R.id.nameError);
 
+        nombre.setText(oldname);
+
         MaterialToolbar topAppBar = findViewById(R.id.ambito_material_toolbar);
         topAppBar.setOnMenuItemClickListener(this::onMenuItemClick);
 
-        Button newAmbito = findViewById(R.id.newAmbitoButton);
+        Button newAmbito = findViewById(R.id.editAmbitoButton);
         newAmbito.setOnClickListener(v -> {
             if (validarDatos()){
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 Bundle ambito = new Bundle();
                 ambito.putString("name", nombre.getText().toString());
                 ambito.putLong("color", colorAmbito);
+                ambito.putString("selfID", selfID);
                 intent.putExtras(ambito);
                 setResult(RESULT_OK, intent);
                 finish();
             }
         });
-
     }
 
     private boolean validarDatos() {
@@ -110,12 +110,16 @@ public class NewAmbitoActivity extends AppCompatActivity {
         return false;
     }
 
-    private void getColors(){
+    private void getValues(){
         Intent intent = getIntent();
         this.colors = intent.getIntegerArrayListExtra("Ambitos");
+        this.oldname = intent.getStringExtra("OldName");
+        this.colorAmbito = intent.getIntExtra("OldColor", 0);
+        this.selfID = intent.getStringExtra("SelfID");
+
+        this.colors.remove(Integer.valueOf(this.colorAmbito));
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private void setColorSelected(int color){
         if(colors.contains(color)){ colorAmbitoError.setError(getResources().getString(R.string.errorColorAmbitoAlredySelected)); }
         else {
@@ -149,56 +153,52 @@ public class NewAmbitoActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public void setColorOfCardViews(){
-        red.setCardBackgroundColor(getColor(R.color.Default_Red));
-        morado.setCardBackgroundColor(getColor(R.color.Default_Purple));
-        indigo.setCardBackgroundColor(getColor(R.color.Default_Indigo));
-        azul.setCardBackgroundColor(getColor(R.color.Default_Blue));
-        teal.setCardBackgroundColor(getColor(R.color.Default_Teal));
-        verde.setCardBackgroundColor(getColor(R.color.Default_Green));
-        amarillo.setCardBackgroundColor(getColor(R.color.Default_Yellow));
-        naranja.setCardBackgroundColor(getColor(R.color.Default_Orange));
-        marron.setCardBackgroundColor(getColor(R.color.Default_Brown));
+        red.setCardBackgroundColor(getResources().getColor(R.color.Default_Red));
+        morado.setCardBackgroundColor(getResources().getColor(R.color.Default_Purple));
+        indigo.setCardBackgroundColor(getResources().getColor(R.color.Default_Indigo));
+        azul.setCardBackgroundColor(getResources().getColor(R.color.Default_Blue));
+        teal.setCardBackgroundColor(getResources().getColor(R.color.Default_Teal));
+        verde.setCardBackgroundColor(getResources().getColor(R.color.Default_Green));
+        amarillo.setCardBackgroundColor(getResources().getColor(R.color.Default_Yellow));
+        naranja.setCardBackgroundColor(getResources().getColor(R.color.Default_Orange));
+        marron.setCardBackgroundColor(getResources().getColor(R.color.Default_Brown));
 
         try {
             for (int col : colors) {
                 CardView cardView = getCardViewByColor(col);
-                if(cardView != null ) cardView.setCardBackgroundColor(getColor(R.color.Default_Grey));
+                if(cardView != null ) cardView.setCardBackgroundColor(getResources().getColor(R.color.Default_Grey));
             }
         } catch (Exception e){
             Toast.makeText(getApplicationContext(), "Error al cargar la lista de colores ya seleccionados", Toast.LENGTH_SHORT).show();
         }
 
         switch (colorAmbito){
-            case 1:     red.setCardBackgroundColor(getColor(R.color.Presseed_Red)); break;
-            case 2:     morado.setCardBackgroundColor(getColor(R.color.Presseed_Purple)); break;
-            case 3:     indigo.setCardBackgroundColor(getColor(R.color.Presseed_Indigo)); break;
-            case 4:     azul.setCardBackgroundColor(getColor(R.color.Presseed_Blue)); break;
-            case 5:     teal.setCardBackgroundColor(getColor(R.color.Presseed_Teal)); break;
-            case 6:     verde.setCardBackgroundColor(getColor(R.color.Presseed_Green)); break;
-            case 7:     amarillo.setCardBackgroundColor(getColor(R.color.Presseed_Yellow)); break;
-            case 8:     naranja.setCardBackgroundColor(getColor(R.color.Presseed_Orange)); break;
-            case 9:     marron.setCardBackgroundColor(getColor(R.color.Presseed_Brown)); break;
+            case 1:     red.setCardBackgroundColor(getResources().getColor(R.color.Presseed_Red)); break;
+            case 2:     morado.setCardBackgroundColor(getResources().getColor(R.color.Presseed_Purple)); break;
+            case 3:     indigo.setCardBackgroundColor(getResources().getColor(R.color.Presseed_Indigo)); break;
+            case 4:     azul.setCardBackgroundColor(getResources().getColor(R.color.Presseed_Blue)); break;
+            case 5:     teal.setCardBackgroundColor(getResources().getColor(R.color.Presseed_Teal)); break;
+            case 6:     verde.setCardBackgroundColor(getResources().getColor(R.color.Presseed_Green)); break;
+            case 7:     amarillo.setCardBackgroundColor(getResources().getColor(R.color.Presseed_Yellow)); break;
+            case 8:     naranja.setCardBackgroundColor(getResources().getColor(R.color.Presseed_Orange)); break;
+            case 9:     marron.setCardBackgroundColor(getResources().getColor(R.color.Presseed_Brown)); break;
 
             default:
         }
-
     }
 
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.cardRojo:         setColorSelected(1);    break;
-            case R.id.cardMorado:       setColorSelected(2);    break;
-            case R.id.cardIndigo:       setColorSelected(3);    break;
-            case R.id.cardAzul:         setColorSelected(4);    break;
-            case R.id.cardTeal:         setColorSelected(5);    break;
-            case R.id.cardVerde:        setColorSelected(6);    break;
-            case R.id.cardAmarillo:     setColorSelected(7);    break;
-            case R.id.cardNaranja:      setColorSelected(8);    break;
-            case R.id.cardMarron:       setColorSelected(9);    break;
+            case R.id.cardRojoEdit:         setColorSelected(1);    break;
+            case R.id.cardMoradoEdit:       setColorSelected(2);    break;
+            case R.id.cardIndigoEdit:       setColorSelected(3);    break;
+            case R.id.cardAzulEdit:         setColorSelected(4);    break;
+            case R.id.cardTealEdit:         setColorSelected(5);    break;
+            case R.id.cardVerdeEdit:        setColorSelected(6);    break;
+            case R.id.cardAmarilloEdit:     setColorSelected(7);    break;
+            case R.id.cardNaranjaEdit:      setColorSelected(8);    break;
+            case R.id.cardMarronEdit:       setColorSelected(9);    break;
         }
     }
 
@@ -217,5 +217,4 @@ public class NewAmbitoActivity extends AppCompatActivity {
         }
         return true;
     }
-
 }

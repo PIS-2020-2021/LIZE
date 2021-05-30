@@ -2,6 +2,7 @@ package com.example.lize.workers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -111,7 +112,9 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
      * Eliminamos un ambito del DataSet del MainViewModel
      * @param ambitoID Nombre del nuevo ambito a crear
      */
-    public void deleteAmbito(String ambitoID){ }
+    public void deleteAmbito(String ambitoID){
+
+    }
 
 
     /**
@@ -121,6 +124,21 @@ public class AmbitoHostFragment extends Fragment implements AmbitosAdapter.Ambit
     @Override
     public void onAmbitoSelected(AmbitosAdapter.AmbitoHolder ambitoHolder) {
         dataViewModel.selectAmbito(ambitoHolder.getmTitleAmbito().getText().toString());
+    }
+
+    @Override
+    public void onEditAmbitoSelected(AmbitosAdapter.AmbitoHolder ambitoHolder) {
+        Intent intent = new Intent(mContext, EditAmbitoActivity.class);
+        intent.putIntegerArrayListExtra("Ambitos", dataViewModel.getUserSelected().getValue().getColorsTaken());
+        intent.putExtra("OldColor", ambitoHolder.getAmbitomColor());
+        intent.putExtra("OldName", ambitoHolder.getmTitleAmbito().getText());
+        intent.putExtra("SelfID", ambitoHolder.getmAmbitoID());
+        requireActivity().startActivityForResult(intent, MainActivity.REQUEST_CODE_EDIT_AMBITO);
+    }
+
+    @Override
+    public void onAmbitoDelete(AmbitosAdapter.AmbitoHolder ambitoHolder) {
+        dataViewModel.deleteAmbito(ambitoHolder.getmAmbitoID());
     }
 
 }

@@ -204,8 +204,12 @@ public class MainViewModel extends ViewModel{
                 if(ambito.getSelfID().equals(ambitoID)){
                     ambito.setName(ambitoName);
                     ambito.setColor(ambitoColor);
+                    if(mAmbitoSelected.getValue().getSelfID().equals(ambitoID)) mViewUpdated.setValue(false);         //Actualizamos la Vista solo si es el mismo Ambito para cargar el Tema
                     if(mAmbitoSelected.getValue().getSelfID().equals(ambitoID)) mAmbitoSelected.setValue(ambito);     // Actualizamos el Ambito editado
-                    databaseAdapter.saveAmbito(ambito);                                                               // Guardamos el Ambito en DB
+                    mUserSelected.setValue(mUserSelected.getValue());
+
+                    databaseAdapter.saveAmbito(ambito);
+                    // Guardamos el Ambito en DB
                     setToast("Ambito " + ambitoName + " correctly edited.");                                          // Creamos Toast Informativo
                     return;
                 }
@@ -359,6 +363,8 @@ public class MainViewModel extends ViewModel{
                     if (mNoteSelected.getValue().getSelfID().equals(noteID))        // Si la Nota eliminada es la seleccionada, la deseleccionamos.
                         mNoteSelected.setValue(null);
                     databaseAdapter.deleteNote(note.getSelfID());                   // Eliminamos la Nota de DB
+                    if(note.getHaveImages()) databaseAdapter.deleteImages(note.getImagesID());          //Eliminamos el Array de Imagenes de la DB
+                    if(note.getHaveDocuments()) databaseAdapter.deleteDocuments(note.getDocumentsID());    //Eliminamos el Array de Documentos de la DB
                     setToast("Note " + note.getTitle() + " correctly deleted.");    // Creamos Toast Informativo
                     return;
                 }

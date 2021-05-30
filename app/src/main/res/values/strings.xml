@@ -92,6 +92,7 @@
     <string name="naranja">Naranja</string>
     <string name="marr_n">Marrón</string>
     <string name="nuevo_ambito">Nuevo Ambito</string>
+    <string name="editar_ambito">Editar Ambito</string>
     <string name="introduce_aqu_el_nombre">Introduce aquí el nombre</string>
     <string name="salir">Salir</string>
     <string name="boton_redondo">boton redondo</string>
@@ -105,7 +106,6 @@
     <string name="textview">TextView</string>
     <string name="documents">documents</string>
     <string name="barra">|</string>
-    <string name="editar_ambito">Editar Ambito</string>
     <string name="eliminar_ambito">Eliminar Ambito</string>
     <string name="note_default_metadata">ambitoID - folderTag - last connection</string>
     <string name="numero_notas">Nº notas</string>

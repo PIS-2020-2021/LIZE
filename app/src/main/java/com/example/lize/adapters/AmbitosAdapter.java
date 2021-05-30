@@ -1,6 +1,7 @@
 package com.example.lize.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.chauthai.swipereveallayout.ViewBinderHelper;
 import com.example.lize.R;
 import com.example.lize.data.Ambito;
 import com.example.lize.utils.Preferences;
+import com.example.lize.workers.NewAmbitoActivity;
 
 import java.util.ArrayList;
 
@@ -31,6 +33,8 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
     /* Custom Ambito onClick Listener */
     public interface AmbitoListener{
         void onAmbitoSelected(AmbitoHolder ambitoHolder);
+        void onEditAmbitoSelected(AmbitoHolder ambitoHolder);
+        void onAmbitoDelete(AmbitoHolder ambitoHolder);
     }
 
     /**
@@ -102,6 +106,7 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
 
         private final TextView mTitleAmbito;
         private int mAmbitoColor;
+        private String mAmbitoID;
         private LinearLayout mAmbitoSelectedLinearLayout;
         private ImageView mCancel;
         private ImageView mEdit;
@@ -139,6 +144,8 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(mContext, "Se ha seleccionado \"Editar Ambito\"", Toast.LENGTH_SHORT).show();
+                    for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
+                        listener.onEditAmbitoSelected(AmbitoHolder.this);
                 }
             });
 
@@ -147,6 +154,8 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(mContext, "Se ha seleccionado \"Eliminar Ambito\"", Toast.LENGTH_SHORT).show();
+                    for (AmbitosAdapter.AmbitoListener listener : ambitoListeners)
+                        listener.onAmbitoDelete(AmbitoHolder.this);
                 }
             });
 
@@ -169,6 +178,8 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
             return mAmbitoColor;
         }
 
+        public String getmAmbitoID() { return mAmbitoID; }
+
         /**
          * Método para enlazar los datos del ambito con el RecyclerView de este objeto ViewHolder
          * @param currentAmbito Ambito actual
@@ -176,13 +187,9 @@ public class AmbitosAdapter extends RecyclerView.Adapter<AmbitosAdapter.AmbitoHo
         public void bindTo(Ambito currentAmbito){
             mTitleAmbito.setText(currentAmbito.getName());
             mAmbitoColor = currentAmbito.getColor();
+            mAmbitoID = currentAmbito.getSelfID();
             mAmbitoSelectedLinearLayout.setBackgroundColor(mContext.getResources().getColor(Preferences.getAmbitoPressedColor(mAmbitoColor)));
             mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(Preferences.getAmbitoColor(mAmbitoColor)));
-        }
-
-
-        public void reset(){
-            mTitleAmbito.setBackgroundColor(mContext.getResources().getColor(Preferences.getDefaultAmbitoColor()));
         }
 
     }
