@@ -8,9 +8,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
