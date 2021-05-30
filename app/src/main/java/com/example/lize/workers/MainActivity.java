@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
 
         // Observador del Usuario seleccionado. Inicializa el HeaderNavigationView.
-        dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail()));
+        dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), user.getSelfID()));
 
 
         // Observador del Ámbito seleccionado.
@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 Log.d("Email", email);
                 Log.d("Contraseña", psw);
                 dataViewModel.editUser(name, surnames, email, psw);
-                dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail()));
+                dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), user.getSelfID()));
 
 
             } else Log.d(TAG, "Invalid RESULT from NoteActivity: " + resultCode);
@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      * @param name nombre del User
      * @param eMail email del User
      */
-    private void initHeaderNavigationView(String name, String eMail){
+    private void initHeaderNavigationView(String name, String eMail, String userID){
         View header = (View) findViewById(R.id.headerView);
 
         TextView headerName = (TextView) header.findViewById(R.id.name_header);
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         if(name != null) headerName.setText(name);
         if(eMail != null)  headerEMail.setText(eMail);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-        StorageReference profileRef = storageReference.child("/profileUser_" + eMail + ".png");
+        StorageReference profileRef = storageReference.child("/profileUser_" + userID + ".png");
         profileRef.getDownloadUrl().addOnSuccessListener(downloadUrl -> Picasso.get().load(downloadUrl).into(headerImgProfile));
 
     }

@@ -34,7 +34,7 @@ public class AjustesActivity extends Activity {
 
     public static final int PICK_IMAGE = 1;
     private ArrayList<String> info;
-    private String name, surnames, email, psw, ambitos;
+    private String name, surnames, email, psw, ambitos, userID;
     private EditText editName, editSurnames, editPsw, editEmail;
     boolean isNameValid, areSurnamesValid, isEmailValid, isPasswordValid;
     TextInputLayout nameInput, apellidosInput, emailInput, pswInput;
@@ -64,7 +64,8 @@ public class AjustesActivity extends Activity {
         pswInput = findViewById(R.id.pswInput);
         storageReference = FirebaseStorage.getInstance().getReference();
 
-        String photoName = "profileUser_" + email + ".png";
+
+        String photoName = "profileUser_" + userID + ".png";
         StorageReference profileRef = storageReference.child(photoName);
         profileRef.getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).into(profilePicture));
 
@@ -95,6 +96,7 @@ public class AjustesActivity extends Activity {
         this.email = info.get(2);
         this.psw = info.get(3);
         this.ambitos = info.get(4);
+        this.userID = info.get(5);
 
     }
 
@@ -150,7 +152,7 @@ public class AjustesActivity extends Activity {
     }
 
     private void uploadImageToFirebase(Uri selectedImageUri) {
-        String photoName = "profileUser_" + email + ".png";
+        String photoName = "profileUser_" + userID + ".png";
         StorageReference fileRef = storageReference.child(photoName);
         fileRef.putFile(selectedImageUri).addOnSuccessListener(taskSnapshot -> {
             Toast.makeText(AjustesActivity.this, "Imagen actualizada.", Toast.LENGTH_SHORT).show();

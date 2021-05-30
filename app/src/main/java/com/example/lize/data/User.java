@@ -90,6 +90,7 @@ public class User {
         info.add(getMail());
         info.add(getPassword());
         info.add(String.valueOf(ambitos.size()));
+        info.add(getSelfID());
         return info;
     }
 
