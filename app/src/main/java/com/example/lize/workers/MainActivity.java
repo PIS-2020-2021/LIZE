@@ -1,21 +1,14 @@
 package com.example.lize.workers;
 
-import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.TimeInterpolator;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -24,15 +17,8 @@ import android.view.MenuItem;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.Transformation;
-import android.widget.Adapter;
+
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -41,7 +27,6 @@ import android.widget.Toast;
 import com.example.lize.R;
 import com.example.lize.models.MainViewModel;
 import com.example.lize.utils.Preferences;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
@@ -51,15 +36,13 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
-;import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
-public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener{
+public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
 
     private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
     private NoteHostFragment noteHostFragment;               // Contenedor de Notas
@@ -164,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         return true;
     }
 
@@ -186,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         // Observador del Usuario seleccionado. Inicializa el HeaderNavigationView.
         dataViewModel.getUserSelected().observe(this, user -> initHeaderNavigationView(user.getFirst() + " " + user.getLast(), user.getMail(), user.getSelfID()));
 
-
         // Observador del Ámbito seleccionado.
         dataViewModel.getAmbitoSelected().observe(this, (ambito) -> {
             drawerLayout.closeDrawer(Gravity.LEFT);
@@ -198,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     /**
      * Implementación del método OnMenuItemClick para definir las acciones de los items del Toolbar.
      * @param item item del Toolbar: search, sandwich
+     * @return True si se ha hecho click en alguno de ellos, False si no
      */
     @Override
     public boolean onMenuItemClick(MenuItem item) {
@@ -240,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        assert data != null;
         Bundle bundle = data.getExtras();
         if (bundle != null) {
             Log.d(TAG, "Received new Bundle Data: " + bundle.toString());
@@ -290,10 +273,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      * @param eMail email del User
      */
     private void initHeaderNavigationView(String name, String eMail, String userID){
-        View header = (View) findViewById(R.id.headerView);
+        View header = findViewById(R.id.headerView);
 
-        TextView headerName = (TextView) header.findViewById(R.id.name_header);
-        TextView headerEMail = (TextView) header.findViewById(R.id.email_header);
+        TextView headerName = header.findViewById(R.id.name_header);
+        TextView headerEMail = header.findViewById(R.id.email_header);
         CircleImageView headerImgProfile = header.findViewById(R.id.circleImageView_header);
 
 

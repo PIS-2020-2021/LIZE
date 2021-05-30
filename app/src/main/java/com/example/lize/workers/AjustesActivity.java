@@ -13,20 +13,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.example.lize.R;
-
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
-
-
 import java.util.ArrayList;
 
 
@@ -34,13 +28,14 @@ public class AjustesActivity extends Activity {
 
     public static final int PICK_IMAGE = 1;
     private ArrayList<String> info;
-    private String name, surnames, email, psw, ambitos, userID;
+    private String name, surnames, email, psw, ambitos, userID, totalNotes;
     private EditText editName, editSurnames, editPsw, editEmail;
     boolean isNameValid, areSurnamesValid, isEmailValid, isPasswordValid;
     TextInputLayout nameInput, apellidosInput, emailInput, pswInput;
     ImageButton profilePicture;
     StorageReference storageReference;
 
+    /** Ajustes constructor */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,11 +47,11 @@ public class AjustesActivity extends Activity {
         getInfo();
         setInfoSettings();
 
-        editName = (EditText) findViewById(R.id.nameSettings);
-        editSurnames = (EditText) findViewById(R.id.surnamesSettings);
-        editEmail = (EditText) findViewById(R.id.emailSettings);
-        editPsw = (EditText) findViewById(R.id.pswSettings);
-        profilePicture = (ImageButton) findViewById(R.id.foto_de_perfil);
+        editName = findViewById(R.id.nameSettings);
+        editSurnames = findViewById(R.id.surnamesSettings);
+        editEmail = findViewById(R.id.emailSettings);
+        editPsw = findViewById(R.id.pswSettings);
+        profilePicture = findViewById(R.id.foto_de_perfil);
 
         nameInput = findViewById(R.id.nameInput);
         apellidosInput = findViewById(R.id.apellidosInput);
@@ -64,15 +59,13 @@ public class AjustesActivity extends Activity {
         pswInput = findViewById(R.id.pswInput);
         storageReference = FirebaseStorage.getInstance().getReference();
 
-
         String photoName = "profileUser_" + userID + ".png";
         StorageReference profileRef = storageReference.child(photoName);
         profileRef.getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).into(profilePicture));
 
-
         Button guardarCambios = findViewById(R.id.guardar_cambios);
         guardarCambios.setOnClickListener(v -> {
-            if (validarDatos()){
+            if (validarDatos()) {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 Bundle userChanges = new Bundle();
                 userChanges.putString("name", editName.getText().toString());
@@ -84,11 +77,13 @@ public class AjustesActivity extends Activity {
                 finish();
             }
         });
-
         profilePicture.setOnClickListener(v -> selectImage());
     }
 
-    private void getInfo(){
+    /**
+     * Metodo para recoger la información del usuario pasada desde el MainActivity
+     */
+    private void getInfo() {
         Intent intent = getIntent();
         this.info = intent.getStringArrayListExtra("Info_User");
         this.name = info.get(0);
@@ -97,30 +92,38 @@ public class AjustesActivity extends Activity {
         this.psw = info.get(3);
         this.ambitos = info.get(4);
         this.userID = info.get(5);
-
+        this.totalNotes = info.get(6);
     }
 
+    /**
+     * Metodo para establecer la información del usuario en todas las partes de la activity
+     */
     private void setInfoSettings () {
-        initInfoViews(name, surnames, email, psw, ambitos);
-        TextView userFullName = (TextView) findViewById(R.id.user_full_name);
+        initInfoViews(name, surnames, email, psw, ambitos, totalNotes);
+        TextView userFullName = findViewById(R.id.user_full_name);
         String fullName = name + ' ' + surnames;
         if (name != null) userFullName.setText(fullName);
     }
 
-    //Método para el tratamiento de los permisos de la aplicación
+    /**
+     * Método para el tratamiento de los permisos de la aplicación
+     * @param requestCode Código de Request
+     * @param permissions Permisos de la app
+     * @param grantResults Resultados
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PICK_IMAGE && grantResults.length > 0) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 selectImage();
-            } else {
-                Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
-            }
+            } else Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    //Intent para seleccionar una imagen del dispositivo para ponerla de perfil
+    /**
+     * Metodo para poder seleccionar una imagen como foto de perfil
+     */
     private void selectImage() {
         Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickIntent.setType("image/*");
@@ -132,7 +135,13 @@ public class AjustesActivity extends Activity {
         startActivityForResult(chooserIntent, PICK_IMAGE);
     }
 
-    // Tratamiento de los datos de Intents de imagenes y documentos.
+    /**
+     * Metodo para conseguir la Uri de la foto de perfil ua vez se lleve a cabo la acción
+     * de escoger la imagen
+     * @param requestCode Codigo de la Request
+     * @param resultCode Status code resultante
+     * @param data Datos a tratar
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -142,7 +151,6 @@ public class AjustesActivity extends Activity {
                 if (selectedImageUri != null) {
                     try {
                         uploadImageToFirebase(selectedImageUri);
-
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -151,9 +159,14 @@ public class AjustesActivity extends Activity {
         }
     }
 
+    /**
+     * Metodo para recoger y subir una imagen de foto de perfil del Usuario a la DB
+     * @param selectedImageUri Uri de la foto de perfil
+     */
     private void uploadImageToFirebase(Uri selectedImageUri) {
         String photoName = "profileUser_" + userID + ".png";
         StorageReference fileRef = storageReference.child(photoName);
+
         fileRef.putFile(selectedImageUri).addOnSuccessListener(taskSnapshot -> {
             Toast.makeText(AjustesActivity.this, "Imagen actualizada.", Toast.LENGTH_SHORT).show();
             fileRef.getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).into(profilePicture));
@@ -162,7 +175,7 @@ public class AjustesActivity extends Activity {
 
 
     /**
-     * Setea el Header de la MainActivity
+     * Metodo para establecer la info del User en la activity Ajustes
      * @param name nombre del User
      * @param surnames apellidos del User
      * @param email email del User
@@ -170,22 +183,26 @@ public class AjustesActivity extends Activity {
      * @param numAmbitos Numero de ámbitos creados por el User
      */
     //TODO numero de notas total
-    private void initInfoViews(String name, String surnames, String email, String psw, String numAmbitos){
-        EditText editName = (EditText) findViewById(R.id.nameSettings);
-        EditText editSurnames = (EditText) findViewById(R.id.surnamesSettings);
-        EditText editEmail = (EditText) findViewById(R.id.emailSettings);
-        EditText editPsw = (EditText) findViewById(R.id.pswSettings);
-        TextView numero_Ambitos = (TextView) findViewById(R.id.numAmbitos);
-        TextView numero_Notas = (TextView) findViewById(R.id.numNotas);
+    private void initInfoViews(String name, String surnames, String email, String psw, String numAmbitos, String numNotas) {
+        EditText editName = findViewById(R.id.nameSettings);
+        EditText editSurnames = findViewById(R.id.surnamesSettings);
+        EditText editEmail = findViewById(R.id.emailSettings);
+        EditText editPsw = findViewById(R.id.pswSettings);
+        TextView numero_Ambitos =  findViewById(R.id.numAmbitos);
+        TextView numero_Notas = findViewById(R.id.numNotas);
 
         if (name != null) editName.setText(name);
         if (surnames != null)  editSurnames.setText(surnames);
         if (email != null)  editEmail.setText(email);
         if (psw != null)  editPsw.setText(psw);
         if (numAmbitos != null) numero_Ambitos.setText(numAmbitos);
-
+        if (numNotas != null) numero_Notas.setText(numNotas);
     }
 
+    /**
+     * Metodo para validad los datos del usuario modificados
+     * @return True si son aptos, False si hay alguno que debería revisar el User
+     */
     private boolean validarDatos() {
         //Comprobaciones del nombre
         if (editName.getText().toString().isEmpty()) {
@@ -220,12 +237,10 @@ public class AjustesActivity extends Activity {
             emailInput.setError(getResources().getString(R.string.error_campo_vacio));
             Toast.makeText(getApplicationContext(), emailInput.getError(), Toast.LENGTH_SHORT).show();
             isEmailValid = false;
-
         } else if (!Patterns.EMAIL_ADDRESS.matcher(editEmail.getText().toString()).matches()) {
             emailInput.setError(getResources().getString(R.string.error_invalid_email));
             Toast.makeText(getApplicationContext(), emailInput.getError(), Toast.LENGTH_SHORT).show();
             isEmailValid = false;
-
         } else  {
             isEmailValid = true;
             emailInput.setErrorEnabled(false);
@@ -236,12 +251,10 @@ public class AjustesActivity extends Activity {
             pswInput.setError(getResources().getString(R.string.error_campo_vacio));
             Toast.makeText(getApplicationContext(), pswInput.getError(), Toast.LENGTH_SHORT).show();
             isPasswordValid = false;
-
         } else if (editPsw.getText().length() < 8) {
             pswInput.setError(getResources().getString(R.string.error_invalid_pwd_Login));
             Toast.makeText(getApplicationContext(), pswInput.getError(), Toast.LENGTH_SHORT).show();
             isPasswordValid = false;
-
         } else  {
             isPasswordValid = true;
             pswInput.setErrorEnabled(false);
@@ -255,14 +268,17 @@ public class AjustesActivity extends Activity {
     }
 
 
+    /**
+     * Metodo para saber si se ha hecho click en la X para volver atrás
+     * @param item Botón a apretar
+     * @return True si se ha hecho click, False si no
+     */
     public boolean onMenuItemClick(MenuItem item) {
         if (item.getItemId() == R.id.arrow) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             setResult(RESULT_CANCELED, intent);
             finish();
-        } else {
-            return false;
-        }
+        } else  return false;
         return true;
     }
 }

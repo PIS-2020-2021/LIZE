@@ -217,7 +217,6 @@ public class MainViewModel extends ViewModel{
         try {
             User selected = mUserSelected.getValue();
 
-            String userUID = FirebaseAuth.getInstance().getUid();
             FirebaseAuth.getInstance().getCurrentUser().updateEmail(email);
             FirebaseAuth.getInstance().getCurrentUser().updatePassword(password);
 
@@ -225,9 +224,6 @@ public class MainViewModel extends ViewModel{
             selected.setLast(apellidos);
             selected.setMail(email);
             selected.setPassword(password);
-
-
-
 
             DatabaseAdapter.getInstance().saveUser(selected);                                                 // Guardamos el Ambito en DB
             setToast("User " + name + " correctly edited.");    // Creamos Toast Informativo
