@@ -25,9 +25,26 @@
         <item name="hintTextColor">@style/Theme.hint</item>
         <item name="android:windowDisablePreview">true</item>
         <item name="searchViewStyle">@style/SearchViewStyle</item>
-
-
     </style>
+
+    <!--****************************
+        Estilos de los Edit TextViews
+        ****************************-->
+    <!-- Hints -->
+    <style name="Theme.hint" parent="">
+        <item name="colorPrimary">@color/light_blue_400</item>
+    </style>
+    <!-- SignUp TextViews -->
+    <style name="LogInSignUp" parent="Widget.AppCompat.TextView">
+        <item name="android:background">#33FFFFFF</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="paddingStart">5dp</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+        <item name="maxLines">1</item>
+        <item name="singleLine">true</item>
+    </style>
+
 
     <!-- CardView Style -->
     <style name="Widget.Lize.CardView" parent="Widget.MaterialComponents.CardView">
@@ -367,16 +384,6 @@
         <item name="colorOnError">@color/md_red_50</item>
     </style>
 
-
-    <!-- Ambit Color Themes -->
-    <style name="Theme.hint" parent="">
-        <item name="colorPrimary">@color/light_blue_400</item>
-        <item name="colorPrimaryDark">@color/light_blue_700</item>
-        <item name="colorSurface">@color/light_blue_A400</item>
-        <item name="colorOnPrimary">@color/md_grey_600</item>
-        <item name="colorOnSurface">@color/black</item>
-        <item name="colorAccent">@color/teal_A400</item>
-    </style>
 
     <!-- Ambit Color Themes -->
     <style name="Theme.Lize.Ambit.Red" parent="">

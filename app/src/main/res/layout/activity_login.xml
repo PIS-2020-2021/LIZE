@@ -52,17 +52,11 @@
                         android:id="@+id/email_header"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
                         android:autofillHints=""
                         android:hint="@string/prompt_email"
                         android:textColorHint="@color/black"
-                        android:background="@android:color/transparent"
                         android:inputType="textEmailAddress"
-                        android:maxLines="1"
-                        android:paddingStart="5dp"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp"
-                        android:singleLine="true"
+                        style="@style/LogInSignUp"
                         android:theme="@style/Theme.hint"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -79,16 +73,10 @@
                         android:id="@+id/password_login"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
                         android:autofillHints="Password"
-                        android:background="#46FFFFFF"
                         android:hint="@string/prompt_password"
                         android:inputType="textPassword"
-                        android:maxLines="1"
-                        android:paddingStart="5dp"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp"
-                        android:singleLine="true"
+                        style="@style/LogInSignUp"
                         android:theme="@style/Theme.hint"/>
 
                 </com.google.android.material.textfield.TextInputLayout>

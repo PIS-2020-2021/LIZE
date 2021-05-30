@@ -78,16 +78,10 @@
                     android:id="@+id/nombre"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:autofillHints=""
-                    android:background="#33FFFFFF"
                     android:hint="@string/nombre"
                     android:inputType="textNoSuggestions"
-                    android:maxLines="1"
-                    android:paddingStart="5dp"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:singleLine="true" />
+                    style="@style/LogInSignUp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -102,16 +96,10 @@
                     android:id="@+id/apellidos"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:autofillHints=""
-                    android:background="#33FFFFFF"
                     android:hint="@string/apellidos"
                     android:inputType="textNoSuggestions"
-                    android:maxLines="1"
-                    android:paddingStart="5dp"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:singleLine="true"  />
+                    style="@style/LogInSignUp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -126,16 +114,10 @@
                     android:id="@+id/email_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:autofillHints=""
-                    android:background="#33FFFFFF"
                     android:hint="@string/prompt_email"
                     android:inputType="textEmailAddress"
-                    android:maxLines="1"
-                    android:paddingStart="5dp"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:singleLine="true" />
+                    style="@style/LogInSignUp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -151,16 +133,10 @@
                     android:id="@+id/password_login"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:autofillHints=""
-                    android:background="#33FFFFFF"
                     android:hint="@string/prompt_password"
                     android:inputType="textPassword"
-                    android:maxLines="1"
-                    android:paddingStart="5dp"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:singleLine="true" />
+                    style="@style/LogInSignUp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -175,16 +151,10 @@
                     android:id="@+id/password_login_second"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:autofillHints=""
-                    android:background="#33FFFFFF"
                     android:hint="@string/repetir_la_contrasena"
                     android:inputType="textPassword"
-                    android:maxLines="1"
-                    android:paddingStart="5dp"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:singleLine="true" />
+                    style="@style/LogInSignUp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
