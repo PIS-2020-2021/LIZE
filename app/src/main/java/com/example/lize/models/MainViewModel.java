@@ -210,13 +210,6 @@ public class MainViewModel extends ViewModel{
                     return;
                 }
             }
-            selected.setName(ambitoName);
-            selected.setColor(ambitoColor);
-            if (mAmbitoSelected.getValue().getSelfID().equals(ambitoID)) mAmbitoSelected.setValue(selected);     // Actualizamos el Ambito editado
-            DatabaseAdapter.getInstance().saveAmbito(selected);                                                 // Guardamos el Ambito en DB
-            setToast("Ambito " + ambitoName + " correctly edited.");                                            // Creamos Toast Informativo
-           
-
         }catch (NullPointerException exception) {
             Log.w(TAG, "Failed to edit ambito " + ambitoName + ": null pointer exception.");
             Log.w(TAG, "Exception message: " + exception.getMessage());

@@ -196,7 +196,7 @@ public class DatabaseAdapter {
                     note.setHaveDocuments(document.getBoolean("documents"));
                     ambitoNotes.add(note);
                 }
-                if(loader != null) loader.getNoteCollectionResult(ambitoID, ambitoNotes);
+                if (loader != null) loader.getNoteCollectionResult(ambitoID, ambitoNotes);
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
