@@ -195,7 +195,7 @@ public class DatabaseAdapter {
                     note.setHaveImages(document.getBoolean("images"));
                     note.setHaveDocuments(document.getBoolean("documents"));
                     note.setHaveAudios(document.getBoolean("audios"));
-                    note.setAudiosID(document.getString("AudioID"));
+                    note.setAudiosID(document.getString("audiosID"));
                     ambitoNotes.add(note);
                 }
                 if(loader != null) loader.getNoteCollectionResult(ambitoID, ambitoNotes);

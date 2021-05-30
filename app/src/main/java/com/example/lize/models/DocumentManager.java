@@ -2,6 +2,7 @@ package com.example.lize.models;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
@@ -187,13 +188,11 @@ public class DocumentManager {
                     noteDocuments.put("imagesID", finalDocumentsID2);
                     noteDocuments.put("images", imagenes);
                     String finalDocumentsID1 = finalDocumentsID2;
-                    noteRef.set(noteDocuments).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful())
-                                Log.d(TAG, "Note " + finalDocumentsID1 + "Document correctly saved.");
-                            else Log.d(TAG, "Error saving note " + finalDocumentsID1, task.getException());
-                        }      });
+                    noteRef.set(noteDocuments).addOnCompleteListener(task1 -> {
+                        if (task1.isSuccessful())
+                            Log.d(TAG, "Note " + finalDocumentsID1 + "Document correctly saved.");
+                        else Log.d(TAG, "Error saving note " + finalDocumentsID1, task1.getException());
+                    });
                 }
             });
             return imagesID;
@@ -255,13 +254,11 @@ public class DocumentManager {
                     noteDocuments.put("DocumentsID", finalDocumentsID2);
                     noteDocuments.put("files", files);
                     String finalDocumentsID1 = finalDocumentsID2;
-                    noteRef.set(noteDocuments).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful())
-                                Log.d(TAG, "Note " + finalDocumentsID1 + "Document correctly saved.");
-                            else Log.d(TAG, "Error saving note " + finalDocumentsID1, task.getException());
-                        }      });
+                    noteRef.set(noteDocuments).addOnCompleteListener(task1 -> {
+                        if (task1.isSuccessful())
+                            Log.d(TAG, "Note " + finalDocumentsID1 + "Document correctly saved.");
+                        else Log.d(TAG, "Error saving note " + finalDocumentsID1, task1.getException());
+                    });
                 }
             });
             return DocumentsID;
@@ -489,7 +486,7 @@ public class DocumentManager {
             Map<String, Object> noteAudios = new HashMap<>();
             ArrayList<String> files = new ArrayList<>();
             files.add(ref);
-            noteAudios.put("AudioID", AudiosID);
+            noteAudios.put("audiosID", AudiosID);
             noteAudios.put("files", files);
             String finalDocumentsID = AudiosID;
             noteRef.set(noteAudios).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -516,7 +513,7 @@ public class DocumentManager {
                     files.add(ref);
                     uploadAudio(a);
                     Map<String, Object> noteAudios = new HashMap<>();
-                    noteAudios.put("AudiosID", finalDocumentsID2);
+                    noteAudios.put("audiosID", finalDocumentsID2);
                     noteAudios.put("files", files);
                     String finalDocumentsID1 = finalDocumentsID2;
                     noteRef.set(noteAudios).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -566,7 +563,7 @@ public class DocumentManager {
                 audios.remove(ref);
 
                 Map<String, Object> noteAudios = new HashMap<>();
-                noteAudios.put("AudiosID", AudiosID);
+                noteAudios.put("audiosID", AudiosID);
                 noteAudios.put("files", audios);
                 notasRef.update(noteAudios).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -615,17 +612,17 @@ public class DocumentManager {
                                 }
                             });
                         }
-                        int duration = 1;
+
                         MediaPlayer mp = new MediaPlayer();
-                        try {
-                            mp.setDataSource(filename);
-                             duration = mp.getDuration();
+                        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                        retriever.setDataSource(context,Uri.parse(Uri.fromFile(file).toString()));
+                        String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                        int millSecond = Integer.parseInt(duration);
 
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
 
-                        audios.add(new Audio(audio,filename,duration));
+
+
+                        audios.add(new Audio(audio,filename,millSecond));
                 }
 
             }});
