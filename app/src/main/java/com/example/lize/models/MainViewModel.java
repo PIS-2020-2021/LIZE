@@ -372,6 +372,7 @@ public class MainViewModel extends ViewModel{
                     databaseAdapter.deleteNote(note.getSelfID());                   // Eliminamos la Nota de DB
                     if(note.getHaveImages()) databaseAdapter.deleteImages(note.getImagesID());          //Eliminamos el Array de Imagenes de la DB
                     if(note.getHaveDocuments()) databaseAdapter.deleteDocuments(note.getDocumentsID());    //Eliminamos el Array de Documentos de la DB
+                    if(note.getHaveAudios()) databaseAdapter.deleteAudios(note.getAudiosID());
                     setToast("Note " + note.getTitle() + " correctly deleted.");    // Creamos Toast Informativo
                     return;
                 }

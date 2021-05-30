@@ -94,6 +94,7 @@ public class DatabaseAdapter {
     }
 
 
+
     // Métodos para reconstruir la jerarquía del modelo.
     public interface LoaderInterface{
         void getUserResult(User user);
@@ -376,6 +377,26 @@ public class DatabaseAdapter {
                 .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + documentsID, e));
     }
 
+    public void deleteAudios(String audiosID) {
+        DocumentReference documentsRef = db.collection("audios").document(audiosID);
+        documentsRef.get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                try {
+                    DocumentSnapshot document = task.getResult();
+                    List<String> group = (List<String>) document.get("files");
+                    for (String stringAux: group) {
+                        StorageReference singleDoc = mStorageRef.child(stringAux);
+                        singleDoc.delete();
+                    }
+                } catch (NullPointerException exception){
+                    Log.w(TAG, "Failed to get Collection of audios of  " + audiosID + ": null pointer exception.");
+                }
+            } else Log.d(TAG, "Error al eliminar la coleccion de audios: ", task.getException());
+        });
+
+        documentsRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + audiosID, e));
+    }
 
     /**
      * Eliminamos la subcolección de notas cuyo valor del campo "folderTAG" sea el pasado por parámetro.
@@ -462,6 +483,8 @@ public class DatabaseAdapter {
 
         user.delete();
     }
+
+
 
     public void saveNoteWithFile(String id, String description, String userid, String path) {
     /*  Uri file = Uri.fromFile(new File(path));

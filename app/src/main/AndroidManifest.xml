@@ -58,8 +58,8 @@
 
         </activity>
         <activity android:name=".workers.SignUpActivity" />
+        <activity android:name=".workers.EditAmbitoActivity"/>
         <activity android:name=".workers.MainActivity" />
-        <activity android:name=".workers.EditarAmbitoActivity" />
         <activity android:name=".workers.AjustesActivity" />
 
     </application>

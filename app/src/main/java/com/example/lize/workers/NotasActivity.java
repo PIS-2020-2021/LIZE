@@ -296,7 +296,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
     //Función para validar el contenido de la nota antes de agregarla a base de datos
     private int validateNote() {
-        if (inputNoteTitulo.getText().toString().isEmpty() && rtEditText.getText(RTFormat.PLAIN_TEXT).isEmpty() /*&&  imagesUris.isEmpty()*/)
+        if (inputNoteTitulo.getText().toString().isEmpty() && rtEditText.getText(RTFormat.PLAIN_TEXT).isEmpty() && audioAdapter.getItemCount() == 0 && documentManager.imagesArraySize(imagesID) == 0 && documentAdapter.getItemCount() == 0  /*&&  imagesUris.isEmpty()*/)
             return RESULT_CANCELED;
         return RESULT_OK;
     }
