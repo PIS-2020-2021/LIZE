@@ -3,6 +3,7 @@ package com.example.lize.workers;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private DrawerLayout drawerLayout;              //Declaramos DrawerLayout
     private ActionBarDrawerToggle mDrawerToggle;    //Declaramos Toggle
     private Button addAmbito;                       //Declaramos Botones
+    private Button darkMode;
     private Button signOut;
     private Button settings;
 
@@ -115,6 +117,16 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             Intent intent = new Intent(getApplicationContext(), NewAmbitoActivity.class);
             intent.putIntegerArrayListExtra("Ambitos", dataViewModel.getUserSelected().getValue().getColorsTaken());
             startActivityForResult(intent, REQUEST_CODE_ADD_AMBITO);
+        });
+
+        //Asignamos Boton y Listener a addAmbito
+        this.darkMode = findViewById(R.id.darkModeButton);
+        darkMode.setOnClickListener(v -> {
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            }
         });
 
         //Asignamos Boton y Listener a settings
