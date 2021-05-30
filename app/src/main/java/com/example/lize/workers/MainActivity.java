@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private static final int REQUEST_CODE_ADD_AMBITO = 3;
+    public static final int REQUEST_CODE_EDIT_AMBITO = 4;
     private static final int THEME_UPDATE_DURATION = 1000;
 
     private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
@@ -260,6 +261,16 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
                 dataViewModel.addAmbito(name, color);
                 // ambitoHostFragment.addAmbito(name, color);
+
+            } else if(requestCode == REQUEST_CODE_EDIT_AMBITO && resultCode == RESULT_OK) {
+                String name = bundle.getString("name");
+                int color = (int) bundle.getLong("color");
+                String selfID = bundle.getString("selfID");
+                Log.d("Nombre", name);
+                Log.d("Color ", String.valueOf(color));
+                Log.d("SelfID ", String.valueOf(selfID));
+
+                dataViewModel.editAmbito(selfID, name, color);
 
             } else Log.d(TAG, "Invalid RESULT from NoteActivity: " + resultCode);
         }
