@@ -1,6 +1,8 @@
 package com.example.lize.models;
 
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.util.Pair;
@@ -16,6 +18,7 @@ import com.example.lize.data.Note;
 import com.example.lize.data.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.example.lize.workers.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,13 +28,15 @@ public class MainViewModel extends ViewModel{
 
     private static final String TAG = "MainViewModel";
 
-    private final MutableLiveData<User> mUserSelected;          // Contiene el Usuario Seleccionado
-    private final MutableLiveData<Ambito> mAmbitoSelected;      // Contiene el Ambito Seleccionado
-    private final MutableLiveData<Folder> mFolderSelected;      // Contiene la Carpeta Seleccionada
-    private final MutableLiveData<Note> mNoteSelected;          // Contiene la Nota Seleccionada
+    private final MutableLiveData<User> mUserSelected;
+    private final MutableLiveData<Ambito> mAmbitoSelected;
+    private final MutableLiveData<Folder> mFolderSelected;
+    private final MutableLiveData<Note> mNoteSelected;
+    private final MutableLiveData<String> mToast;
+    private final MutableLiveData<Boolean> mViewUpdated;
 
-    private final MutableLiveData<String> mToast;               // Toast informativo
-    private final MutableLiveData<Boolean> mViewUpdate;         // Vista actualizada?
+    private final DatabaseAdapter databaseAdapter;
+    private final DocumentManager documentManager;
 
     public MainViewModel() {
         mUserSelected = new MutableLiveData<>();
@@ -39,14 +44,16 @@ public class MainViewModel extends ViewModel{
         mFolderSelected = new MutableLiveData<>();
         mNoteSelected = new MutableLiveData<>();
         mToast = new MutableLiveData<>();
-        mViewUpdate = new MutableLiveData<>();
-        mViewUpdate.setValue(false);
+        mViewUpdated = new MutableLiveData<>();
+        mViewUpdated.setValue(false);
 
         // Enlazamos con la base de datos, reconstruyendo la jerarquía del modelo a partir del Usuario Registrado
-        DatabaseAdapter da = DatabaseAdapter.getInstance();
-        da.setLoaderListener(new UserBuilder());
-        da.initFireBase();
-        da.getUser();
+        this.databaseAdapter = DatabaseAdapter.getInstance();
+        this.documentManager = DocumentManager.getInstance();
+
+        databaseAdapter.setLoaderListener(new UserBuilder());
+        databaseAdapter.initFireBase();
+        databaseAdapter.getUser();
     }
 
     public MutableLiveData<User> getUserSelected() { return mUserSelected; }
@@ -67,7 +74,8 @@ public class MainViewModel extends ViewModel{
         return mToast;
     }
 
-    public MutableLiveData<Boolean> getViewUpdate(){ return mViewUpdate; }
+    public MutableLiveData<Boolean> getViewUpdate(){ return mViewUpdated; }
+
 
     /**
      * Selecciona un Ámbito del Usuario logueado mUserSelected. Antes de nada, marcamos que la Vista
@@ -79,7 +87,7 @@ public class MainViewModel extends ViewModel{
         try {
             for (Ambito ambito : mUserSelected.getValue().getAmbitos()) {
                 if (ambito.getName().equals(ambitoName)) {
-                    mViewUpdate.setValue(false);
+                    mViewUpdated.setValue(false);
                     setToast("Ambito " + ambitoName + " selected.");
                     mAmbitoSelected.setValue(ambito);
                     mFolderSelected.setValue(null);
@@ -93,6 +101,7 @@ public class MainViewModel extends ViewModel{
             Log.w(TAG, "Exception message: " + exception.getMessage());
         }
     }
+
 
     /**
      * Selecciona una Carpeta del Ámbito actual mAmbitoSelected
@@ -113,6 +122,7 @@ public class MainViewModel extends ViewModel{
         }
     }
 
+
     /**
      * Deselecciona la Carpeta mFolderSelected del Ámbito actual, actualizando su lista de notas general.
      */
@@ -130,6 +140,7 @@ public class MainViewModel extends ViewModel{
             Log.w(TAG, "Exception message: " + exception.getMessage());
         }
     }
+
 
     /**
      * Selecciona una Nota del Ámbito actual mAmbitoSelected.
@@ -153,6 +164,7 @@ public class MainViewModel extends ViewModel{
         }
     }
 
+
     /**
      * Añadimos un nuevo Ámbito a la lista de Ámbitos del Usuario logueado.
      * @param ambitoName Nombre del Ámbito a crear. Debe ser distinto a los demás Ámbitos del Usuario.
@@ -170,7 +182,7 @@ public class MainViewModel extends ViewModel{
             Ambito newAmbito = new Ambito(ambitoName, ambitoColor);     // Creamos un nuevo Ámbito
             mUserSelected.getValue().addAmbito(newAmbito);              // Añadimos ese Ámbito al Usuario registrado
             mUserSelected.setValue(mUserSelected.getValue());           // Actualizamos la colección de Ámbitos del Usuario registrado
-            DatabaseAdapter.getInstance().saveAmbito(newAmbito);        // Guardamos el Ámbito en DB
+            databaseAdapter.saveAmbito(newAmbito);                      // Guardamos el Ámbito en DB
             setToast("Ambito " + ambitoName + " correctly created.");   // Creamos Toast informativo
 
         }catch(NullPointerException exception){
@@ -178,6 +190,7 @@ public class MainViewModel extends ViewModel{
             Log.w(TAG, "Exception message: " + exception.getMessage());
         }
     }
+
 
     /**
      * Actualizamos el contenido del Ambito editado
@@ -187,10 +200,14 @@ public class MainViewModel extends ViewModel{
      */
     public void editAmbito(String ambitoID, String ambitoName, int ambitoColor) {
         try {
-            Ambito selected = null;
             for (Ambito ambito : mUserSelected.getValue().getAmbitos()){
                 if(ambito.getSelfID().equals(ambitoID)){
-                    selected = ambito;                                     // Editamos el Ambito seleccionado
+                    ambito.setName(ambitoName);
+                    ambito.setColor(ambitoColor);
+                    if(mAmbitoSelected.getValue().getSelfID().equals(ambitoID)) mAmbitoSelected.setValue(ambito);     // Actualizamos el Ambito editado
+                    databaseAdapter.saveAmbito(ambito);                                                               // Guardamos el Ambito en DB
+                    setToast("Ambito " + ambitoName + " correctly edited.");                                          // Creamos Toast Informativo
+                    return;
                 }
             }
             selected.setName(ambitoName);
@@ -198,12 +215,14 @@ public class MainViewModel extends ViewModel{
             if (mAmbitoSelected.getValue().getSelfID().equals(ambitoID)) mAmbitoSelected.setValue(selected);     // Actualizamos el Ambito editado
             DatabaseAdapter.getInstance().saveAmbito(selected);                                                 // Guardamos el Ambito en DB
             setToast("Ambito " + ambitoName + " correctly edited.");                                            // Creamos Toast Informativo
+           
 
         }catch (NullPointerException exception) {
             Log.w(TAG, "Failed to edit ambito " + ambitoName + ": null pointer exception.");
             Log.w(TAG, "Exception message: " + exception.getMessage());
         }
     }
+
 
     /**
      * Actualizamos el contenido del Ambito editado
@@ -241,7 +260,7 @@ public class MainViewModel extends ViewModel{
     public void savePositionAmbitos(){
         try {
             for (Ambito ambito : mUserSelected.getValue().getAmbitos()){
-                DatabaseAdapter.getInstance().saveAmbito(ambito);
+                databaseAdapter.saveAmbito(ambito);
             }
         }catch(NullPointerException exception){
             Log.w(TAG, "Failed to save positions: null pointer exception.");
@@ -278,6 +297,7 @@ public class MainViewModel extends ViewModel{
         }
     }
 
+
     /**
      * Añadimos una nueva Nota a la lista de Notas del Ámbito actual (también en la Carpeta actual)
      * @param noteName Título de la Nota a añadir.
@@ -285,16 +305,19 @@ public class MainViewModel extends ViewModel{
      * @param text_html Texto en formato HTML de la Nota a añadir.
      * @throws NullPointerException Si el Ámbito actual no ha sido correctamente seleccionado.
      */
-    public void addNote(String noteName, String text_plain, String text_html) {
+    public void addNote(String noteName, String text_plain, String text_html,Boolean images,Boolean documents, String documentsID,String imagesID) {
         try{
             Note newNote = new Note(noteName, text_plain, text_html);   // Creamos una nueva Nota
-
+            newNote.setDocumentsID(documentsID);
+            newNote.setImagesID(imagesID);
+            newNote.setHaveDocuments(documents);
+            newNote.setHaveImages(images);
             if (mFolderSelected.getValue() != null)                     // Si tenemos una carpeta seleccionada, la asignamos a la Nota
                 newNote.setFolderTAG(mFolderSelected.getValue().getName());
 
             mAmbitoSelected.getValue().addNote(newNote);                // Añadimos esa Nota al Ámbito seleccionado
             mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos la colección de Notas de la Folder seleccionada
-            DatabaseAdapter.getInstance().saveNote(newNote);            // Guardamos la Nota en DB
+            databaseAdapter.saveNote(newNote);                          // Guardamos la Nota en DB
             setToast("Note " + noteName + " correctly created.");       // Creamos Toast Informativo
 
         }catch(NullPointerException exception){
@@ -303,6 +326,7 @@ public class MainViewModel extends ViewModel{
         }
     }
 
+
     /**
      * Actualizamos el contenido de la Nota editada del Ámbito actual.
      * @param title Título de la Nota editada.
@@ -310,29 +334,29 @@ public class MainViewModel extends ViewModel{
      * @param htmlText Texto en formato HTML de la Nota editada.
      * @throws NullPointerException Si la Nota Editada no ha sido correctamente seleccionada.
      */
-    public void editNote(String title, String plainText, String htmlText){
-        try {
-            Note selected = mNoteSelected.getValue();                   // Editamos la Nota seleccionada
-            selected.setTitle(title);
-            selected.setText_plain(plainText);
-            selected.setText_html(htmlText);
-            selected.setLastUpdate(new Date());
-            mNoteSelected.setValue(selected);                           // Actualizamos la Nota editada
-            mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos la colección de Notas de la Folder seleccionada
-            DatabaseAdapter.getInstance().saveNote(selected);           // Guardamos la Nota en DB
-            setToast("Note " + title + " correctly edited.");           // Creamos Toast Informativo
+    public void editNote(String title, String plainText, String htmlText, boolean images, boolean documents, String documentsID, String imagesID){
+        Note selected = mNoteSelected.getValue();                   // Editamos la Nota seleccionada
+        selected.setTitle(title);
+        selected.setText_plain(plainText);
+        selected.setText_html(htmlText);
+        selected.setDocumentsID(documentsID);
+        selected.setImagesID(imagesID);
+        selected.setLastUpdate(new Date());
+        selected.setHaveImages(images);
+        selected.setHaveDocuments(documents);
 
-        }catch(NullPointerException exception){
-            Log.w(TAG, "Failed to edit note " + title + ": null pointer exception.");
-            Log.w(TAG, "Exception message: " + exception.getMessage());
-        }
+        mNoteSelected.setValue(mNoteSelected.getValue());           // Actualizamos la Nota seleccionada
+        mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos colección de la carpeta seleccionada
+        databaseAdapter.saveNote(selected);                         // Guardamos la Nota en DB
+        setToast("Note " + title + " correctly edited.");           // Creamos Toast Informativo
     }
+
 
     /** Eliminamos una nota de la colección de notas del Ámbito seleccionado. La nota se elimina del Ámbito
      * y de la carpeta contenedora, en caso de que haya alguna.
      * @param noteID ID de la nota a eliminar.
      * @throws NullPointerException Si el Ámbito de la Nota no ha sido correctamente seleccionado.
-     * */
+     */
     public void deleteNote(String noteID) {
         try{
             for (Note note :mAmbitoSelected.getValue().getNotes()) {
@@ -341,7 +365,7 @@ public class MainViewModel extends ViewModel{
                     mFolderSelected.setValue(mFolderSelected.getValue());           // Actualizamos la colección de Notas de la Folder seleccionada
                     if (mNoteSelected.getValue().getSelfID().equals(noteID))        // Si la Nota eliminada es la seleccionada, la deseleccionamos.
                         mNoteSelected.setValue(null);
-                    DatabaseAdapter.getInstance().deleteNote(note.getSelfID());     // Eliminamos la Nota de DB
+                    databaseAdapter.deleteNote(note.getSelfID());                   // Eliminamos la Nota de DB
                     setToast("Note " + note.getTitle() + " correctly deleted.");    // Creamos Toast Informativo
                     return;
                 }
@@ -353,6 +377,7 @@ public class MainViewModel extends ViewModel{
             Log.w(TAG, "Exception message: " + exception.getMessage());
         }
     }
+
 
     /**
      * Eliminamos todas las notas de la colección de notas de la carpeta seleccionada. Estas son eliminadas
@@ -368,7 +393,7 @@ public class MainViewModel extends ViewModel{
                 mAmbitoSelected.setValue(mAmbitoSelected.getValue());           // Actualizamos la colección de carpetas del Ámbito seleccionado
                 if (mFolderSelected.getValue().getName().equals(folderName))    // Si la carpeta eliminada es la carpeta seleccionada, la deseleccionamos.
                     mFolderSelected.setValue(null);
-                DatabaseAdapter.getInstance().deleteFolder(folderName);         // Eliminamos las Notas de la Carpeta de DB
+                databaseAdapter.deleteFolder(folderName);                       // Eliminamos las Notas de la Carpeta de DB
                 setToast("Folder " + folderName + " correctly deleted.");       // Creamos Toast informativo
                 return;
             }
@@ -379,6 +404,7 @@ public class MainViewModel extends ViewModel{
             Log.w(TAG, "Exception message: " + exception.getMessage());
         }
     }
+
 
     /**
      * Eliminamos un Ámbito del Usuario. Ello implica eliminar TODAS las notas que contiene, así como sus Carpetas.
@@ -395,7 +421,7 @@ public class MainViewModel extends ViewModel{
                     if (ambito.getSelfID().equals(ambitoID)) {
                         mUserSelected.getValue().getAmbitos().remove(ambito);                       // Eliminamos el Ámbito del Usuario registrado en modo Local.
                         mUserSelected.setValue(mUserSelected.getValue());                           // Actualizamos el listado de Ámbitos del Usuario registrado.
-                        DatabaseAdapter.getInstance().deleteAmbito(ambitoID);                       // Eliminamos el Ámbito de DB
+                        databaseAdapter.deleteAmbito(ambitoID);                                     // Eliminamos el Ámbito de DB
 
                         setToast("Ambito " + ambito.getName() + " correctly deleted.");             // Creamos Toast informativo
                         if (mAmbitoSelected.getValue().getSelfID().equals(ambitoID))                // Finalmente, si el Ámbito eliminado es el seleccionado, lo deseleccionamos.
@@ -404,7 +430,7 @@ public class MainViewModel extends ViewModel{
                     }
                 } Log.w(TAG, "Failed to delete ambito " + ambitoID + ": ambito note founded. ");
 
-            } else Log.w(TAG, "Failed to delete ambito " + ambitoID + ": can't delete last User's Ambito");
+            } else setToast("Failed to delete last User's Ambito");
 
         }catch(NullPointerException exception){
             Log.w(TAG, "Failed to add ambito " + ambitoID + ": null pointer exception.");
@@ -412,10 +438,12 @@ public class MainViewModel extends ViewModel{
         }
     }
 
+
     private void setToast(String s) {
         Log.w(TAG, s);
         mToast.setValue(s);
     }
+
 
     /* BUILDER PATTERN FOR DATABASE INTERFACE */
     protected class UserBuilder implements DatabaseAdapter.LoaderInterface{
@@ -433,7 +461,7 @@ public class MainViewModel extends ViewModel{
         public void getUserResult(User user) {
             currentUser = user;
             Log.w("UserBuilder", "Step 1 succes: user correctly loaded from Database.");
-            DatabaseAdapter.getInstance().getAmbitos();
+            databaseAdapter.getAmbitos();
         }
 
         @Override
@@ -441,7 +469,7 @@ public class MainViewModel extends ViewModel{
             if (currentUser != null && currentUser.getSelfID().equals(userID)) {
                 currentUser.setAmbitos(userAmbitos);
                 Log.w("UserBuilder", "Step 2 succes: ambitos of user " + currentUser.getSelfID() + " correctly loaded from Database.");
-                for (Ambito ambito : userAmbitos) DatabaseAdapter.getInstance().getNotes(ambito.getSelfID());
+                for (Ambito ambito : userAmbitos) databaseAdapter.getNotes(ambito.getSelfID());
             } else Log.w("UserBuilder", "Step 2 failure. User " + currentUser.getSelfID() + " it's unitiallized.");
         }
 
@@ -452,7 +480,12 @@ public class MainViewModel extends ViewModel{
             else{
                 for (Ambito ambito : currentUser.getAmbitos()) {
                     if (ambito.getSelfID().equals(ambitoID)) {
-                        for (Note note : ambitoNotes) ambito.addNote(note);
+                        for (Note note : ambitoNotes){ // Cargamos las Imágenes y Documentos necesarios de DB en el Map de DocumentManager
+                            if(note.getHaveImages() && note.getImagesID() != null) documentManager.getImagesNote(note.getImagesID());
+                            if(note.getHaveDocuments() && note.getDocumentsID() != null)  documentManager.getDocuments(note.getDocumentsID());
+
+                            ambito.addNote(note);
+                        }
                         loadingCounter++;
                         break;
                     }

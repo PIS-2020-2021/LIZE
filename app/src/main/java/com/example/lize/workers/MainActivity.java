@@ -8,7 +8,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -25,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lize.R;
+import com.example.lize.models.DocumentManager;
 import com.example.lize.models.MainViewModel;
 import com.example.lize.utils.Preferences;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -35,7 +38,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -44,12 +46,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /** Activity Principal de la app Lize. Contenedor del Ámbito con sus Carpetas y sus Notas. */
 public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
 
-    private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
-    private NoteHostFragment noteHostFragment;               // Contenedor de Notas
-    private FolderHostFragment folderHostFragment;           // Contenedor de Folders
-    private AmbitoHostFragment ambitoHostFragment;           // Contenedor de Ambitos
-    private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
-
     public static final String TAG = "MainActivity";
     public static final int REQUEST_CODE_ADD_NOTE = 1;
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
@@ -57,7 +53,15 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     private static final int REQUEST_CODE_UPDATE_USER = 4;
     private static final int THEME_UPDATE_DURATION = 1000;
 
+    private MaterialToolbar topAppBar;                       // MaterialToolbar de la app.
+    private NoteHostFragment noteHostFragment;               // Contenedor de Notas
+    private FolderHostFragment folderHostFragment;           // Contenedor de Folders
+    private AmbitoHostFragment ambitoHostFragment;           // Contenedor de Ambitos
+    private boolean cardNoteType = true;                     // Boolean del tipo de vista de las Notas.
+
     private MainViewModel dataViewModel;
+    private DocumentManager documentManager;
+
     private FloatingActionButton addFAB, addNoteFAB, addFolderFAB;  // Floating Action Buttons
     private boolean isFABGroupExpanded = false;
     private final Handler handler = new Handler();        // Methods to create a simple animation
@@ -142,7 +146,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
         //Observamos el LiveData del ViewModel
         observeLiveData();
-    }
+
+        documentManager = documentManager.getInstance();
+        documentManager.setContext(this);
+     }
 
 
     @Override
@@ -186,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         switch (item.getItemId()) {
             case R.id.search:
                 noteHostFragment.searchNote(item);
-                searchNote();
                 break;
             case R.id.sandwich:
                 changeCardNoteType(item);
@@ -198,19 +204,12 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     }
 
     /**
-     * Método para buscar una Nota en el Ámbito en el que estamos.
-     * TODO: Implementación futura
-     */
-    private void searchNote() {}
-
-    /**
      * Método para modificar el icono del MenuItem de cambiar vista de Notas
      * @param item menú item de cambiar vista de notas (sandwich)
      */
     private void changeCardNoteType(MenuItem item){
         cardNoteType = !cardNoteType;
-        item.setIcon((cardNoteType) ? R.drawable.ic_baseline_table_rows_24 :
-                R.drawable.ic_baseline_view_module_24);
+        item.setIcon((cardNoteType) ? R.drawable.ic_baseline_table_rows_24 : R.drawable.ic_baseline_view_module_24);
     }
 
     /**
@@ -233,21 +232,34 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
                 Log.d("Titulo", title);
                 Log.d("Texto Plano", plainText);
                 Log.d("Texto HTML", htmlText);
-                dataViewModel.addNote(title, plainText, htmlText);
+
+                Boolean images = bundle.getBoolean("images");
+                Boolean documents = bundle.getBoolean("documents");
+                String documentsID =  bundle.getString("documentsID");
+                String imagesID =  bundle.getString("imagesID");
+
+                dataViewModel.addNote(title, plainText, htmlText, images, documents,documentsID,imagesID);
 
             } else if (requestCode == REQUEST_CODE_EDIT_NOTE && resultCode == RESULT_OK) {
                 Log.d(TAG, "Request Code for Note Editing OK");
                 String title = bundle.getString("title");
                 String plainText = bundle.getString("noteText_PLAIN");
                 String htmlText = bundle.getString("noteText_HTML");
-                dataViewModel.editNote(title, plainText, htmlText);
+                Boolean images = bundle.getBoolean("images");
+                String imagesID =  bundle.getString("imagesID");
+                Boolean documents = bundle.getBoolean("documents");
+                String documentsID =  bundle.getString("documentsID");
+
+                dataViewModel.editNote(title, plainText, htmlText, images, documents,documentsID,imagesID);
 
             } else if (requestCode == REQUEST_CODE_ADD_AMBITO && resultCode == RESULT_OK) {
                 String name = bundle.getString("name");
                 int color = (int) bundle.getLong("color");
                 Log.d("Nombre", name);
                 Log.d("Color ", String.valueOf(color));
-                ambitoHostFragment.addAmbito(name, color);
+
+                dataViewModel.addAmbito(name, color);
+                // ambitoHostFragment.addAmbito(name, color);
 
             } else if (requestCode == REQUEST_CODE_UPDATE_USER && resultCode == RESULT_OK) {
                 String name = bundle.getString("name");
@@ -263,10 +275,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
 
             } else Log.d(TAG, "Invalid RESULT from NoteActivity: " + resultCode);
+        }
+        else Log.d(TAG, "Null bundle");
 
-        } else Log.d(TAG, "Null bundle");
     }
-
     /**
      * Setea el Header de la MainActivity
      * @param name nombre del User
@@ -358,6 +370,9 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
     }
 
+    /**
+     * Lógica de actualización de Vista. Realizamos una pequeña animación antes de recrear la actividad.
+     */
     protected void updateAmbito() {
         ViewGroup root = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
         CircularProgressIndicator circleProgress = findViewById(R.id.progress_circle);

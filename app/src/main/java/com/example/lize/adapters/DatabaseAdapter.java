@@ -1,7 +1,23 @@
 package com.example.lize.adapters;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
+
+import com.example.lize.data.Document;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
@@ -23,6 +39,13 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -167,6 +190,10 @@ public class DatabaseAdapter {
                     note.setFolderTAG(document.getString("folderTAG"));
                     note.setSelfID(document.getString("selfID"));
                     note.setLastUpdate(document.getDate("lastUpdate"));
+                    note.setDocumentsID(document.getString("documentsID"));
+                    note.setImagesID(document.getString("imagesID"));
+                    note.setHaveImages(document.getBoolean("images"));
+                    note.setHaveDocuments(document.getBoolean("documents"));
                     ambitoNotes.add(note);
                 }
                 if(loader != null) loader.getNoteCollectionResult(ambitoID, ambitoNotes);
@@ -265,6 +292,10 @@ public class DatabaseAdapter {
         notesData.put("ambitoID", note.getAmbitoID());
         notesData.put("folderTAG", note.getFolderTAG());
         notesData.put("lastUpdate", note.getLastUpdate());
+        notesData.put("documentsID",note.getDocumentsID());
+        notesData.put("imagesID",note.getImagesID());
+        notesData.put("documents",note.getHaveDocuments());
+        notesData.put("images",note.getHaveImages());
 
         noteRef.set(notesData).addOnCompleteListener(new OnCompleteListener(){
             @Override

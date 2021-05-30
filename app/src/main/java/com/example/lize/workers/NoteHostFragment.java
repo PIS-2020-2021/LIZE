@@ -38,6 +38,7 @@ import com.example.lize.adapters.NoteAdapter;
 import com.example.lize.data.Ambito;
 import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
+import com.example.lize.models.DocumentManager;
 import com.example.lize.models.MainViewModel;
 import com.google.android.material.card.MaterialCardView;
 
@@ -52,16 +53,15 @@ import java.util.ArrayList;
 public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteListener {
 
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
+    private Context mContext;                           // Root context
+    private RecyclerView mNotesRecyclerView;            // Recycle View of Card-Notes
+    private StaggeredGridLayoutManager mNotesManager;            // Recycle View Layout Manager
+    private NoteAdapter mNoteAdapter;                   // NoteAdapter for the RecycleView
+    private boolean cardNoteType;                       // boolean cardNote type
+    private MainViewModel dataViewModel;                // Model Shared Data between Fragments
 
-    private Context mContext;                               // Root context
-    private RecyclerView mNotesRecyclerView;                // Recycle View of Card-Notes
-    private StaggeredGridLayoutManager mNotesManager;       // Recycle View Layout Manager
-    private NoteAdapter mNoteAdapter;                       // NoteAdapter for the RecycleView
 
     private NoteAdapter.CardNote lastCardChecked;           // Last CardNote selected
-    private boolean cardNoteType;                           // boolean cardNote type
-
-    private MainViewModel dataViewModel;                    // Model Shared Data between Fragments
 
     /** Inicializa el fragment contenedor de Notas. */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,6 +74,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         mNotesRecyclerView.setLayoutManager(mNotesManager);
 
         this.cardNoteType = true;
+
         return root;
     }
 
@@ -152,16 +153,6 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
     }
 
     /**
-     * Añadimos una nueva nota al DataSet del MainViewModel.
-     * @param noteName Nombre de la nueva nota a crear
-     * @param text_plain Texto Plano de la nueva nota a crear
-     * @param text_html Texto HTML de la nueva nota a crear
-     */
-    public void addCardNote(String noteName, String text_plain, String text_html) {
-        dataViewModel.addNote(noteName, text_plain, text_html);
-    }
-
-    /**
      * Cuando un card note sea clickeado, inicia la actividad NotasActivity.class mediante un Intent
      * @param cardNote cardNote clickeado
      */
@@ -173,6 +164,10 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         Bundle nota = new Bundle();
         nota.putString("title", selectedNote.getTitle());
         nota.putString("noteText_HTML", selectedNote.getText_html());
+        nota.putString("documentsID",selectedNote.getDocumentsID());
+        nota.putString("imagesID",selectedNote.getImagesID());
+        nota.putBoolean("images",selectedNote.getHaveImages());
+        nota.putBoolean("documents",selectedNote.getHaveDocuments());
         intent.putExtras(nota);
 
         requireActivity().startActivityForResult(intent, REQUEST_CODE_EDIT_NOTE);
