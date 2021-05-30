@@ -774,5 +774,10 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
         }
     }
+
+    @Override
+    public void removeAudio(int position) {
+
+    }
 }
 

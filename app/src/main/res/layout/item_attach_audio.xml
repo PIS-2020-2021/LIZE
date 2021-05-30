@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/_12sdp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="@dimen/_5sdp"
+    android:layout_marginBottom="@dimen/_5sdp"
+    tools:layout_editor_absoluteX="8dp"
+    tools:layout_editor_absoluteY="8dp"
+    android:id="@+id/audio_layout"
+    android:background="@drawable/rectangle_audio_item"
+    >
+
+    <ImageButton
+        android:id="@+id/playButton"
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_marginLeft="@dimen/_3sdp"
+        android:focusable="true"
+        android:layout_gravity="center"
+        android:background="@drawable/ic_baseline_play_circle_filled_24"
+        android:layout_marginStart="@dimen/_3sdp"
+        android:contentDescription="@string/documents" />
+
+
+
+    <com.gauravk.audiovisualizer.visualizer.BarVisualizer
+        xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/blast"
+        android:layout_width="@dimen/_170sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_marginLeft="@dimen/_14sdp"
+        android:gravity="center_vertical"
+        custom:avDensity="0.8"
+        custom:avType="fill"
+        custom:avColor="@color/Default_Purple"
+        custom:avSpeed="normal"/>
+
+    <TextView
+        android:id="@+id/audioTime"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/_4sdp"
+        android:layout_marginStart="@dimen/_3sdp"/>
+
+    <ImageButton
+        android:id="@+id/removeAudioButton"
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_marginLeft="@dimen/_3sdp"
+        android:layout_gravity="center"
+        android:background="@drawable/ic_baseline_clear_24"
+        android:layout_marginStart="@dimen/_3sdp"
+        android:contentDescription="@string/documents" />
+</LinearLayout>
