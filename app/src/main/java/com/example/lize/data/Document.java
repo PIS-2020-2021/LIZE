@@ -13,6 +13,7 @@ public class Document {//extends File{
     private String id;
     private String path;
     private byte[] bytes;
+    File content;
 
     public Document(Uri uri){
         this.Url = uri;
@@ -66,5 +67,13 @@ public class Document {//extends File{
 
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
+    }
+
+    public File getContent() {
+        return content;
+    }
+
+    public void setContent(File content) {
+        this.content = content;
     }
 }

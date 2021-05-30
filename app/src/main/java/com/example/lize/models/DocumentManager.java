@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.lize.data.Audio;
 import com.example.lize.data.Document;
 import com.example.lize.data.Image;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -49,6 +50,7 @@ public class DocumentManager {
     private StorageTask mUploadTask;
     private Map<String, ArrayList<Image>> imagesNote;
     private Map<String, ArrayList<Document>> documentsNote;
+    private Map<String, ArrayList<String>> audiosNote;
 
     private synchronized static void createInstance() {
         if (documentManager == null) {
@@ -64,6 +66,7 @@ public class DocumentManager {
     public DocumentManager() {
         imagesNote = new HashMap<>();
         documentsNote = new HashMap<>();
+        audiosNote = new HashMap<>();
     }
 
     public void setContext(Context context){
@@ -120,9 +123,6 @@ public class DocumentManager {
                                 // Handle any errors
                             }
                         });
-
-
-
                     }
                 }
 
@@ -411,9 +411,6 @@ public class DocumentManager {
         });
     }
 
-
-
-
     public boolean arrayImagesEmpty(String imagesID){
         if(imagesNote.containsKey(imagesID)){
             return imagesNote.get(imagesID).isEmpty();
@@ -429,8 +426,15 @@ public class DocumentManager {
         }else{
             return true;
         }
-
     }
+    public boolean arrayAudiosEmpty(String AudiosID){
+        if(audiosNote.containsKey(AudiosID)){
+            return audiosNote.get(AudiosID).isEmpty();
+        }else{
+            return true;
+        }
+    }
+
 
     public String selectImageFromArray(String imagesID,int position){
         return imagesNote.get(imagesID).get(position).getPath();
@@ -460,5 +464,160 @@ public class DocumentManager {
         fos.flush();
         fos.close();
         return f;
+    }
+
+    public String addAudioToCloud(String AudiosID, Audio a) {
+        DocumentReference noteRef;
+        if (AudiosID == null) {
+            noteRef = db.collection("audios").document();
+            AudiosID = noteRef.getId();
+        } else {
+            noteRef = db.collection("audios").document(AudiosID);
+        }
+        if (audiosNote.containsKey(AudiosID)) {
+            audiosNote.get(AudiosID).add(a.getAddress());
+        } else {
+            ArrayList<String> audios = new ArrayList<>();
+            audios.add(a.getAddress());
+            audiosNote.put(AudiosID, audios);
+            //notas.get(DocumentsID).getDocuments().add(doc);
+        }
+
+        if(audiosNote.get(AudiosID).size() == 1) {
+            String ref = a.getAddress();// "-img-" + notas.get(DocumentsID).getBitmaps().indexOf(image);
+            uploadAudio(a);
+            Map<String, Object> noteAudios = new HashMap<>();
+            ArrayList<String> files = new ArrayList<>();
+            files.add(ref);
+            noteAudios.put("AudioID", AudiosID);
+            noteAudios.put("files", files);
+            String finalDocumentsID = AudiosID;
+            noteRef.set(noteAudios).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful())
+                        Log.d(TAG, "Note " + finalDocumentsID + "Document correctly saved.");
+                    else Log.d(TAG, "Error saving note " + finalDocumentsID, task.getException());
+                }
+            });
+
+        } else {
+            DocumentReference notasRef = db.collection("audios").document(AudiosID);
+
+            String finalDocumentsID2 = AudiosID;
+
+            notasRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    List<String> group = (List<String>) document.get("audios");
+                    ArrayList<String> files = (ArrayList<String>) group;
+                    String ref = a.getAddress();//+ "-img-" + (notas.get(finalDocumentsID2).getBitmaps().indexOf(image)) ;
+
+                    files.add(ref);
+                    uploadAudio(a);
+                    Map<String, Object> noteAudios = new HashMap<>();
+                    noteAudios.put("AudiosID", finalDocumentsID2);
+                    noteAudios.put("files", files);
+                    String finalDocumentsID1 = finalDocumentsID2;
+                    noteRef.set(noteAudios).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful())
+                                Log.d(TAG, "Note " + finalDocumentsID1 + "Document correctly saved.");
+                            else Log.d(TAG, "Error saving note " + finalDocumentsID1, task.getException());
+                        }      });
+                }
+            });
+        }
+        return AudiosID;
+
+    }
+
+
+    private Boolean uploadAudio(Audio audio) {
+        final Boolean[] success = {false};
+
+        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        //image.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+        //byte[] data = baos.toByteArray();
+
+
+        StorageReference file = mStorageRef.child(audio.getAddress());
+        mUploadTask = file.putFile(Uri.fromFile(new File(audio.getAddress()))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                success[0] = true;
+            }
+        });
+
+        return success[0];
+    }
+
+    public void removeAudioFromNote(String AudiosID, Audio currentItem) {
+        String ref = currentItem.getAddress();//+ "-img-" + (currentItem);
+        DocumentReference notasRef = db.collection("audios").document(AudiosID);
+
+        audiosNote.get(AudiosID).remove(currentItem);
+        notasRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                List<String> group = (List<String>) document.get("audios");
+                ArrayList<String> audios = (ArrayList<String>) group;
+                audios.remove(ref);
+
+                Map<String, Object> noteAudios = new HashMap<>();
+                noteAudios.put("AudiosID", AudiosID);
+                noteAudios.put("files", audios);
+                notasRef.update(noteAudios).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful())
+                            Log.d(TAG, "Note Image " + AudiosID + "Document correctly update.");
+                        else Log.d(TAG, "Error updating image note " + AudiosID, task.getException());
+                    }      });
+                StorageReference singleDoc = mStorageRef.child(ref);
+                singleDoc.delete();
+
+            }
+        });
+    }
+
+
+    public ArrayList<String> getAudios(String AudiosID) {
+
+        if (audiosNote.containsKey( AudiosID)) {
+            return audiosNote.get(AudiosID);
+
+        } else {
+            ArrayList<String> audios = new ArrayList<>();
+
+            DocumentReference notasRef = db.collection("audios").document(AudiosID);
+            notasRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    List<String> group = (List<String>) document.get("files");
+                    ArrayList<String> files = (ArrayList<String>) group;
+                    for(String audio :files){
+                        audios.add(audio);
+                        StorageReference singleDoc = mStorageRef.child(audio);
+                        File file = new File(audio);
+                        singleDoc.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                // Local temp file has been created
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Handle any errors
+                            }
+                        });
+
+                }
+
+            }});
+            audiosNote.put(AudiosID, audios);
+            return audiosNote.get(AudiosID);
+        }
     }
 }

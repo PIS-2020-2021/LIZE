@@ -152,6 +152,15 @@
                     app:layout_constraintTop_toBottomOf="@+id/imageNote" />
 
 
+        <include layout="@layout/audio_recyle_view"
+            android:id="@+id/audioRecycleView"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_30sdp"
+            app:layout_constraintTop_toBottomOf="@id/inputNota"
+            android:visibility="visible"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!--<include layout="@layout/bottom_menu_note"/>-->
