@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:menu="@menu/crear_ambito_top_menu"
-                app:title="Nuevo ámbito"
+                app:title="Modificar ámbito"
                 app:contentInsetLeft="@dimen/_1sdp"
                 app:titleTextColor="@color/white"
                 />
