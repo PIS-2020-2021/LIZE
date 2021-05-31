@@ -125,4 +125,8 @@
     <string name="move_note">Mover Nota</string>
 
 
+    <string name="save_audio">Save Audio</string>
+    <string name="cancel">Cancel</string>
+
+
 </resources>

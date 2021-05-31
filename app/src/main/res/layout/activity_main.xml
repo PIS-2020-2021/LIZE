@@ -18,10 +18,10 @@
                 android:id="@+id/ambito_material_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:menu="@menu/ambito_top_menu"
+                android:background="?attr/colorPrimary"
+                app:titleTextColor="?colorOnPrimary"
                 app:title="@string/ambit_default_name"
-                app:titleTextColor="@color/white"
-                app:navigationIcon="@drawable/ic_baseline_menu_24"/>
+                app:menu="@menu/ambito_top_menu"/>
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -29,19 +29,22 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_below="@id/ambito_top_app_bar">
+            android:layout_below="@id/ambito_top_app_bar"
+            android:background="?attr/background">
 
             <fragment
                 android:id="@+id/folders_host_fragment"
                 android:name="com.example.lize.workers.FolderHostFragment"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:background="?attr/background"/>
 
             <fragment
                 android:id="@+id/notes_host_fragment"
                 android:name="com.example.lize.workers.NoteHostFragment"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:background="?attr/background"/>
 
         </LinearLayout>
 
@@ -52,6 +55,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_margin="16dp"
+            android:backgroundTint="?attr/colorPrimaryDark"
+            app:tint="?attr/colorOnPrimary"
             app:srcCompat="@drawable/ic_baseline_add_24"
             android:layout_alignParentEnd="true"
             android:contentDescription="@string/boton_mas_del_fab" />
@@ -63,6 +68,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_margin="16dp"
+            android:backgroundTint="?attr/colorPrimaryDark"
+            app:tint="?attr/colorOnPrimary"
             app:fabSize="mini"
             android:visibility="invisible"
             app:srcCompat="@drawable/ic_baseline_note_add_24"
@@ -76,6 +83,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_margin="16dp"
+            android:backgroundTint="?attr/colorPrimaryDark"
+            app:tint="?attr/colorOnPrimary"
             app:fabSize="mini"
             android:visibility="invisible"
             app:srcCompat="@drawable/ic_baseline_folder_add_24"
@@ -93,4 +102,3 @@
     </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

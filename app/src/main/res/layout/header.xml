@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorOnPrimary"
             android:text="@string/android_default_user"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="5dp"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorOnPrimary"
             android:text="@string/android_default_email"
             android:textSize="14sp"
             android:textStyle="normal"
@@ -61,8 +61,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:background="#00FFFFFF"
-                app:backgroundTint="#00FFFFFF"
+                android:background="@color/cardview_shadow_end_color"
+                app:backgroundTint="@color/cardview_shadow_end_color"
                 app:icon="@drawable/settings_30x30" />
 
             <Button
@@ -70,8 +70,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:background="#00FFFFFF"
-                app:backgroundTint="#00FFFFFF"
+                android:background="@color/cardview_shadow_end_color"
+                app:backgroundTint="@color/cardview_shadow_end_color"
                 app:icon="@drawable/luna_30x30" />
 
             <Button
@@ -79,11 +79,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:background="#00FFFFFF"
+                android:background="@color/cardview_shadow_end_color"
                 app:backgroundTint="@color/cardview_shadow_end_color"
                 app:icon="@drawable/add_ambito_30x30" />
-
-
         </LinearLayout>
     </LinearLayout>
 

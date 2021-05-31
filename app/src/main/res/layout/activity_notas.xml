@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="?attr/background"
     tools:context=".workers.NotasActivity"
-    android:id="@+id/coordinator"
-
-    >
+    android:id="@+id/coordinator">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/_45sdp"
-        android:background="?attr/colorPrimaryDark">
+        android:background="?attr/colorPrimary">
     <ImageView
         android:id="@+id/backBtn"
         android:layout_width="@dimen/_20sdp"
@@ -26,7 +25,7 @@
         app:srcCompat="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white"
+        app:tint="?attr/colorOnPrimary"
         android:clickable="true"
         android:focusable="true"/>
 
@@ -37,9 +36,10 @@
         android:layout_marginLeft="@dimen/_270sdp"
         android:contentDescription="@string/app_name"
         app:srcCompat="@drawable/ic_baseline_more_vert_24"
+        app:tint="?attr/colorOnPrimary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="#00000000"
+        android:background="@android:color/transparent"
         android:onClick="showMenu"
         android:layout_marginRight="@dimen/_10sdp" />
     <EditText
@@ -56,8 +56,8 @@
         android:textAlignment="center"
         android:includeFontPadding="false"
         android:inputType="text"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
+        android:textColor="?attr/colorOnPrimary"
+        android:textColorHint="?attr/colorOnPrimary"
         android:textSize="@dimen/_16ssp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -86,12 +86,6 @@
             android:layout_height="@dimen/_55sdp"
             android:layout_width="match_parent" />
 
-
-        <!-- <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/fileAttachView"
-            >-->
                 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     xmlns:tools="http://schemas.android.com/tools"
@@ -122,24 +116,6 @@
 
                 </RelativeLayout>
 
-<!--            <EditText
-                android:id="@+id/inputNota"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_12sdp"
-                android:layout_marginTop="@dimen/_12sdp"
-                android:layout_marginEnd="@dimen/_12sdp"
-                android:background="@null"
-                android:fontFamily="@font/ubuntu"
-                android:hint="@string/escribe_aqui"
-                android:imeOptions="actionDone"
-                android:importantForAutofill="no"
-                android:includeFontPadding="false"
-                android:inputType="textMultiLine"
-                android:textColor="@color/black"
-                android:textColorHint="@color/black"
-                android:textSize="@dimen/_13ssp"
-                app:layout_constraintTop_toBottomOf="@+id/imageNote" />-->
                 <com.onegravity.rteditor.RTEditText
                     android:id="@+id/inputNota"
                     android:layout_width="match_parent"
@@ -149,8 +125,18 @@
                     android:layout_marginStart="@dimen/_12sdp"
                     android:layout_marginEnd="@dimen/_12sdp"
                     android:textSize="@dimen/_13ssp"
+                    android:textColor="?attr/colorOnBackground"
                     app:layout_constraintTop_toBottomOf="@+id/imageNote" />
 
+
+        <include layout="@layout/audio_recyle_view"
+            android:id="@+id/audioRecycleView"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_30sdp"
+            app:layout_constraintTop_toBottomOf="@id/inputNota"
+            android:visibility="visible"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -159,7 +145,8 @@
     <!-- layout="@layout/rte_toolbar" -->
     </ScrollView>
 
-    <include android:id="@+id/toolbar_container" layout="@layout/textv3"
+    <include android:id="@+id/toolbar_container"
+        layout="@layout/textv3"
         android:layout_gravity="bottom"
         android:layout_height="@dimen/_100sdp"
          android:layout_width="match_parent"

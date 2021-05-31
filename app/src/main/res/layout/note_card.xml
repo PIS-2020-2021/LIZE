@@ -17,7 +17,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:background="?attr/colorSurface">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/text_group"
@@ -34,7 +35,8 @@
                     app:layout_constraintTop_toTopOf="parent"
                     android:paddingHorizontal="5dp"
                     android:text="@string/note_default_metadata"
-                    android:textAppearance="@style/TextAppearance.Lize.MetadataText"/>
+                    android:textAppearance="@style/TextAppearance.Lize.MetadataText"
+                    android:textColor="?attr/colorOnSurface"/>
 
                 <TextView
                     android:id="@+id/note_title"
@@ -46,7 +48,7 @@
                     android:paddingBottom="8dp"
                     android:text="@string/note_default_name"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                    android:textColor="?attr/colorOnPrimary"/>
+                    android:textColor="?attr/colorOnPrimarySurface"/>
 
                 <TextView
                     android:id="@+id/note_body"
@@ -59,7 +61,7 @@
                     android:maxHeight="@dimen/cardnote_text_max_height"
                     android:text="@string/note_default_body"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                    android:textColor="?attr/colorOnPrimary"/>
+                    android:textColor="?attr/colorOnPrimarySurface"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -91,7 +93,7 @@
                 app:layout_constraintEnd_toStartOf="@id/note_copy_btn"
                 android:layout_width="30dp"
                 android:layout_height="40dp"
-                android:tint="?attr/colorOnSurface"
+                android:tint="?attr/colorOnPrimarySurface"
                 app:srcCompat="@drawable/ic_baseline_drive_file_move_24"
                 android:background="@android:color/transparent"/>
 
@@ -102,7 +104,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_width="30dp"
                 android:layout_height="40dp"
-                android:tint="?attr/colorOnSurface"
+                android:tint="?attr/colorOnPrimarySurface"
                 app:srcCompat="@drawable/ic_baseline_file_copy_24"
                 android:background="@android:color/transparent"/>
 
@@ -113,7 +115,7 @@
                 app:layout_constraintStart_toEndOf="@id/note_copy_btn"
                 android:layout_width="30dp"
                 android:layout_height="40dp"
-                android:tint="?attr/colorOnSurface"
+                android:tint="?attr/colorOnPrimarySurface"
                 app:srcCompat="@drawable/delete_icon"
                 android:background="@android:color/transparent"/>
 

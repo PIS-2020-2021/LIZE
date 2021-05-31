@@ -9,7 +9,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="?attr/background">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/ambito_top_app_bar"
@@ -21,11 +22,11 @@
                 android:id="@+id/ambito_material_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
                 app:menu="@menu/crear_ambito_top_menu"
                 app:title="Modificar ámbito"
                 app:contentInsetLeft="@dimen/_1sdp"
-                app:titleTextColor="@color/white"
-                />
+                app:titleTextColor="?attr/colorOnPrimary" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -44,7 +45,7 @@
                 android:layout_marginTop="15dp"
                 android:text="@string/nombre_del_ambito"
                 android:textSize="@dimen/_13sdp"
-                android:textColor="?attr/colorOnPrimary"/>
+                android:textColor="?attr/colorOnBackground"/>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -72,7 +73,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="0dp"
-                            android:background="#33FFFFFF"
+                            android:background="@android:color/transparent"
+                            android:textColor="?attr/colorOnBackground"
                             android:inputType="textNoSuggestions"
                             android:maxLines="1"
                             android:paddingStart="5dp"
@@ -91,13 +93,13 @@
                 android:layout_marginTop="10dp"
                 android:textSize="@dimen/_13sdp"
                 android:text="@string/color_de_fondo"
-                android:textColor="?attr/colorOnPrimary"/>
+                android:textColor="?attr/colorOnBackground"/>
 
             <RelativeLayout
                 android:id="@+id/relativeLayoutCardViews"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="10dp"
                 android:layout_gravity="center_horizontal">
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -118,16 +120,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardRojoEdit"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:clickable="true"
-                            android:foreground="?selectableItemBackground"
-                            app:cardCornerRadius="2dp"
-                            app:cardElevation="4dp"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="5dp"
-                            app:cardBackgroundColor="@color/red_A400"
+                            style="@style/NewAmbito.CardView.Red"
                             android:onClick="onClick"
                             android:focusable="true">
 
@@ -137,16 +130,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardMoradoEdit"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:clickable="true"
-                            android:foreground="?selectableItemBackground"
-                            app:cardCornerRadius="2dp"
-                            app:cardElevation="4dp"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="5dp"
-                            app:cardBackgroundColor="@color/purple_A400"
+                            style="@style/NewAmbito.CardView.Purple"
                             android:onClick="onClick"
                             android:focusable="true">
 
@@ -175,20 +159,9 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardAzulEdit"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:clickable="true"
-                            android:foreground="?selectableItemBackground"
-                            app:cardCornerRadius="2dp"
-                            app:cardElevation="4dp"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginTop="20dp"
-                            android:layout_marginRight="10dp"
-                            app:cardBackgroundColor="@color/light_blue_A400"
+                            style="@style/NewAmbito.CardView.Blue"
                             android:onClick="onClick"
-                            android:focusable="true"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginEnd="10dp">
+                            android:focusable="true">
 
                         </androidx.cardview.widget.CardView>
 
@@ -196,16 +169,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardTealEdit"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:clickable="true"
-                            android:foreground="?selectableItemBackground"
-                            app:cardCornerRadius="2dp"
-                            app:cardElevation="4dp"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginTop="20dp"
-                            android:layout_marginRight="5dp"
-                            app:cardBackgroundColor="@color/teal_A400"
+                            style="@style/NewAmbito.CardView.Teal"
                             android:onClick="onClick"
                             android:focusable="true">
 
@@ -215,16 +179,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardVerdeEdit"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:clickable="true"
-                            android:foreground="?selectableItemBackground"
-                            app:cardCornerRadius="2dp"
-                            app:cardElevation="4dp"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginTop="20dp"
-                            android:layout_marginRight="5dp"
-                            app:cardBackgroundColor="@color/light_green_A400"
+                            style="@style/NewAmbito.CardView.Green"
                             android:onClick="onClick"
                             android:focusable="true">
 
@@ -234,16 +189,7 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardAmarilloEdit"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:clickable="true"
-                            android:foreground="?selectableItemBackground"
-                            app:cardCornerRadius="2dp"
-                            app:cardElevation="4dp"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginTop="20dp"
-                            android:layout_marginRight="5dp"
-                            app:cardBackgroundColor="@color/yellow_A400"
+                            style="@style/NewAmbito.CardView.Yellow"
                             android:onClick="onClick"
                             android:focusable="true">
 
@@ -253,35 +199,16 @@
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardNaranjaEdit"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:clickable="true"
-                            android:foreground="?selectableItemBackground"
-                            app:cardCornerRadius="2dp"
-                            app:cardElevation="4dp"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginTop="20dp"
-                            android:layout_marginRight="5dp"
-                            app:cardBackgroundColor="@color/orange_A400"
+                            style="@style/NewAmbito.CardView.Orange"
                             android:onClick="onClick"
                             android:focusable="true">
-
                         </androidx.cardview.widget.CardView>
 
                         <!-- Fila 3 - Columna 3 -->
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cardMarronEdit"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:clickable="true"
-                            android:foreground="?selectableItemBackground"
-                            app:cardCornerRadius="2dp"
-                            app:cardElevation="4dp"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginTop="20dp"
-                            android:layout_marginRight="5dp"
-                            app:cardBackgroundColor="@color/brown_A400"
+                            style="@style/NewAmbito.CardView.Brown"
                             android:onClick="onClick"
                             android:focusable="true">
                         </androidx.cardview.widget.CardView>
@@ -293,6 +220,7 @@
                 android:id="@+id/editAmbitoButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="?attr/colorPrimaryDark"
                 android:layout_gravity="center"
                 android:radius="50dip"
                 app:cornerRadius="50dp"

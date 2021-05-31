@@ -1,5 +1,7 @@
 package com.example.lize.workers;
 
+import android.Manifest;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -8,7 +10,11 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -18,6 +24,7 @@ import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,10 +32,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.webkit.MimeTypeMap;
+import android.widget.Button;
 import android.widget.EditText;
 
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
@@ -40,11 +48,14 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lize.R;
+import com.example.lize.adapters.AudioAdapter;
 import com.example.lize.adapters.DocumentAdapter;
+import com.example.lize.data.Audio;
 import com.example.lize.data.Document;
 import com.example.lize.data.Image;
 import com.example.lize.models.DocumentManager;
@@ -64,16 +75,17 @@ import com.synnapps.carouselview.ImageListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 
-public class NotasActivity extends AppCompatActivity implements DocumentAdapter.OnDocumentListener {
+public class NotasActivity extends AppCompatActivity implements DocumentAdapter.OnDocumentListener, AudioAdapter.playerInterface {
 
     private static final String DEFAULT_TITLE = "Titulo";
 
@@ -83,9 +95,12 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     //private ArrayList<Document> documents;
     public static final int PICK_IMAGE = 1;
     public static final int REQUEST_DOCUMENT_GET = 2;
-    private RecyclerView recyclerView;
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 3;
+    private RecyclerView documentRecycleView;
+    private RecyclerView audioRecycleView;
     private LinearLayoutManager layoutManager;
-    private DocumentAdapter adapter;
+    private DocumentAdapter documentAdapter;
+    private AudioAdapter audioAdapter;
     private RTApi rtApi;
     private RTManager rtManager;
     private ViewGroup toolbarContainer;
@@ -100,8 +115,15 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     private DocumentManager documentManager;
     private String documentsID;
     private String imagesID;
+    private String AudioID;
     private boolean initRecycleView = false;
-
+    private MediaRecorder recorder;
+    private boolean isRecording = false;
+    private String fileName = new String();
+    private long startAudio;
+    private long endAudio;
+    private Dialog recordDialog;
+    private MediaPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,19 +144,26 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
         // Apartado de documentos
         //ArrayList de imagenes y documentes
-        fileUtils = new FileUtils(this);
+        fileUtils = new FileUtils();
         documentManager = documentManager.getInstance();
         //images = new ArrayList<>();
         //documents = new ArrayList<>();
         //Onclick Listener botones
         backBtn.setOnClickListener(v -> saveNote());
-        recyclerView =  (RecyclerView) findViewById(R.id.fileAttachView);
+        documentRecycleView = (RecyclerView) findViewById(R.id.fileAttachView);
         layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        recyclerView.setLayoutManager(layoutManager);
+        documentRecycleView.setLayoutManager(layoutManager);
+        documentAdapter = new DocumentAdapter(this);
+        documentRecycleView.setAdapter(documentAdapter);
 
-        adapter = new DocumentAdapter(this);
-        recyclerView.setAdapter(adapter);
+
+        audioRecycleView = (RecyclerView) findViewById(R.id.audioRecycleView);
+        audioRecycleView.setLayoutManager(new LinearLayoutManager(this));
+        audioAdapter = new AudioAdapter(this,this);
+        audioRecycleView.setAdapter(audioAdapter);
+        player = new MediaPlayer();
+        recordDialog = new Dialog(this);
 
         // Crear RTManager para gestionar los botones de estilo
         rtApi = new RTApi(this, new RTProxyImpl(this), new RTMediaFactoryImpl(this, true));
@@ -158,6 +187,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         } catch (IOException e) {
             e.printStackTrace();
         }
+
 
 // ContentView is the root view of the layout of this activity/fragment
         primaryLayout.getViewTreeObserver().addOnGlobalLayoutListener(
@@ -200,20 +230,20 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             toolbarContainer.setVisibility(View.VISIBLE);
             carouselView.setVisibility(View.GONE);
             //rtEditText.setHeight(1000);
-            recyclerView.setVisibility(View.GONE);
+            documentRecycleView.setVisibility(View.GONE);
         } else {
-            if(rtEditText.getLineCount() <=2 ){
+            if (rtEditText.getLineCount() <= 2) {
                 rtEditText.setMaxHeight(200);
-            }else{
+            } else {
                 rtEditText.setMaxHeight(primaryLayout.getHeight());
             }
             toolbarContainer.setVisibility(View.GONE);
             //rtEditText.setHeight(rtEditText.getLineCount() * 100);
-            if (adapter.getItemCount() !=0/*&& !imagesUris.isEmpty()*/) {
-                recyclerView.setVisibility(View.VISIBLE);
-                 //showHideFragment(carouselFragment);
+            if (documentAdapter.getItemCount() != 0/*&& !imagesUris.isEmpty()*/) {
+                documentRecycleView.setVisibility(View.VISIBLE);
+                //showHideFragment(carouselFragment);
             }
-            if(!documentManager.arrayImagesEmpty(imagesID)){
+            if (!documentManager.arrayImagesEmpty(imagesID)) {
                 carouselView.setVisibility(View.VISIBLE);
             }
         }
@@ -243,17 +273,17 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
             inputNoteTitulo.setText(title);
             rtEditText.setRichTextEditing(true, html_text);
-            if(bundle.getBoolean("images")){
+            if (bundle.getBoolean("images")) {
                 //images = documentManager.getImagesNote(documentsID);
 
-                    init_carousel();
+                init_carousel();
             }
-            if(bundle.getBoolean("documents")){
+            if (bundle.getBoolean("documents")) {
 
-                for(Document doc:  documentManager.getDocuments(documentsID)){
-                    adapter.addDocument(doc);
+                for (Document doc : documentManager.getDocuments(documentsID)) {
+                    documentAdapter.addDocument(doc);
                 }
-                recyclerView.setVisibility(View.VISIBLE);
+                documentRecycleView.setVisibility(View.VISIBLE);
             }
 
         }
@@ -271,6 +301,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         //noinspection RestrictedApi
         MenuBuilder menuBuilder = new MenuBuilder(this);
         MenuInflater inflater = new MenuInflater(this);
+
         inflater.inflate(R.menu.note_menu, menuBuilder);
         //noinspection RestrictedApi
         MenuPopupHelper optionsMenu = new MenuPopupHelper(this, menuBuilder, v);
@@ -290,6 +321,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
                         selectImage();
                         return true;
                     case R.id.add_audio: // Handle option2 Click
+                        add_audio();
                         return true;
                     case R.id.share:
                         shareNote();
@@ -311,6 +343,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
     }
 
+
     private void shareNote() {
         Intent intent2 = new Intent();
         intent2.setAction(Intent.ACTION_SEND);
@@ -326,15 +359,14 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         nota.putString("title", inputNoteTitulo.getText().toString());
         nota.putString("noteText_HTML", rtEditText.getText(RTFormat.HTML));
         nota.putString("noteText_PLAIN", rtEditText.getText(RTFormat.PLAIN_TEXT));
-        nota.putBoolean("images",!documentManager.arrayImagesEmpty(imagesID));
-        nota.putBoolean("documents",!(adapter.getItemCount() == 0));
+        nota.putBoolean("images", !documentManager.arrayImagesEmpty(imagesID));
+        nota.putBoolean("documents", !(documentAdapter.getItemCount() == 0));
         nota.putString("documentsID", documentsID);
         nota.putString("imagesID", imagesID);
         intent.putExtras(nota);
         setResult(validateNote(), intent);
         finish();
     }
-
 
 
     //Este método calcula el tamaño por defecto que tendrá el editText
@@ -366,8 +398,8 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     private void init_carousel() {
 
         ImageListener imageListener = (position, imageView) -> {
-                Bitmap bitmap = BitmapFactory.decodeFile(documentManager.selectImageFromArray(imagesID,position));
-                imageView.setImageBitmap(bitmap);
+            Bitmap bitmap = BitmapFactory.decodeFile(documentManager.selectImageFromArray(imagesID, position));
+            imageView.setImageBitmap(bitmap);
 
             registerForContextMenu(imageView);
         };
@@ -381,8 +413,6 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             carouselView.setVisibility(View.VISIBLE);
         }
     }
-
-
 
 
     //Intent para seleccionar una imagen del dispositivo e insertarlo en el Carrusel
@@ -427,6 +457,15 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
                 Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
             }
         }
+        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                add_audio();
+            } else {
+                Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
     }
 
 
@@ -443,7 +482,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         Image i = documentManager.BitmapToImage(bitmap);
                         //images.add(i);
-                        imagesID = documentManager.addImageToCloud(imagesID,i);
+                        imagesID = documentManager.addImageToCloud(imagesID, i);
                         init_carousel();
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -472,15 +511,18 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             myFile.setName(displayName);
             myFile.setId(displayName);
 
-            documentsID = documentManager.addDocumentToCloud(documentsID,  myFile);
+            //myFile.setContent(file);
+
+
+            documentsID = documentManager.addDocumentToCloud(documentsID, myFile);
 /*            if(!initRecycleView){
                 adapter = new DocumentAdapter(documentManager.getDocuments(documentsID), this);
                 recyclerView.setAdapter(adapter);
                 initRecycleView = true;
             }*/
-            adapter.addDocument(myFile);
+            documentAdapter.addDocument(myFile);
             //adapter.notifyDataSetChanged();
-            recyclerView.setVisibility(View.VISIBLE);
+            documentRecycleView.setVisibility(View.VISIBLE);
         }
 
     }
@@ -497,14 +539,14 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getTitle().equals("Eliminar")) {
-            documentManager.removeImageFromNote(imagesID,carouselView.getCurrentItem());
+            documentManager.removeImageFromNote(imagesID, carouselView.getCurrentItem());
             init_carousel();
         } else if (item.getTitle().equals("Eliminar documento")) {
 
-            documentManager.removeDocumentFromNote(documentsID,adapter.getDocument(item.getGroupId()));
-            adapter.removeDocument(item.getGroupId());
-            if (adapter.getItemCount() == 0) {
-                recyclerView.setVisibility(View.GONE);
+            documentManager.removeDocumentFromNote(documentsID, documentAdapter.getDocument(item.getGroupId()));
+            documentAdapter.removeDocument(item.getGroupId());
+            if (documentAdapter.getItemCount() == 0) {
+                documentRecycleView.setVisibility(View.GONE);
             }
         }
         return true;
@@ -514,7 +556,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     @Override
     public void onDocumentClick(int position) throws FileNotFoundException {
         Document d = documentManager.getDocuments(documentsID).get(position);
-        openFile(d.getUrl());
+        //openFile(Uri.fromFile(d.getContent()));
     }
 
     public static String getMimeType(Context mContext, Uri uri) {
@@ -541,7 +583,8 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
         try {
 
-            Uri uri =url;;
+            Uri uri = url;
+            ;
             Log.d("NotasActivity", "openFile: " + url.toString());
 
             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -560,7 +603,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             } else if (url.toString().contains(".zip")) {
                 // ZIP file
                 intent.setDataAndType(uri, "application/zip");
-            } else if (url.toString().contains(".rar")){
+            } else if (url.toString().contains(".rar")) {
                 // RAR file
                 intent.setDataAndType(uri, "application/x-rar-compressed");
             } else if (url.toString().contains(".rtf")) {
@@ -591,6 +634,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             Toast.makeText(this, "No application found which can open the file", Toast.LENGTH_SHORT).show();
         }
     }
+
     public byte[] getBytes(InputStream inputStream) throws IOException {
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
         int bufferSize = 1024;
@@ -601,6 +645,139 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             byteBuffer.write(buffer, 0, len);
         }
         return byteBuffer.toByteArray();
+    }
+
+    private void add_audio() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO_PERMISSION);
+        } else {
+
+            Button cancel;
+            ImageButton record;
+
+            recordDialog.setContentView(R.layout.record_pop_up);
+
+            cancel = (Button) recordDialog.findViewById(R.id.cancel_button);
+            record = (ImageButton) recordDialog.findViewById(R.id.record);
+
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isRecording) {
+                        stopRecording();
+                    }
+
+                    recordDialog.dismiss();
+                }
+            });
+
+            record.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isRecording) {
+                        stopRecording();
+                        recordDialog.dismiss();
+                    } else {
+                        record.setImageResource(R.drawable.ic_baseline_stop_24);
+
+                        startRecording();
+                    }
+                }
+            });
+            recordDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            recordDialog.show();
+
+
+        }
+    }
+    private void startRecording() {
+        Log.d("startRecording", "startRecording");
+
+        recorder = new MediaRecorder();
+        DateFormat df = new SimpleDateFormat("yyMMddHHmmss", Locale.ITALY);
+        String date = df.format(Calendar.getInstance().getTime());
+        fileName = getExternalCacheDir().getAbsolutePath() + File.separator + date + ".3gp";
+        Log.d("startRecording", fileName);
+
+        recorder.setOutputFile(fileName);
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        try {
+            recorder.prepare();
+        } catch (IOException e) {
+            Log.d("startRecording", "prepare() failed");
+        }
+
+        recorder.start();
+        startAudio = System.currentTimeMillis();
+        isRecording = true;
+    }
+
+    private void stopRecording() {
+        endAudio = System.currentTimeMillis();
+        recorder.stop();
+        recorder.release();
+
+        Audio a = new Audio(fileName,(endAudio-startAudio));
+        documentManager.addAudioToCloud(AudioID,a);
+        audioAdapter.addAudio(a);
+        recorder = null;
+        isRecording = false;
+    }
+
+    public void startPlaying(int position) {
+        try {
+            if(player != null){
+                if (!player.isPlaying()) {
+                    player = new MediaPlayer();
+                    String fileName = audioAdapter.getAudio(position).getAddress();
+                    Log.d("startPlaying", fileName);
+                    player.setDataSource(fileName);
+
+                    player.prepare();
+
+
+                }
+                audioAdapter.setSessionID(player.getAudioSessionId());
+                player.start();
+                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        audioAdapter.setSessionID(-1);
+                        audioAdapter.setStateReproduction(position);
+                        audioAdapter.notifyItemChanged(position);
+
+                        Toast.makeText(getApplicationContext(), "Audio finished!", Toast.LENGTH_SHORT).show();
+
+                        //playButton.setBackgroundResource(R.drawable.ic_baseline_play_circle_filled_24);
+                    }
+
+                });
+            }
+        } catch (IOException e) {
+            Log.d("startPlaying", "prepare() failed");
+        }
+    }
+
+    @Override
+    public void pausePlaying(int position) {
+        try {
+            player.pause();
+
+            //notifyItemChanged(position);
+
+        }catch (IllegalStateException e){
+
+        }
+    }
+
+    @Override
+    public void removeAudio(int position) {
+
     }
 }
 

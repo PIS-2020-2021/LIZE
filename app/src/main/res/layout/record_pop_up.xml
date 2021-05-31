@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/_250sdp"
+    android:layout_height="@dimen/_250sdp"
+    android:padding="@dimen/_10sdp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical"
+    android:background="@drawable/popup_audio_record"
+    >
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/record"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/circular_shape"
+        app:layout_constraintStart_toStartOf="parent"
+        android:tint="?attr/colorOnPrimary"
+        android:backgroundTint="?attr/colorPrimaryDark"
+        app:srcCompat="@drawable/ic_baseline_mic_34"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/_40sdp"
+        />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/cancel"
+        android:textColor="?attr/colorOnPrimary"
+        android:layout_marginTop="@dimen/_30sdp"
+        android:layout_gravity="center"
+        android:backgroundTint="?attr/colorPrimaryDark"
+        app:cornerRadius="@dimen/_14sdp"
+
+         />
+
+
+</LinearLayout>

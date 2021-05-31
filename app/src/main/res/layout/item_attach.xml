@@ -22,5 +22,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/_3sdp"
         android:text="@string/textview"
+        android:textColor="?attr/colorOnBackground"
         android:layout_marginStart="@dimen/_3sdp" />
 </LinearLayout>

@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.view.ContextThemeWrapper;
 
+import androidx.appcompat.app.AppCompatDelegate;
+
 import com.example.lize.R;
 
 public class Preferences {
@@ -64,7 +66,14 @@ public class Preferences {
             case 8:  return R.color.Ambito_Orange;
             case 9:  return R.color.Ambito_Brown;
 
-            default: return R.color.white;
+                default: return R.color.Ambito_Red;
+            }
+        } else {
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                return R.color.md_grey_dark;
+            } else {
+                return R.color.md_grey_100;
+            }
         }
     }
 
