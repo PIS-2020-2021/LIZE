@@ -55,6 +55,7 @@ public class Preferences {
     }
 
     public static int getAmbitoColor(int ambitoColor) {
+        if(ambitoColor == selectedColor){
         switch (ambitoColor) {
             case 1:  return R.color.Ambito_Red;
             case 2:  return R.color.Ambito_Purple;
