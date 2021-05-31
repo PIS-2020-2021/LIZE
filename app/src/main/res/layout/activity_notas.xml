@@ -86,9 +86,7 @@
             android:layout_height="@dimen/_55sdp"
             android:layout_width="match_parent" />
 
-                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    xmlns:tools="http://schemas.android.com/tools"
+                <RelativeLayout
                     android:id="@+id/imageNote"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -146,7 +144,7 @@
     </ScrollView>
 
     <include android:id="@+id/toolbar_container"
-        layout="@layout/textv3"
+        layout="@layout/text_toolbar_styles"
         android:layout_gravity="bottom"
         android:layout_height="@dimen/_100sdp"
          android:layout_width="match_parent"

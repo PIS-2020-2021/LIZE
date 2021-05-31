@@ -17,7 +17,7 @@
         android:background="@drawable/circular_shape"
         app:layout_constraintStart_toStartOf="parent"
         android:tint="?attr/colorOnPrimary"
-        android:backgroundTint="?attr/colorPrimaryDark"
+        android:backgroundTint="?attr/colorSecondary"
         app:srcCompat="@drawable/ic_baseline_mic_34"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="@dimen/_40sdp"
@@ -32,7 +32,7 @@
         android:textColor="?attr/colorOnPrimary"
         android:layout_marginTop="@dimen/_30sdp"
         android:layout_gravity="center"
-        android:backgroundTint="?attr/colorPrimaryDark"
+        android:backgroundTint="?attr/colorSecondary"
         app:cornerRadius="@dimen/_14sdp"
 
          />
