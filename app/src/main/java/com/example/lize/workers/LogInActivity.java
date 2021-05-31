@@ -1,23 +1,17 @@
 package com.example.lize.workers;
-
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.util.Log;
 import android.util.Patterns;
 import com.example.lize.R;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
@@ -61,40 +55,38 @@ public class LogInActivity extends AppCompatActivity {
 
                     // SignIn process
                     mAuth.signInWithEmailAndPassword(email, password)
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(getApplicationContext(), "¡Bienvenido a LIZE!", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(this, MainActivity.class);
-                                    startActivity(intent);
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getApplicationContext(), "¡Bienvenido a LIZE!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(this, MainActivity.class);
+                                startActivity(intent);
 
-                                } else {    // Exception Procedure
+                            } else {    // Exception Procedure
+                                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                                builder.setPositiveButton("Aceptar", null);
 
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                                    builder.setPositiveButton("Aceptar", null);
+                                try {
+                                    throw task.getException();
+                                } catch (FirebaseAuthInvalidUserException userException) {
+                                    builder.setTitle("Autentificación inválida");
+                                    builder.setMessage("Se ha producido un error de autentificación. \nEstá registrado en la App?");
+                                    builder.create().show();
 
-                                    try {
-                                        throw task.getException();
+                                } catch( FirebaseAuthInvalidCredentialsException passwordExcept){
+                                    builder.setTitle("Contraseña inválida");
+                                    builder.setMessage("Se ha producido un error de credenciales. \nInténtelo de nuevo.");
+                                    builder.create().show();
 
-                                    } catch (FirebaseAuthInvalidUserException userException) {
-                                        builder.setTitle("Autentificación inválida");
-                                        builder.setMessage("Se ha producido un error de autentificación. \nEstá registrado en la App?");
-                                        builder.create().show();
+                                } catch (FirebaseTooManyRequestsException requestExcept) {
+                                    builder.setTitle("Registro bloqueado");
+                                    builder.setMessage("Se han producido demasiados intentos de autentificación. \nPor favor, inténtelo más tarde. ");
+                                    builder.create().show();
 
-                                    } catch( FirebaseAuthInvalidCredentialsException passwordExcept){
-                                        builder.setTitle("Contraseña inválida");
-                                        builder.setMessage("Se ha producido un error de credenciales. \nInténtelo de nuevo.");
-                                        builder.create().show();
-
-                                    } catch (FirebaseTooManyRequestsException requestExcept) {
-                                        builder.setTitle("Registro bloqueado");
-                                        builder.setMessage("Se han producido demasiados intentos de autentificación. \nPor favor, inténtelo más tarde. ");
-                                        builder.create().show();
-
-                                    } catch (Exception e) {
-                                        Log.w(TAG, "Unidentified EXCEPTION. \n\tClass: " + e.getClass() + " \n\tMessage: " + e.getMessage());
-                                    }
+                                } catch (Exception e) {
+                                    Log.w(TAG, "Unidentified EXCEPTION. \n\tClass: " + e.getClass() + " \n\tMessage: " + e.getMessage());
                                 }
-                            });
+                            }
+                        });
                 }
             });
 
@@ -110,7 +102,6 @@ public class LogInActivity extends AppCompatActivity {
          *  Metodo para validar el incio de sesión en la APP
          */
         public boolean setValidation() {
-
             // Primero validamos el email
             if (email.getText().toString().isEmpty()) {
                 emailError.setError(getResources().getString(R.string.error_campo_vacio));
@@ -142,9 +133,6 @@ public class LogInActivity extends AppCompatActivity {
                 isPasswordValid = true;
                 passError.setErrorEnabled(false);
             }
-
             return isEmailValid && isPasswordValid;
         }
-
-
     }

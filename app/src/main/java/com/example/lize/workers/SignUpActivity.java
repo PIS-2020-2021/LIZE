@@ -20,9 +20,9 @@ import android.widget.EditText;
 
 public class SignUpActivity extends AppCompatActivity {
         // Variables
-        EditText nombre, apellidos, email, psw, pswCheck;
         Button signup;
         TextView login;
+        EditText nombre, apellidos, email, psw, pswCheck;
         boolean isNameValid, isEmailValid, isPasswordValid;
         TextInputLayout nameError,surnameError, emailError, passError, passErrorCheck;
 
@@ -44,27 +44,28 @@ public class SignUpActivity extends AppCompatActivity {
             passError = findViewById(R.id.passError);
             passErrorCheck = findViewById(R.id.passErrorCheck);
 
-            signup.setOnClickListener(v ->
-            {
-                if(SetValidation()) {
-                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(email.getText().toString(),
-                            psw.getText().toString()).addOnCompleteListener(a -> {
-                        if(a.isSuccessful()){
-                            User user = new User(email.getText().toString(), psw.getText().toString(),
-                                    nombre.getText().toString(), apellidos.getText().toString());
-                            user.setSelfID(a.getResult().getUser().getUid());
-                            DatabaseAdapter.getInstance().saveUser(user);
-                            startActivity(new Intent(this, LogInActivity.class));
-                        } else {
-                            showAlert();
-                        }
+            signup.setOnClickListener(v -> {
+                if (SetValidation()) {
+                    FirebaseAuth.getInstance()
+                        .createUserWithEmailAndPassword(email.getText().toString(),
+                        psw.getText().toString()).addOnCompleteListener(a -> {
+                            if (a.isSuccessful()) {
+                                User user = new User(email.getText().toString(), psw.getText().toString(),
+                                        nombre.getText().toString(), apellidos.getText().toString());
+                                user.setSelfID(a.getResult().getUser().getUid());
+                                DatabaseAdapter.getInstance().saveUser(user);
+                                startActivity(new Intent(this, LogInActivity.class));
+                            } else showAlert();
                     });
                 }
             });
 
         }
 
-
+    /**
+     * Metodo para validar los datos del usuario
+     * @return True si pasa todos los filtros, False si no
+     */
     public boolean SetValidation() {
         // Validamos el nombre
         if (nombre.getText().toString().isEmpty()) {
@@ -135,8 +136,10 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    //FireBase Alert
-    private void showAlert(){
+    /**
+     * Metodo de alerta del Firebase
+     */
+    private void showAlert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Error");
         builder.setMessage("Se ha producido un error creando al usuario\n Pruebe de nuevo en otro momento");

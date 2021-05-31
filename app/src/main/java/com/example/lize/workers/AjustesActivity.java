@@ -223,7 +223,7 @@ public class AjustesActivity extends Activity {
             apellidosInput.setError(getResources().getString(R.string.error_campo_vacio));
             Toast.makeText(getApplicationContext(), apellidosInput.getError(), Toast.LENGTH_SHORT).show();
             areSurnamesValid = false;
-        } else if (editSurnames.getText().toString().length() >= 14) {
+        } else if (editSurnames.getText().toString().length() > 14) {
             apellidosInput.setError(getResources().getString(R.string.demasiados_caracteres));
             Toast.makeText(getApplicationContext(), apellidosInput.getError(), Toast.LENGTH_SHORT).show();
             areSurnamesValid = false;
