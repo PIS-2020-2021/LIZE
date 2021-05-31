@@ -18,8 +18,10 @@ public class Note {
     private Date lastUpdate;
     private Boolean haveDocuments;
     private Boolean haveImages;
+    private Boolean haveAudios;
     private String documentsID;
     private String imagesID;
+    private String audiosID;
 
 
     public Note(String title, String text_plain, String text_html) {
@@ -101,9 +103,27 @@ public class Note {
         this.imagesID = imagesID;
     }
 
+    public Boolean getHaveAudios() {
+        return haveAudios;
+    }
+
+    public void setHaveAudios(Boolean haveAudios) {
+        this.haveAudios = haveAudios;
+    }
+
+    public String getAudiosID() {
+        return audiosID;
+    }
+
+    public void setAudiosID(String audiosID) {
+        this.audiosID = audiosID;
+    }
+
     public Date getLastUpdate() {return lastUpdate; }
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
+
+
 }

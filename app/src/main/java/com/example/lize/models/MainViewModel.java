@@ -300,13 +300,17 @@ public class MainViewModel extends ViewModel{
      * @param noteName Título de la Nota a añadir.
      * @param text_plain Texto plano de la Nota a añadir.
      * @param text_html Texto en formato HTML de la Nota a añadir.
+     * @param audios booleano para determinar si la nota tiene audios
+     * @param audiosID identificador de la colección audios de la nota
      * @throws NullPointerException Si el Ámbito actual no ha sido correctamente seleccionado.
      */
-    public void addNote(String noteName, String text_plain, String text_html, Boolean images, Boolean documents, String documentsID, String imagesID) {
+    public void addNote(String noteName, String text_plain, String text_html, Boolean images, Boolean documents, Boolean audios, String documentsID, String imagesID, String audiosID) {
         try{
             Note newNote = new Note(noteName, text_plain, text_html);   // Creamos una nueva Nota
             newNote.setDocumentsID(documentsID);
             newNote.setImagesID(imagesID);
+            newNote.setAudiosID(audiosID);
+            newNote.setHaveAudios(audios);
             newNote.setHaveDocuments(documents);
             newNote.setHaveImages(images);
             if (mFolderSelected.getValue() != null)                     // Si tenemos una carpeta seleccionada, la asignamos a la Nota
@@ -329,9 +333,11 @@ public class MainViewModel extends ViewModel{
      * @param title Título de la Nota editada.
      * @param plainText Texto plano de la Nota editada.
      * @param htmlText Texto en formato HTML de la Nota editada.
+     * @param audios booleano para determinar si la nota tiene audios
+     * @param audiosID identificador de la colección audios de la nota
      * @throws NullPointerException Si la Nota Editada no ha sido correctamente seleccionada.
      */
-    public void editNote(String title, String plainText, String htmlText, boolean images, boolean documents, String documentsID, String imagesID){
+    public void editNote(String title, String plainText, String htmlText, boolean images, boolean documents, Boolean audios, String documentsID, String imagesID, String audiosID){
         Note selected = mNoteSelected.getValue();                   // Editamos la Nota seleccionada
         selected.setTitle(title);
         selected.setText_plain(plainText);
@@ -341,7 +347,8 @@ public class MainViewModel extends ViewModel{
         selected.setLastUpdate(new Date());
         selected.setHaveImages(images);
         selected.setHaveDocuments(documents);
-
+        selected.setAudiosID(audiosID);
+        selected.setHaveAudios(audios);
         mNoteSelected.setValue(mNoteSelected.getValue());           // Actualizamos la Nota seleccionada
         mFolderSelected.setValue(mFolderSelected.getValue());       // Actualizamos colección de la carpeta seleccionada
         databaseAdapter.saveNote(selected);                         // Guardamos la Nota en DB
@@ -439,6 +446,7 @@ public class MainViewModel extends ViewModel{
                     databaseAdapter.deleteNote(note.getSelfID());                   // Eliminamos la Nota de DB
                     if(note.getHaveImages()) databaseAdapter.deleteImages(note.getImagesID());          //Eliminamos el Array de Imagenes de la DB
                     if(note.getHaveDocuments()) databaseAdapter.deleteDocuments(note.getDocumentsID());    //Eliminamos el Array de Documentos de la DB
+                    if(note.getHaveAudios()) databaseAdapter.deleteAudios(note.getAudiosID());
                     setToast("Note " + note.getTitle() + " correctly deleted.");    // Creamos Toast Informativo
                     return;
                 }
@@ -556,9 +564,12 @@ public class MainViewModel extends ViewModel{
                         for (Note note : ambitoNotes){ // Cargamos las Imágenes y Documentos necesarios de DB en el Map de DocumentManager
                             if(note.getHaveImages() && note.getImagesID() != null) documentManager.getImagesNote(note.getImagesID());
                             if(note.getHaveDocuments() && note.getDocumentsID() != null)  documentManager.getDocuments(note.getDocumentsID());
-
+                            if(note.getHaveAudios() != null){
+                                if(note.getHaveAudios() && note.getAudiosID() != null) documentManager.getAudios(note.getAudiosID());
+                                }
                             ambito.addNote(note);
-                        }
+                            }
+
                         loadingCounter++;
                         break;
                     }

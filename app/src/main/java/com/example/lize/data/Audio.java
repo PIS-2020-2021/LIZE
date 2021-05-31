@@ -9,11 +9,9 @@ public class Audio {
     private long duration;
 
     // Description, uri, duration, format, owner
-    public Audio(String localPath, long duration) {
-        //this.noteId = id;
+    public Audio(String id,String localPath, long duration) {
+        this.ID = id;
         this.address = localPath;
-        UUID uuid = UUID.randomUUID();
-        this.ID = uuid.toString();
         this.duration = duration;
     }
     public String getAddress () {
@@ -32,7 +30,10 @@ public class Audio {
         this.duration = duration;
     }
 
-    /*    public void saveCard() {
+    public String getID() {
+        return ID;
+    }
+/*    public void saveCard() {
 
         Log.d("saveCard", "saveCard-> saveDocument");
         adapter.saveDocumentWithFile(this.noteId, this.audioDesc, this.owner,this.address);
