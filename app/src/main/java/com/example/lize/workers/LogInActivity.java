@@ -36,6 +36,14 @@ public class LogInActivity extends AppCompatActivity {
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
+
+            if (mAuth.getCurrentUser() != null){
+                Toast.makeText(getApplicationContext(), "¡Bienvenido a LIZE!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_login);
 

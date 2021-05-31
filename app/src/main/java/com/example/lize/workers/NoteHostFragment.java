@@ -68,8 +68,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
     private boolean cardNoteType;                       // boolean cardNote type
     private MainViewModel dataViewModel;                // Model Shared Data between Fragments
 
-
-    private NoteAdapter.CardNote lastCardChecked;           // Last CardNote selected
+    private NoteAdapter.CardNote lastCardChecked;       // Last CardNote selected
 
     /** Inicializa el fragment contenedor de Notas. */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,7 +77,6 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
 
         mNotesRecyclerView = root.findViewById(R.id.note_recycler_view);
         mNotesManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-        //mNotesManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
         mNotesRecyclerView.setLayoutManager(mNotesManager);
 
         this.cardNoteType = true;
@@ -106,9 +104,9 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
                     if (folder == null) {
                         Ambito ambito = dataViewModel.getAmbitoSelected().getValue();
                         mNoteAdapter = new NoteAdapter(root.getContext(),  new ArrayList<>(ambito.getNotes()), cardNoteType);
-                    } else
+                    } else {
                         mNoteAdapter = new NoteAdapter(root.getContext(), new ArrayList<>(folder.getNotes()), cardNoteType);
-
+                    }
                     mNoteAdapter.registerCardNoteListener(this);
                     mNotesRecyclerView.swapAdapter(mNoteAdapter, false);
                     mNoteAdapter.notifyDataSetChanged();
@@ -157,7 +155,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         else mNotesManager.setSpanCount(1);
 
         // Modificamos el 'type' de los CardNote de las notas, a partir del Adaptador.
-        mNoteAdapter.changeCardNoteType();
+        mNoteAdapter.changeCardNoteType(cardNoteType);
     }
 
     /**
@@ -231,5 +229,4 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         dataViewModel.deleteNote(cardNote.getNoteID());
         lastCardChecked = null;
     }
-
 }

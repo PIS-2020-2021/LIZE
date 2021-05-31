@@ -2,6 +2,9 @@ package com.example.lize.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -13,14 +16,20 @@ import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.Group;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.lize.R;
+import com.example.lize.data.Image;
 import com.example.lize.data.Note;
+import com.example.lize.models.DocumentManager;
+import com.example.lize.workers.NoteHostFragment;
 import com.google.android.material.card.MaterialCardView;
 
 import java.text.DateFormat;
@@ -78,9 +87,11 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
     /**
      * Modificamos el cardNoteType, y actualizamos el RecicleView llamando a {@link #notifyDataSetChanged()}
      */
-    public void changeCardNoteType(){
-        this.cardNoteType = !cardNoteType;
-        super.notifyDataSetChanged();
+    public void changeCardNoteType(boolean newCardNoteType){
+        if (cardNoteType != newCardNoteType) {
+            cardNoteType = newCardNoteType;
+            super.notifyDataSetChanged();
+        }
     }
 
     /**
@@ -103,10 +114,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
      */
     @Override
     public void onBindViewHolder(@NonNull CardNote holder, int position) {
-        holder.mTitleNote.setMaxHeight(mContext.getResources().getDimensionPixelSize((cardNoteType) ?
-                R.dimen.cardnote_layout_height_high : R.dimen.cardnote_layout_height_low));
-        Note currentNote = mNotesData.get(position);    // Obtenemos la nota de la posición
-        holder.bindTo(currentNote);                     // Enlazamos la nota con el ViewHolder
+        holder.bindTo(mNotesData.get(position), cardNoteType);  // Enlazamos la nota de la posición con el ViewHolder
     }
 
     /**
@@ -165,7 +173,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
         private final TextView mMetadataText;
         private final TextView mTitleNote;
         private final TextView mTextNote;
-        private final View mButtonGroup;
+        private final ImageView mMediaNote;
+        private final View mButtonGroup, mTextGroup;
 
         private String mNoteID;
 
@@ -181,11 +190,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
             mMetadataText = (TextView) itemView.findViewById(R.id.note_metadata);
             mTitleNote = (TextView) itemView.findViewById(R.id.note_title);
             mTextNote = (TextView) itemView.findViewById(R.id.note_body);
+            mMediaNote = (ImageView) itemView.findViewById(R.id.note_media);
 
             ImageButton mMoveBtn = itemView.findViewById(R.id.note_move_btn);
             ImageButton mCopyBtn = itemView.findViewById(R.id.note_copy_btn);
             ImageButton mDeleteBtn = itemView.findViewById(R.id.note_delete_btn);
 
+            mTextGroup = itemView.findViewById(R.id.text_group);
             mButtonGroup = itemView.findViewById(R.id.button_group);
 
             if (customListener != null){
@@ -203,7 +214,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
          * Método para <b>enlazar</b> los datos de la nota con el Card de este objeto ViewHolder.
          * @param currentNote nota actual
          */
-        public void bindTo(Note currentNote) {
+        public void bindTo(Note currentNote, boolean cardNoteType) {
             mTitleNote.setText(currentNote.getTitle());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -223,6 +234,42 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
 
             mMetadataText.setText(metadata);
             mNoteID = currentNote.getSelfID();
+
+            ViewGroup.LayoutParams params = mTextGroup.getLayoutParams();
+
+            // Grid Layout
+            if (cardNoteType){
+                params.width = mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_text_width_low);
+                params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                mTextGroup.setLayoutParams(params);
+
+                mMediaNote.setImageDrawable(null);
+                mMediaNote.setVisibility(View.GONE);
+
+            } else{ // Linear Layout
+
+                if (currentNote.getHaveImages()) {
+                    params.width = mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_text_width_high_image);
+                    params.height = mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_text_group_height);
+                    mTextGroup.setLayoutParams(params);
+
+                    /*Bitmap bitmap = BitmapFactory.decodeFile(DocumentManager.getInstance()
+                            .selectImageFromArray(currentNote.getImagesID(), 0));*/
+                    //mMediaNote.setImageBitmap(bitmap);
+
+                    Glide.with(mContext).load(DocumentManager.getInstance().selectImageFromArray(
+                            currentNote.getImagesID(), 0)).into(mMediaNote);
+
+                    mMediaNote.setVisibility(View.VISIBLE);
+
+                }else{
+                    params.width = mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_text_width_high_no_image);
+                    params.height = mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_text_group_height);
+                    mTextGroup.setLayoutParams(params);
+
+                    mMediaNote.setVisibility(View.GONE);
+                }
+            }
         }
 
         public void select() {

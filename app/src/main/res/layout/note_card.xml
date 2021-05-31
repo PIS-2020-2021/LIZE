@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="@dimen/cardnote_layout_height_low"
     android:layout_margin="4dp"
     android:clickable= "true"
     android:focusable="true"
@@ -18,49 +17,61 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:orientation="horizontal">
+            android:padding="10dp">
 
-            <TextView
-                android:id="@+id/note_metadata"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/text_group"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:text="@string/note_default_metadata"
-                android:textAppearance="@style/TextAppearance.Lize.MetadataText"/>
+                android:layout_width="@dimen/cardnote_text_width_low"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/note_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/note_metadata"
-                android:text="@string/note_default_name"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                android:textColor="?attr/colorOnPrimary"/>
+                <TextView
+                    android:id="@+id/note_metadata"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:paddingHorizontal="5dp"
+                    android:text="@string/note_default_metadata"
+                    android:textAppearance="@style/TextAppearance.Lize.MetadataText"/>
+
+                <TextView
+                    android:id="@+id/note_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/note_metadata"
+                    android:paddingHorizontal="5dp"
+                    android:paddingBottom="8dp"
+                    android:text="@string/note_default_name"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                    android:textColor="?attr/colorOnPrimary"/>
+
+                <TextView
+                    android:id="@+id/note_body"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/note_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="2dp"
+                    android:minHeight="@dimen/cardnote_text_min_height"
+                    android:maxHeight="@dimen/cardnote_text_max_height"
+                    android:text="@string/note_default_body"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="?attr/colorOnPrimary"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageView
                 android:id="@+id/note_media"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/note_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="centerCrop" />
-
-            <TextView
-                android:id="@+id/note_body"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/note_media"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxHeight="@dimen/cardnote_layout_height_high"
-                android:layout_weight="4"
-                android:padding="8dp"
-                android:text="@string/note_default_body"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                android:textColor="?attr/colorOnPrimary"/>
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="@dimen/cardnote_media"
+                android:layout_height="@dimen/cardnote_media"
+                android:scaleType="centerCrop"
+                android:visibility="gone"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -72,45 +83,6 @@
             android:background="?attr/colorPrimary"
             android:alpha="0.0"
             android:visibility="gone">
-
-            <!--<com.google.android.material.button.MaterialButton
-                android:id="@+id/note_move_btn"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/note_copy_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:tint="?attr/colorSurface"
-                android:textColor="?attr/colorAccent"
-                android:text="move"
-                android:background="@android:color/transparent"
-                app:backgroundTint="@android:color/transparent"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/note_copy_btn"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:tint="?attr/colorSurface"
-                android:textColor="?attr/colorAccent"
-                android:text="copy"
-                android:background="@android:color/transparent"
-                app:backgroundTint="@android:color/transparent"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/note_delete_btn"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/note_copy_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:tint="?attr/colorSurface"
-                android:textColor="?attr/colorAccent"
-                android:text="delete"
-                android:background="@android:color/transparent"
-                app:backgroundTint="@android:color/transparent"/>-->
 
             <ImageButton
                 android:id="@+id/note_move_btn"
