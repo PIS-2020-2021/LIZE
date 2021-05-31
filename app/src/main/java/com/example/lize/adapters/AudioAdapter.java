@@ -166,15 +166,15 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(parentContext)
-                        .setTitle("Are you sure ?")
-                        .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+                        .setTitle("¿Estás seguro que deseas eliminarlo?")
+                        .setPositiveButton("Borrar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 removeAudio(position);
                                 Log.d("MainActivity", "Sending atomic bombs to Jupiter");
                             }
                         })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
