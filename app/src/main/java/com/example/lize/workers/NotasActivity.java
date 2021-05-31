@@ -82,6 +82,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 
+
 public class NotasActivity extends AppCompatActivity implements DocumentAdapter.OnDocumentListener, AudioAdapter.playerInterface {
 
     private static final String DEFAULT_TITLE = "Titulo";
@@ -122,7 +123,6 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     private long endAudio;
     private Dialog recordDialog;
     private MediaPlayer player;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -296,7 +296,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
     //Función para validar el contenido de la nota antes de agregarla a base de datos
     private int validateNote() {
-        if (inputNoteTitulo.getText().toString().isEmpty() && rtEditText.getText(RTFormat.PLAIN_TEXT).isEmpty() && audioAdapter.getItemCount() == 0 && documentManager.imagesArraySize(imagesID) == 0 && documentAdapter.getItemCount() == 0  /*&&  imagesUris.isEmpty()*/)
+        if (inputNoteTitulo.getText().toString().isEmpty() && rtEditText.getText(RTFormat.PLAIN_TEXT).isEmpty() && audioAdapter.getItemCount() == 0 && documentManager.arrayImagesEmpty(imagesID)  && documentAdapter.getItemCount() == 0  /*&&  imagesUris.isEmpty()*/)
             return RESULT_CANCELED;
         return RESULT_OK;
     }

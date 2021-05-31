@@ -439,7 +439,11 @@ public class DocumentManager {
     }
 
     public int imagesArraySize(String imagesID){
-        return Objects.requireNonNull(imagesNote.get(imagesID)).size();
+        if(imagesNote.containsKey(imagesID)){
+            return imagesNote.get(imagesID).size();
+        }
+        return 0;
+
     }
 
     public int documentArraySize(String documentsID){
