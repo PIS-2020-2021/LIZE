@@ -20,7 +20,7 @@
             app:menu="@menu/crear_ambito_top_menu"
             android:background="@drawable/settings_gradient"
             app:contentInsetLeft="@dimen/_1sdp"
-            app:titleTextColor="@color/white"
+            app:titleTextColor="?attr/colorOnPrimary"
             />
 
         <androidx.cardview.widget.CardView
@@ -54,7 +54,7 @@
             android:layout_marginTop="35sp"
             android:fontFamily="sans-serif-light"
             android:text="@string/android_default_user"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="32sp" />
 
 
@@ -70,18 +70,6 @@
             android:textColor="#2F7092"
             android:textSize="14sp" />
 
-        <ImageView
-            android:id="@+id/goBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="15dp"
-            android:layout_marginRight="353dp"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="353dp"
-            android:contentDescription="@string/foto_de_perfil" />
 
     </RelativeLayout>
 
@@ -115,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
                     android:text="@string/numero_notas"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/colorOnPrimary"
                     android:textSize="25sp" />
 
                 <TextView
@@ -124,7 +112,7 @@
                     android:fontFamily="sans-serif-light"
                     android:text="@string/numero_total_de_notas"
                     android:textAllCaps="true"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/colorOnPrimary"
                     android:textSize="13sp" />
 
             </LinearLayout>
@@ -153,7 +141,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
                     android:text="@string/n_de_mbitos"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/colorOnPrimary"
                     android:textSize="25sp" />
 
                 <TextView
@@ -162,7 +150,7 @@
                     android:fontFamily="sans-serif-light"
                     android:text="@string/numero_de_ambitos"
                     android:textAllCaps="true"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/colorOnPrimary"
                     android:textSize="13sp" />
 
             </LinearLayout>
@@ -175,7 +163,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/linlay1">
+        android:layout_below="@+id/linlay1"
+        style="@style/Settings.Background">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -213,8 +202,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:autofillHints=""
-                        android:background="#33FFFFFF"
+                        android:background="@android:color/transparent"
                         android:text="@string/nombre"
+                        android:textColor="?attr/colorOnBackground"
                         android:inputType="textNoSuggestions"
                         android:maxLines="1"
                         android:paddingStart="5dp"
@@ -256,8 +246,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:autofillHints=""
-                        android:background="#33FFFFFF"
+                        android:background="@android:color/transparent"
                         android:text="@string/apellidos"
+                        android:textColor="?attr/colorOnBackground"
                         android:inputType="textNoSuggestions"
                         android:maxLines="1"
                         android:paddingStart="5dp"
@@ -296,8 +287,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:autofillHints=""
-                        android:background="#33FFFFFF"
+                        android:background="@android:color/transparent"
                         android:text="@string/email"
+                        android:textColor="?attr/colorOnBackground"
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
                         android:paddingStart="5dp"
@@ -337,8 +329,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:autofillHints=""
-                        android:background="#33FFFFFF"
+                        android:background="@android:color/transparent"
                         android:text="@string/password"
+                        android:textColor="?attr/colorOnBackground"
                         android:inputType="textPassword"
                         android:maxLines="1"
                         android:paddingStart="5dp"

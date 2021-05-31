@@ -7,30 +7,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:openDrawer="start"
-    android:elevation="7dp">
+    android:elevation="7dp"
+    app:itemIconTint="?attr/colorOnPrimary">
 
-
+    <!-- Contenido Principal -->
     <include
         layout="@layout/activity_main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
-    <!--
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <include
-            android:id="@+id/tool_bar"
-            layout="@layout/tool_bar">
-        </include>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello World"/>
-    </LinearLayout>
-    -->
+    <!-- Contenido del Drawer -->
     <com.google.android.material.navigation.NavigationView
     android:id="@+id/navigation_view"
     android:layout_width="wrap_content"
@@ -40,11 +26,11 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="?attr/background">
 
             <include
                 layout="@layout/header" />
-
 
             <fragment
                 android:layout_below="@+id/headerView"
@@ -60,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:orientation="vertical"
-                android:background="#ffffff"
+                android:background="?attr/background"
                 android:gravity="bottom"
                 android:paddingTop="3dp"
                 android:paddingBottom="6dp">
@@ -70,15 +56,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:backgroundTint="?attr/colorPrimaryDark"
                     android:radius="50dip"
                     android:text="@string/salir"
+                    android:textColor="?attr/colorOnPrimary"
                     app:cornerRadius="50dp"
                     app:elevation="7dp" />
 
             </LinearLayout>
         </RelativeLayout>
-
     </com.google.android.material.navigation.NavigationView>
-
-
 </androidx.drawerlayout.widget.DrawerLayout>

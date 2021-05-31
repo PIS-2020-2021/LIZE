@@ -16,26 +16,169 @@
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
-        <item name="colorAccent">@color/white</item>
+
+        <item name="background">@color/md_grey_dark</item>
+        <item name="colorOnBackground">@color/md_white_1000</item>
 
         <!-- Material Component filters -->
-        <item name="hintTextColor">@style/Theme.hintNight</item>
+        <item name="hintTextColor">@style/Theme.hint</item>
         <item name="materialCardViewStyle">@style/Widget.Lize.CardView.option1</item>
         <item name="toolbarStyle">@style/Widget.Lize.Toolbar</item>
         <item name="chipStyle">@style/Widget.Lize.Chip.option1</item>
         <item name="floatingActionButtonStyle">@style/Widget.Lize.FAB</item>
         <item name="android:windowDisablePreview">true</item>
-        <item name="searchViewStyle">@style/SearchViewStyle</item>
-
-
+        <item name="drawerArrowStyle">@style/drawerToggle</item>
     </style>
 
-    <!-- CardView Style -->
-    <style name="Widget.Lize.CardView" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">@color/md_grey_300</item>
-        <item name="colorSurface">@color/md_grey_600</item>
-        <item name="colorOnSurface">@color/black</item>
+    <!--****************************
+    Estilos de los Edit TextViews
+    ****************************-->
+    <!-- Hints -->
+    <style name="Theme.hint" parent="">
+        <item name="colorPrimary">@color/light_blue_400</item>
     </style>
+
+    <!-- SignUp TextViews -->
+    <style name="LogInSignUp" parent="Widget.AppCompat.TextView">
+        <item name="android:background">#33FFFFFF</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="paddingStart">5dp</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+        <item name="maxLines">1</item>
+        <item name="singleLine">true</item>
+    </style>
+
+    <!--****************************
+        Estilos de Drawable Navigation
+        ****************************-->
+    <!-- Color Drawer Toggle -->
+    <style name="drawerToggle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">?attr/colorOnPrimary</item>
+    </style>
+
+    <!-- Header del Drawer -->
+    <style name="Header" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@drawable/side_nav_bar</item>
+    </style>
+
+    <!-- Menu Lateral de los Ambitos -->
+    <style name="MeuAmbitos" parent="">
+        <item name="android:layout_width">50dp</item>
+        <item name="elevation">5dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/md_grey_700</item>
+    </style>
+
+    <!-- Tinte de los iconos del menu Lateral de los Ambitos -->
+    <style name="Cancel" parent="MeuAmbitos">
+        <item name="tint">@color/md_blue_700_dark</item>
+    </style>
+    <style name="Edit" parent="MeuAmbitos">
+        <item name="tint">@color/md_green_800_dark</item>
+    </style>
+    <style name="Delete" parent="MeuAmbitos">
+        <item name="tint">@color/md_red_800_dark</item>
+    </style>-
+
+    <!--****************************
+        Estilos del ToolBar
+        ****************************-->
+    <style name="Widget.Lize.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <!--****************************
+        Estilos de Settings Activity
+        ****************************-->
+    <style name="Settings.Background" parent="">
+        <item name="android:background">@color/md_grey_500</item>
+    </style>
+
+    <!--****************************
+        Estilos de New Ambito / Edit Ambito Activity
+        ****************************-->
+    <style name="NewAmbito.CardView" parent="CardView">
+        <item name="android:layout_width">80dp</item>
+        <item name="android:layout_height">80dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:foreground">?selectableItemBackground</item>
+        <item name="cardCornerRadius">2dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+    </style>
+
+    <!-- Color de las Cards de los Ambitos -->
+    <style name="NewAmbito.CardView.Red">
+        <item name="cardBackgroundColor">@color/red_400</item>
+    </style>
+    <style name="NewAmbito.CardView.Purple">
+        <item name="cardBackgroundColor">@color/purple_400</item>
+    </style>
+    <style name="NewAmbito.CardView.Indigo">
+        <item name="cardBackgroundColor">@color/indigo_400</item>
+    </style>
+    <style name="NewAmbito.CardView.Blue">
+        <item name="cardBackgroundColor">@color/light_blue_400</item>
+    </style>
+    <style name="NewAmbito.CardView.Teal">
+        <item name="cardBackgroundColor">@color/teal_400</item>
+    </style>
+    <style name="NewAmbito.CardView.Green">
+        <item name="cardBackgroundColor">@color/light_green_400</item>
+    </style>
+    <style name="NewAmbito.CardView.Yellow">
+        <item name="cardBackgroundColor">@color/yellow_400</item>
+    </style>
+    <style name="NewAmbito.CardView.Orange">
+        <item name="cardBackgroundColor">@color/orange_400</item>
+    </style>
+    <style name="NewAmbito.CardView.Brown">
+        <item name="cardBackgroundColor">@color/brown_400</item>
+    </style>
+
+    <!--****************************
+        Estilos del Chip Folder
+        ****************************-->
+    <style name="Widget.Lize.Chip" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="android:textColor">@color/black_to_white</item>
+        <item name="android:textAppearance">@style/TextAppearance.Lize.Body2</item>
+        <item name="chipBackgroundColor">@color/primary_to_primary_dark</item>
+    </style>
+
+    <!-- Transición de Selected-NotSelected -->
+    <style name="Widget.Lize.Chip.option1" parent="Widget.Lize.Chip">
+        <item name="chipIconTint">@color/primary_to_primary_dark</item>
+        <item name="chipIconVisible">true</item>
+        <item name="chipIcon">@drawable/ic_baseline_folder_24</item>
+        <item name="android:textColor">@color/grey_to_black</item>
+        <item name="chipBackgroundColor">?attr/colorSurface</item>
+        <item name="chipStrokeWidth">2dp</item>
+        <item name="chipStrokeColor">@color/primary_to_primary_dark</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.Lize.Chip.Cut</item>
+    </style>
+
+    <!-- Shape Appearance -->
+    <style name="ShapeAppearanceOverlay.Lize.Chip.Cut" parent="">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">4dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.Lize.Chip.Folder" parent="">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">4dp</item>
+        <item name="cornerSizeTopRight">15dp</item>
+    </style>
+
+    <!--****************************
+        Estilos del CardView
+        ****************************-->
+
 
     <style name="Widget.Lize.CardView.option1" parent="Widget.Lize.CardView">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.Lize.Card.Cut</item>
@@ -48,54 +191,9 @@
         <item name="cornerSize">4dp</item>
     </style>
 
-
-    <!-- ToolBar Style -->
-    <style name="Widget.Lize.Toolbar" parent="Widget.MaterialComponents.Toolbar">
-        <item name="android:background">?attr/colorSurface</item>
-        <item name="titleTextColor">?attr/colorOnSurface</item>
-    </style>
-
-    <!-- Chip Style's -->
-    <style name="Widget.Lize.Chip" parent="Widget.MaterialComponents.Chip.Choice">
-        <item name="android:textColor">@color/black_to_white</item>
-        <item name="android:textAppearance">@style/TextAppearance.Lize.Body2</item>
-        <item name="chipBackgroundColor">@color/primary_to_primary_dark</item>
-    </style>
-
-    <style name="Widget.Lize.Chip.option1" parent="Widget.Lize.Chip">
-        <item name="chipIconTint">@color/primary_to_primary_dark</item>
-        <item name="chipIconVisible">true</item>
-        <item name="chipIcon">@drawable/ic_baseline_folder_24</item>
-        <item name="android:textColor">@color/grey_to_black</item>
-        <item name="chipBackgroundColor">@color/md_grey_200</item>
-        <item name="chipStrokeWidth">2dp</item>
-        <item name="chipStrokeColor">@color/primary_to_primary_dark</item>
-        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.Lize.Chip.Cut</item>
-    </style>
-
-    <style name="Widget.Lize.Chip.option2" parent="Widget.Lize.Chip">
-        <item name="android:textColor">@color/black_to_white</item>
-        <item name="chipBackgroundColor">@color/primary_to_primary_dark</item>
-        <item name="chipStrokeWidth">2dp</item>
-        <item name="chipStrokeColor">@color/grey_to_black</item>
-        <item name="chipEndPadding">15dp</item>
-        <item name="chipMinHeight">40dp</item>
-        <item name="android:textAppearance">@style/TextAppearance.Lize.Body1</item>
-        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.Lize.Chip.Folder</item>
-    </style>
-
-    <style name="ShapeAppearanceOverlay.Lize.Chip.Cut" parent="">
-        <item name="cornerFamily">cut</item>
-        <item name="cornerSize">4dp</item>
-    </style>
-
-    <style name="ShapeAppearanceOverlay.Lize.Chip.Folder" parent="">
-        <item name="cornerFamily">cut</item>
-        <item name="cornerSize">4dp</item>
-        <item name="cornerSizeTopRight">15dp</item>
-    </style>
-
-    <!-- FAB Style -->
+    <!--****************************
+        Estilos del FAB Button
+        ****************************-->
     <style name="Widget.Lize.FAB" parent="Widget.MaterialComponents.FloatingActionButton">
         <item name="backgroundTint">?attr/colorSurface</item>
         <item name="tint">?attr/colorOnSurface</item>
@@ -108,52 +206,26 @@
         <item name="android:background">?android:attr/listDivider</item>
     </style>
 
-    <style name="Header" parent="">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">1dp</item>
-        <item name="android:background">@drawable/side_nav_bar</item>
-    </style>
-
-    <!-- Menu Ambitos (Edit, Delete, Exit) -->
-    <style name="MeuAmbitos" parent="">
-        <item name="android:layout_width">50dp</item>
-        <item name="elevation">5dp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:background">@color/md_grey_300</item>
-    </style>
-
-    <style name="Cancel" parent="MeuAmbitos">
-        <item name="tint">@color/md_blue_700</item>
-    </style>
-    <style name="Edit" parent="MeuAmbitos">
-        <item name="tint">@color/md_green_800</item>
-    </style>
-    <style name="Delete" parent="MeuAmbitos">
-        <item name="tint">@color/md_red_800</item>
-    </style>
-
+<!--
     <style name="SearchViewStyle" parent="Widget.AppCompat.Light.SearchView">
 
-        <!-- Gets rid of the search icon -->
         <item name="searchIcon">@drawable/ic_baseline_search_24</item>
-        <!-- Gets rid of the search icon when the SearchView is expanded -->
-        <!--<item name="searchHintIcon">@drawable/ic_baseline_search_24</item>-->
-        <!-- The hint text that appears when the user has not typed anything -->
+
         <item name="color">@color/white</item>
         <item name="queryHint">Search Note</item>
         <item name="android:textColorHint">@color/white</item>
         <item name="editTextColor">@color/white</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textColorPrimary">?attr/colorOnSecondary</item>
-        <item name="android:textColorSecondary">?attr/colorOnSecondary</item>
-        <item name="colorControlNormal">?attr/colorOnSecondary</item>
-        <item name="colorControlHighlight">?attr/colorOnSecondary</item>
+        <item name="android:textColorPrimary">?attr/colorOnPrimarySurface</item>
+        <item name="android:textColorSecondary">?attr/colorOnPrimarySurface</item>
+        <item name="colorControlNormal">?attr/colorOnPrimarySurface</item>
+        <item name="colorControlHighlight">?attr/colorOnPrimarySurface</item>
 
 
 
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.SearchResult.Title</item>
     </style>
-
+-->
 
     <!-- Text Appearance Body -->
     <style name="TextAppearance.Lize.HeadLine6" parent="TextAppearance.MaterialComponents.Headline6">
@@ -182,17 +254,17 @@
     <!-- Ambit Color Themes -->
     <style name="Theme.Red" parent="Theme.Lize">
         <!-- Material Component filters -->
-        <item name="colorPrimary">@color/md_red_A600</item>
-        <item name="colorPrimaryDark">@color/md_red_A700</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimary">@color/md_red_500_dark</item>
+        <item name="colorPrimaryDark">@color/md_red_900_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
 
-        <item name="colorSecondary">@color/md_red_A800</item>
+        <item name="colorSecondary">@color/md_red_300</item>
         <item name="colorSecondaryVariant">@color/md_red_1000</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/md_grey_800</item>
 
-        <item name="colorSurface">@color/md_red_A900</item>
-        <item name="colorOnSurface">@color/md_grey_300</item>
-        <item name="colorOnPrimarySurface">@color/md_red_100</item>
+        <item name="colorSurface">@color/md_grey_900</item>
+        <item name="colorOnSurface">@color/md_grey_400</item>
+        <item name="colorOnPrimarySurface">@color/white</item>
 
         <item name="colorAccent">@color/md_orange_700</item>
 
@@ -203,19 +275,19 @@
     <!-- Ambit Color Themes -->
     <style name="Theme.Purple" parent="Theme.Lize">
         <!-- Material Component filters -->
-        <item name="colorPrimary">@color/md_purple_900</item>
-        <item name="colorPrimaryDark">@color/md_purple_A800</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimary">@color/md_purple_300</item>
+        <item name="colorPrimaryDark">@color/md_deep_purple_400</item>
+        <item name="colorOnPrimary">@color/white</item>
 
         <item name="colorSecondary">@color/md_purple_A600</item>
         <item name="colorSecondaryVariant">@color/md_deep_purple_400</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <item name="colorSurface">@color/md_purple_A800</item>
-        <item name="colorOnSurface">@color/md_grey_300</item>
-        <item name="colorOnPrimarySurface">@color/md_purple_100</item>
+        <item name="colorSurface">@color/md_grey_900</item>
+        <item name="colorOnSurface">@color/md_grey_400</item>
+        <item name="colorOnPrimarySurface">@color/white</item>
 
-        <item name="colorAccent">@color/md_pink_A400</item>
+        <item name="colorAccent">@color/md_purple_A900</item>
 
         <item name="colorError">@color/md_red_A700</item>
         <item name="colorOnError">@color/md_red_50</item>
@@ -224,17 +296,17 @@
     <!-- Ambit Color Themes -->
     <style name="Theme.Indigo" parent="Theme.Lize">
         <!-- Material Component filters -->
-        <item name="colorPrimary">@color/md_indigo_A800</item>
-        <item name="colorPrimaryDark">@color/md_indigo_A900</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimary">@color/md_indigo_300</item>
+        <item name="colorPrimaryDark">@color/md_indigo_A200</item>
+        <item name="colorOnPrimary">@color/white</item>
 
-        <item name="colorSecondary">@color/md_indigo_A600</item>
-        <item name="colorSecondaryVariant">@color/md_indigo_A700</item>
+        <item name="colorSecondary">@color/md_indigo_500</item>
+        <item name="colorSecondaryVariant">@color/md_indigo_900</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <item name="colorSurface">@color/md_indigo_A800</item>
-        <item name="colorOnSurface">@color/md_grey_300</item>
-        <item name="colorOnPrimarySurface">@color/md_indigo_100</item>
+        <item name="colorSurface">@color/md_grey_900</item>
+        <item name="colorOnSurface">@color/md_grey_400</item>
+        <item name="colorOnPrimarySurface">@color/white</item>
 
         <item name="colorAccent">@color/md_blue_A400</item>
 
@@ -245,19 +317,19 @@
     <!-- Ambit Color Themes -->
     <style name="Theme.Blue" parent="Theme.Lize">
         <!-- Material Component filters -->
-        <item name="colorPrimary">@color/md_blue_A700</item>
-        <item name="colorPrimaryDark">@color/md_blue_A900</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimary">@color/md_light_blue_300</item>
+        <item name="colorPrimaryDark">@color/md_light_blue_900</item>
+        <item name="colorOnPrimary">@color/white</item>
 
-        <item name="colorSecondary">@color/md_blue_A600</item>
-        <item name="colorSecondaryVariant">@color/md_blue_A800</item>
+        <item name="colorSecondary">@color/md_light_blue_500</item>
+        <item name="colorSecondaryVariant">@color/md_light_blue_900</item>
         <item name="colorOnSecondary">@color/md_grey_300</item>
 
-        <item name="colorSurface">@color/md_blue_A800</item>
-        <item name="colorOnSurface">@color/md_grey_300</item>
-        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
+        <item name="colorSurface">@color/md_grey_900</item>
+        <item name="colorOnSurface">@color/md_grey_400</item>
+        <item name="colorOnPrimarySurface">@color/white</item>
 
-        <item name="colorAccent">@color/md_teal_A400</item>
+        <item name="colorAccent">@color/md_teal_900</item>
 
         <item name="colorError">@color/md_red_A700</item>
         <item name="colorOnError">@color/md_red_50</item>
@@ -266,17 +338,17 @@
     <!-- Ambit Color Themes -->
     <style name="Theme.Teal" parent="Theme.Lize">
         <!-- Material Component filters -->
-        <item name="colorPrimary">@color/md_teal_A700</item>
-        <item name="colorPrimaryDark">@color/md_teal_A800</item>
+        <item name="colorPrimary">@color/md_teal_300</item>
+        <item name="colorPrimaryDark">@color/md_teal_600</item>
         <item name="colorOnPrimary">@color/white</item>
 
-        <item name="colorSecondary">@color/md_teal_A800</item>
-        <item name="colorSecondaryVariant">@color/md_teal_A900</item>
+        <item name="colorSecondary">@color/md_teal_500</item>
+        <item name="colorSecondaryVariant">@color/md_teal_900</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <item name="colorSurface">@color/md_teal_A800</item>
-        <item name="colorOnSurface">@color/md_grey_300</item>
-        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
+        <item name="colorSurface">@color/md_grey_900</item>
+        <item name="colorOnSurface">@color/md_grey_400</item>
+        <item name="colorOnPrimarySurface">@color/white</item>
 
         <item name="colorAccent">@color/md_green_A400</item>
 
@@ -287,19 +359,19 @@
     <!-- Ambit Color Themes -->
     <style name="Theme.Green" parent="Theme.Lize">
         <!-- Material Component filters -->
-        <item name="colorPrimary">@color/md_light_green_A600</item>
-        <item name="colorPrimaryDark">@color/md_light_green_A800</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimary">@color/md_light_green_300</item>
+        <item name="colorPrimaryDark">@color/md_light_green_600</item>
+        <item name="colorOnPrimary">@color/white</item>
 
-        <item name="colorSecondary">@color/md_light_green_A700</item>
-        <item name="colorSecondaryVariant">@color/md_light_green_A900</item>
+        <item name="colorSecondary">@color/md_light_green_500</item>
+        <item name="colorSecondaryVariant">@color/md_light_green_800</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <item name="colorSurface">@color/md_light_green_A900</item>
-        <item name="colorOnSurface">@color/md_grey_300</item>
-        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
+        <item name="colorSurface">@color/md_grey_900</item>
+        <item name="colorOnSurface">@color/md_grey_400</item>
+        <item name="colorOnPrimarySurface">@color/white</item>
 
-        <item name="colorAccent">@color/md_lime_A400</item>
+        <item name="colorAccent">@color/md_lime_800</item>
 
         <item name="colorError">@color/md_red_A700</item>
         <item name="colorOnError">@color/md_red_50</item>
@@ -308,19 +380,19 @@
     <!-- Ambit Color Themes -->
     <style name="Theme.Yellow" parent="Theme.Lize">
         <!-- Material Component filters -->
-        <item name="colorPrimary">@color/md_amber_A500</item>
-        <item name="colorPrimaryDark">@color/md_amber_A700</item>
+        <item name="colorPrimary">@color/md_amber_A600</item>
+        <item name="colorPrimaryDark">@color/md_amber_A800</item>
         <item name="colorOnPrimary">@color/black</item>
 
-        <item name="colorSecondary">@color/md_amber_A600</item>
-        <item name="colorSecondaryVariant">@color/md_amber_A800</item>
+        <item name="colorSecondary">@color/md_amber_300</item>
+        <item name="colorSecondaryVariant">@color/md_amber_600</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <item name="colorSurface">@color/md_amber_A500</item>
-        <item name="colorOnSurface">@color/black</item>
-        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
+        <item name="colorSurface">@color/md_grey_900</item>
+        <item name="colorOnSurface">@color/md_grey_400</item>
+        <item name="colorOnPrimarySurface">@color/white</item>
 
-        <item name="colorAccent">@color/md_deep_orange_A400</item>
+        <item name="colorAccent">@color/md_amber_900</item>
 
         <item name="colorError">@color/md_red_A700</item>
         <item name="colorOnError">@color/md_red_50</item>
@@ -329,19 +401,19 @@
     <!-- Ambit Color Themes -->
     <style name="Theme.Orange" parent="Theme.Lize">
         <!-- Material Component filters -->
-        <item name="colorPrimary">@color/md_orange_A600</item>
-        <item name="colorPrimaryDark">@color/md_orange_A800</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimary">@color/md_deep_orange_300</item>
+        <item name="colorPrimaryDark">@color/md_deep_orange_600</item>
+        <item name="colorOnPrimary">@color/white</item>
 
-        <item name="colorSecondary">@color/md_orange_A700</item>
-        <item name="colorSecondaryVariant">@color/md_orange_A900</item>
+        <item name="colorSecondary">@color/md_deep_orange_500</item>
+        <item name="colorSecondaryVariant">@color/md_deep_orange_800</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <item name="colorSurface">@color/md_orange_A600</item>
-        <item name="colorOnSurface">@color/md_grey_300</item>
-        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
+        <item name="colorSurface">@color/md_grey_900</item>
+        <item name="colorOnSurface">@color/md_grey_400</item>
+        <item name="colorOnPrimarySurface">@color/white</item>
 
-        <item name="colorAccent">@color/md_red_700</item>
+        <item name="colorAccent">@color/md_red_800</item>
 
         <item name="colorError">@color/md_red_A700</item>
         <item name="colorOnError">@color/md_red_50</item>
@@ -350,145 +422,22 @@
     <!-- Ambit Color Themes -->
     <style name="Theme.Brown" parent="Theme.Lize">
         <!-- Material Component filters -->
-        <item name="colorPrimary">@color/md_brown_900</item>
-        <item name="colorPrimaryDark">@color/md_brown_A800</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimary">@color/md_brown_500</item>
+        <item name="colorPrimaryDark">@color/md_brown_700</item>
+        <item name="colorOnPrimary">@color/white</item>
 
-        <item name="colorSecondary">@color/md_brown_A700</item>
-        <item name="colorSecondaryVariant">@color/md_brown_A900</item>
+        <item name="colorSecondary">@color/md_brown_150</item>
+        <item name="colorSecondaryVariant">@color/md_brown_300</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <item name="colorSurface">@color/md_brown_A500</item>
-        <item name="colorOnSurface">@color/md_grey_300</item>
-        <item name="colorOnPrimarySurface">@color/md_grey_800</item>
+        <item name="colorSurface">@color/md_grey_900</item>
+        <item name="colorOnSurface">@color/md_grey_400</item>
+        <item name="colorOnPrimarySurface">@color/white</item>
 
-        <item name="colorAccent">@color/md_light_blue_A400</item>
+        <item name="colorAccent">@color/md_orange_A800</item>
 
         <item name="colorError">@color/md_red_A700</item>
         <item name="colorOnError">@color/md_red_50</item>
-    </style>
-
-
-    <!-- Ambit Color Themes -->
-    <style name="Theme.hintNight" parent="">
-        <item name="colorPrimary">@color/light_blue_400</item>
-        <item name="colorPrimaryDark">@color/light_blue_700</item>
-        <item name="colorSurface">@color/light_blue_A400</item>
-        <item name="colorOnPrimary">@color/md_grey_800</item>
-        <item name="colorOnSurface">@color/black</item>
-        <item name="hintTextColor">@color/black</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textColorHint">@color/black</item>
-        <item name="colorAccent">@color/teal_A400</item>
-    </style>
-
-    <!-- Ambit Color Themes -->
-    <style name="Theme.Lize.Ambit.Red" parent="">
-        <item name="colorPrimary">@color/red_200</item>
-        <item name="colorPrimaryDark">@color/red_400</item>
-        <item name="colorSurface">@color/red_400</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorOnSurface">@color/md_red_250</item>
-        <item name="colorAccent">@color/teal_A400</item>
-    </style>
-
-    <style name="Theme.Lize.Ambit.Purple" parent="">
-        <item name="colorPrimary">@color/purple_100</item>
-        <item name="colorPrimaryDark">@color/purple_400</item>
-        <item name="colorSurface">@color/purple_400</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorOnSurface">@color/white</item>
-        <item name="colorAccent">@color/light_green_A400</item>
-    </style>
-
-    <style name="Theme.Lize.Ambit.Indigo" parent="">
-        <item name="colorPrimary">@color/indigo_100</item>
-        <item name="colorPrimaryDark">@color/indigo_400</item>
-        <item name="colorSurface">@color/indigo_400</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorOnSurface">@color/white</item>
-        <item name="colorAccent">@color/yellow_A400</item>
-    </style>
-
-    <style name="Theme.Lize.Ambit.LightBlue" parent="">
-        <item name="colorPrimary">@color/light_blue_100</item>
-        <item name="colorPrimaryDark">@color/light_blue_400</item>
-        <item name="colorSurface">@color/light_blue_400</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorOnSurface">@color/white</item>
-        <item name="colorAccent">@color/orange_A400</item>
-    </style>
-
-    <style name="Theme.Lize.Ambit.Teal" parent="">
-        <item name="colorPrimary">@color/teal_100</item>
-        <item name="colorPrimaryDark">@color/teal_400</item>
-        <item name="colorSurface">@color/teal_400</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorOnSurface">@color/white</item>
-        <item name="colorAccent">@color/red_A400</item>
-    </style>
-
-    <style name="Theme.Lize.Ambit.LightGreen" parent="">
-        <item name="colorPrimary">@color/light_green_100</item>
-        <item name="colorPrimaryDark">@color/light_green_700</item>
-        <item name="colorSurface">@color/light_green_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorOnSurface">@color/white</item>
-        <item name="colorAccent">@color/purple_A400</item>
-    </style>
-
-    <style name="Theme.Lize.Ambit.Yellow" parent="">
-        <item name="colorPrimary">@color/yellow_100</item>
-        <item name="colorPrimaryDark">@color/yellow_700</item>
-        <item name="colorSurface">@color/yellow_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorOnSurface">@color/white</item>
-        <item name="colorAccent">@color/indigo_A400</item>
-    </style>
-
-    <style name="Theme.Lize.Ambit.Orange" parent="">
-        <item name="colorPrimary">@color/orange_100</item>
-        <item name="colorPrimaryDark">@color/orange_400</item>
-        <item name="colorSurface">@color/orange_400</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorOnSurface">@color/white</item>
-        <item name="colorAccent">@color/light_blue_A400</item>
-    </style>
-
-
-    <!-- Prueba de Tema -->
-    <style name="Theme.NewTry" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/md_red_A700</item>
-        <item name="colorPrimaryVariant">@color/md_red_A200</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/md_red_200</item>
-        <item name="colorSecondaryVariant">@color/md_red_700</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-    </style>
-
-    <!-- LIGHT THEME -->
-    <style name="RTE_BaseThemeLight" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <item name="rte_darkTheme">false</item>
-
-        <item name="rte_icMenuCloseClearCancel">@drawable/ic_menu_close_clear_cancel_light</item>
-        <item name="rte_icMenuSave">@drawable/ic_menu_save_light</item>
-        <item name="rte_icMenuRotateLeft">@drawable/ic_menu_rotate_left_light</item>
-        <item name="rte_icMenuRotateRight">@drawable/ic_menu_rotate_right_light</item>
-
-    </style>
-
-    <!-- DARK THEME -->
-    <style name="RTE_BaseThemeDark" parent="@style/Theme.AppCompat">
-        <item name="rte_darkTheme">true</item>
-        <item name="rte_icMenuCloseClearCancel">@drawable/ic_menu_close_clear_cancel_dark</item>
-        <item name="rte_icMenuSave">@drawable/ic_menu_save_dark</item>
-        <item name="rte_icMenuRotateLeft">@drawable/ic_menu_rotate_left_dark</item>
-        <item name="rte_icMenuRotateRight">@drawable/ic_menu_rotate_right_dark</item>
     </style>
 
 </resources>

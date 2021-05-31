@@ -9,7 +9,8 @@
         android:id="@+id/folder_recycler_view"
         android:scrollbars="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:background="?attr/background"/>
 
     <View style="@style/Divider"/>
 

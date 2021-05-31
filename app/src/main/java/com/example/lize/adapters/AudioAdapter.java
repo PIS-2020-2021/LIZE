@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import com.example.lize.R;
 import com.example.lize.data.Audio;
 
 import com.example.lize.models.DocumentManager;
+import com.example.lize.utils.Preferences;
 import com.gauravk.audiovisualizer.visualizer.BarVisualizer;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
@@ -100,6 +102,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        Preferences.applySelectedTheme((ContextThemeWrapper) parentContext);
         // Create a new view, which defines the UI of the list item
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.item_attach_audio, viewGroup, false);

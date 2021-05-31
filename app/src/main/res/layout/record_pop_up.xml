@@ -16,8 +16,8 @@
         android:layout_gravity="center"
         android:background="@drawable/circular_shape"
         app:layout_constraintStart_toStartOf="parent"
-        android:tint="@color/white"
-        android:backgroundTint="@color/Default_Purple"
+        android:tint="?attr/colorOnPrimary"
+        android:backgroundTint="?attr/colorPrimaryDark"
         app:srcCompat="@drawable/ic_baseline_mic_34"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="@dimen/_40sdp"
@@ -29,10 +29,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/cancel"
-        android:textColor="@color/white"
+        android:textColor="?attr/colorOnPrimary"
         android:layout_marginTop="@dimen/_30sdp"
         android:layout_gravity="center"
-        android:backgroundTint="@color/Default_Purple"
+        android:backgroundTint="?attr/colorPrimaryDark"
         app:cornerRadius="@dimen/_14sdp"
 
          />

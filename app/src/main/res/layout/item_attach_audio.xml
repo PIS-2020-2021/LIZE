@@ -6,7 +6,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginLeft="@dimen/_12sdp"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:padding="@dimen/_5sdp"
@@ -39,11 +38,12 @@
         android:gravity="center_vertical"
         custom:avDensity="0.8"
         custom:avType="fill"
-        custom:avColor="@color/Default_Purple"
+        custom:avColor="?attr/colorPrimaryDark"
         custom:avSpeed="normal"/>
 
     <TextView
         android:id="@+id/audioTime"
+        android:textColor="?attr/colorOnBackground"
         android:layout_width="@dimen/_40sdp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/_4sdp"
