@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- CardNote layout_height values -->
-    <dimen name="cardnote_layout_height_high">150dp</dimen>
-    <dimen name="cardnote_layout_height_low">100dp</dimen>
+    <!-- CardNote layout values -->
+    <dimen name="cardnote_layout_min_height">100dp</dimen>
+    <dimen name="cardnote_layout_max_height">200dp</dimen>
+    <dimen name="cardnote_layout_min_width">200dp</dimen>
+    <dimen name="cardnote_layout_max_width">400dp</dimen>
+    <dimen name="cardnote_text_min_height">75dp</dimen>
+    <dimen name="cardnote_text_max_height">155dp</dimen>
+    <dimen name="cardnote_text_group_height">135dp</dimen>
+    <dimen name="cardnote_text_width_low">170dp</dimen>
+    <dimen name="cardnote_text_width_high_image">220dp</dimen>
+    <dimen name="cardnote_text_width_high_no_image">380dp</dimen>
+
+    <dimen name="cardnote_media">135dp</dimen>
+
     <dimen name="cardnote_selected_translation">50dp</dimen>
 
     <dimen name="cardnote_selected_stroke_width">2dp</dimen>
