@@ -25,7 +25,7 @@
         android:orientation="vertical"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
-        android:background="@drawable/toolbar_backround">
+        android:background="@drawable/toolbar_background">
 
         <com.onegravity.rteditor.toolbar.HorizontalRTToolbar
             android:id="@+id/rte_toolbar"
