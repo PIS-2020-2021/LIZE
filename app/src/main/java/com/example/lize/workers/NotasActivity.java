@@ -29,7 +29,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
@@ -58,7 +57,6 @@ import com.example.lize.data.Audio;
 import com.example.lize.data.Document;
 import com.example.lize.data.Image;
 import com.example.lize.models.DocumentManager;
-import com.example.lize.utils.FileUtils;
 import com.example.lize.utils.Preferences;
 import com.onegravity.rteditor.RTEditText;
 import com.onegravity.rteditor.RTManager;
@@ -75,7 +73,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -107,7 +104,6 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     private CoordinatorLayout primaryLayout;
     private ConstraintLayout cLayout;
     private ScrollView scrollView;
-    private int NoteHeight;
     boolean isKeyboardShowing = false;
     private DocumentManager documentManager;
     private String documentsID;
@@ -124,7 +120,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setTheme(R.style.RTE_ThemeLight);
+
         Preferences.applySelectedTheme(this);
         setContentView(R.layout.activity_notas);
         setTheme(R.style.RTE_ThemeLight);
@@ -137,13 +133,13 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         cLayout = findViewById(R.id.cLayout);
         scrollView = findViewById(R.id.scrollView);
 
-        // Apartado de documentos
+        /* DOCUMENTOS / IMAGENES */
         //ArrayList de imagenes y documentes
         documentManager = DocumentManager.getInstance();
-        //images = new ArrayList<>();
-        //documents = new ArrayList<>();
+
         //Onclick Listener botones
         backBtn.setOnClickListener(v -> saveNote());
+
         documentRecycleView = (RecyclerView) findViewById(R.id.fileAttachView);
         layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -151,7 +147,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         documentAdapter = new DocumentAdapter(this);
         documentRecycleView.setAdapter(documentAdapter);
 
-
+        /* AUDIOS  */
         audioRecycleView = (RecyclerView) findViewById(R.id.audioRecycleView);
         audioRecycleView.setLayoutManager(new LinearLayoutManager(this));
         audioAdapter = new AudioAdapter(this,this);
@@ -166,78 +162,69 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         // Asignamos el layout del toolbar de estilos
         toolbarContainer = (ViewGroup) findViewById(R.id.toolbar_container);
         rtToolbar = (RTToolbar) findViewById(R.id.rte_toolbar);
+        if (rtToolbar != null) rtManager.registerToolbar(toolbarContainer, rtToolbar);
 
-
-        if (rtToolbar != null) {
-            rtManager.registerToolbar(toolbarContainer, rtToolbar);
-        }
-
-        // register editor & set text
+        // Register editor & set text
         rtEditText = (RTEditText) findViewById(R.id.inputNota);
         rtManager.registerEditor(rtEditText, true);
-        //rtEditText.setRichTextEditing(true, message);
         getBundleForEdit();
 
 
-// ContentView is the root view of the layout of this activity/fragment
-        primaryLayout.getViewTreeObserver().addOnGlobalLayoutListener(
-                () -> {
+        // ContentView is the root view of the layout of this activity/fragment
+        primaryLayout.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                Rect r = new Rect();
+                primaryLayout.getWindowVisibleDisplayFrame(r);
+                int screenHeight = primaryLayout.getRootView().getHeight();
 
-                    Rect r = new Rect();
-                    primaryLayout.getWindowVisibleDisplayFrame(r);
-                    int screenHeight = primaryLayout.getRootView().getHeight();
+                // r.bottom is the position above soft keypad or device button.
+                // if keypad is shown, the r.bottom is smaller than that before.
+                int keypadHeight = screenHeight - r.bottom;
 
-                    // r.bottom is the position above soft keypad or device button.
-                    // if keypad is shown, the r.bottom is smaller than that before.
-                    int keypadHeight = screenHeight - r.bottom;
-
-                    if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
-                        // keyboard is opened
-                        if (!isKeyboardShowing) {
-                            isKeyboardShowing = true;
-                            onKeyboardVisibilityChanged(true);
-                        }
-                    } else {
-                        // keyboard is closed
-                        if (isKeyboardShowing) {
-                            isKeyboardShowing = false;
-                            onKeyboardVisibilityChanged(false);
-                        }
+                if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+                    // keyboard is opened
+                    if (!isKeyboardShowing) {
+                        isKeyboardShowing = true;
+                        onKeyboardVisibilityChanged(true);
                     }
-                });
-
-
+                } else {
+                    // keyboard is closed
+                    if (isKeyboardShowing) {
+                        isKeyboardShowing = false;
+                        onKeyboardVisibilityChanged(false);
+                    }
+                }
+            });
     }
 
+    /**
+     * Metodo para cambiar el aspecto del teclado al abrirlo o cerrarlo
+     * @param opened True si está abierto, False si lo cerramos
+     */
     void onKeyboardVisibilityChanged(boolean opened) {
-
-
         if (opened) {
             rtEditText.setMaxHeight(1000);
             toolbarContainer.setVisibility(View.VISIBLE);
             carouselView.setVisibility(View.GONE);
-            //rtEditText.setHeight(1000);
             documentRecycleView.setVisibility(View.GONE);
         } else {
-            if (rtEditText.getLineCount() <= 2) {
-                rtEditText.setMaxHeight(200);
-            } else {
-                rtEditText.setMaxHeight(primaryLayout.getHeight());
-            }
+            if (rtEditText.getLineCount() <= 2) rtEditText.setMaxHeight(200);
+            else rtEditText.setMaxHeight(primaryLayout.getHeight());
+
             toolbarContainer.setVisibility(View.GONE);
-            //rtEditText.setHeight(rtEditText.getLineCount() * 100);
-            if (documentAdapter.getItemCount() != 0/*&& !imagesUris.isEmpty()*/) {
+
+            /*&& !imagesUris.isEmpty()*/
+            if (documentAdapter.getItemCount() != 0) {
                 documentRecycleView.setVisibility(View.VISIBLE);
                 //showHideFragment(carouselFragment);
             }
-            if (!documentManager.arrayImagesEmpty(imagesID)) {
-                carouselView.setVisibility(View.VISIBLE);
-            }
+            if (!documentManager.arrayImagesEmpty(imagesID)) { carouselView.setVisibility(View.VISIBLE); }
         }
 
     }
 
-    //Método para guardar la nota en caso de que el usuario presione el botón atrás del móvil
+    /**
+     * Método para guardar la nota en caso de que el usuario presione el botón atrás del móvil
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
@@ -247,8 +234,10 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         return super.onKeyDown(keyCode, event);
     }
 
-    // Método para recuperar el contenido de la nota al editar.
-    private void getBundleForEdit(){
+    /**
+     * Método para recuperar el contenido de la nota al editar.
+     */
+    private void getBundleForEdit() {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             documentsID = bundle.getString("documentsID");
@@ -261,29 +250,25 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
             inputNoteTitulo.setText(title);
             rtEditText.setRichTextEditing(true, html_text);
-            if (bundle.getBoolean("images")) {
-                //images = documentManager.getImagesNote(documentsID);
+            if (bundle.getBoolean("images"))  init_carousel();
 
-                init_carousel();
-            }
             if (bundle.getBoolean("documents")) {
-
-                for (Document doc : documentManager.getDocuments(documentsID)) {
+                for (Document doc : documentManager.getDocuments(documentsID))
                     documentAdapter.addDocument(doc);
-                }
                 documentRecycleView.setVisibility(View.VISIBLE);
             }
-            if(bundle.getBoolean("audios")){
-                for(Audio s: documentManager.getAudios(audiosID)){
+            if (bundle.getBoolean("audios")) {
+                for (Audio s: documentManager.getAudios(audiosID))
                     audioAdapter.addAudio(s);
-                }
                 audioAdapter.notifyDataSetChanged();
             }
-
         }
     }
 
-    //Función para validar el contenido de la nota antes de agregarla a base de datos
+    /**
+     * Función para validar el contenido de la nota antes de agregarla a base de datos
+     * @return status code CANCELLED o OK
+     */
     private int validateNote() {
         if (inputNoteTitulo.getText().toString().isEmpty() && rtEditText.getText(RTFormat.PLAIN_TEXT).isEmpty() && audioAdapter.getItemCount() == 0 && documentManager.arrayImagesEmpty(imagesID)  && documentAdapter.getItemCount() == 0  /*&&  imagesUris.isEmpty()*/)
             return RESULT_CANCELED;
@@ -291,6 +276,11 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     }
 
     //Método que construye el menú de tres puntos.
+
+    /**
+     * Metodo para desplegar el menú de opciones para insertar en la nota (menú de 3 puntos)
+     * @param v View a desplegar
+     */
     public void showMenu(View v) {
         //noinspection RestrictedApi
         MenuBuilder menuBuilder = new MenuBuilder(this);
@@ -330,14 +320,14 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             public void onMenuModeChange(@NotNull MenuBuilder menu) {
             }
         });
-
         // Display the menu
         //noinspection RestrictedApi
         optionsMenu.show();
-
     }
 
-
+    /**
+     * Metodo para compartir una nota
+     */
     private void shareNote() {
         Intent intent2 = new Intent();
         intent2.setAction(Intent.ACTION_SEND);
@@ -346,7 +336,9 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         startActivity(Intent.createChooser(intent2, "Share via"));
     }
 
-    //Método para crear el intent para regresar los datos al Main activity
+    /**
+     * Método para crear el intent para regresar los datos al Main activity
+     */
     private void saveNote() {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         Bundle nota = new Bundle();
@@ -365,15 +357,14 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         finish();
     }
 
-
-    //Este método calcula el tamaño por defecto que tendrá el editText
+    /**
+     * Este método calcula el tamaño por defecto que tendrá el editText
+     * @return Tamaño del edit text
+     */
     public int getEnteredWidthOrDefault() {
         String enteredValue = rtEditText.getText(RTFormat.PLAIN_TEXT);
-        if (!TextUtils.isEmpty(enteredValue)) {
-            return rtEditText.getWidth();
-        } else {
-            return 150;
-        }
+        if (!TextUtils.isEmpty(enteredValue)) return rtEditText.getWidth();
+        else return 150;
     }
 
     @Override
@@ -383,7 +374,9 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
     }
 
-    //Cierre del manager de edición cuando la actividad finaliza
+    /**
+     * Cierre del manager de edición cuando la actividad finaliza
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -391,28 +384,26 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
     }
 
-    // Carousel de imagenes de las notas
+    /**
+     * Metodo para iniciar el Carousel de imagenes de las notas
+     */
     private void init_carousel() {
-
         ImageListener imageListener = (position, imageView) -> {
             Bitmap bitmap = BitmapFactory.decodeFile(documentManager.selectImageFromArray(imagesID, position));
             imageView.setImageBitmap(bitmap);
-
             registerForContextMenu(imageView);
         };
 
         carouselView.setPageCount(documentManager.imagesArraySize(imagesID));
         carouselView.setImageListener(imageListener);
 
-        if (documentManager.arrayImagesEmpty(imagesID)) {
-            carouselView.setVisibility(View.GONE);
-        } else {
-            carouselView.setVisibility(View.VISIBLE);
-        }
+        if (documentManager.arrayImagesEmpty(imagesID)) carouselView.setVisibility(View.GONE);
+        else carouselView.setVisibility(View.VISIBLE);
     }
 
-
-    //Intent para seleccionar una imagen del dispositivo e insertarlo en el Carrusel
+    /**
+     * Intent para seleccionar una imagen del dispositivo e insertarlo en el Carrusel
+     */
     private void selectImage() {
         Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickIntent.setType("image/*");
@@ -421,52 +412,47 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
         Intent chooserIntent = Intent.createChooser(getIntent, "Selecciona una imagen");
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
-
         startActivityForResult(chooserIntent, PICK_IMAGE);
     }
 
-    //Intent para seleccionar un documento y agregarlo al apartado documentos de la nota
+    /**
+     * Intent para seleccionar un documento y agregarlo al apartado documentos de la nota
+     */
     private void selectDocument() {
         Intent pickIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         pickIntent.setType("*/*");
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         Intent chooserIntent = Intent.createChooser(getIntent, "Selecciona un documento");
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
-
         startActivityForResult(chooserIntent, REQUEST_DOCUMENT_GET);
     }
 
-    //Método para el tratamiento de los permisos de la aplicación
+    /**
+     * Método para el tratamiento de los permisos de la aplicación
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         if (requestCode == PICK_IMAGE && grantResults.length > 0) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                selectImage();
-            } else {
-                Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
-            }
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) selectImage();
+            else Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
         }
+
         if (requestCode == REQUEST_DOCUMENT_GET && grantResults.length > 0) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                selectDocument();
-            } else {
-                Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
-            }
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) selectDocument();
+            else Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
         }
+
         if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                add_audio();
-            } else {
-                Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
-            }
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) add_audio();
+            else Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show();
         }
-
-
     }
 
-
-    // Tratamiento de los datos de Intents de imagenes y documentos.
+    /**
+     * Tratamiento de los datos de Intents de imagenes y documentos.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -478,7 +464,6 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
                         InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         Image i = documentManager.BitmapToImage(bitmap);
-                        //images.add(i);
                         imagesID = documentManager.addImageToCloud(imagesID, i);
                         init_carousel();
                     } catch (Exception e) {
@@ -492,7 +477,6 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             String uriString = uri.toString();
             Document myFile = new Document(uri);
 
-
             //String path = myFile.getAbsolutePath();
             String displayName = null;
 
@@ -502,18 +486,15 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
                         displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                     }
                 }
-            } else if (uriString.startsWith("file://")) {
-                displayName = myFile.getName();
-            }
+            } else if (uriString.startsWith("file://")) displayName = myFile.getName();
 
             myFile.setName(displayName);
             myFile.setId(displayName);
 
             //myFile.setContent(file);
 
-
             documentsID = documentManager.addDocumentToCloud(documentsID, myFile);
-/*            if(!initRecycleView){
+            /* if(!initRecycleView){
                 adapter = new DocumentAdapter(documentManager.getDocuments(documentsID), this);
                 recyclerView.setAdapter(adapter);
                 initRecycleView = true;
@@ -522,10 +503,11 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             //adapter.notifyDataSetChanged();
             documentRecycleView.setVisibility(View.VISIBLE);
         }
-
     }
 
-    // Context Menu para estilos de texto e imagenes
+    /**
+     * Context Menu para estilos de texto e imagenes
+     */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -533,39 +515,53 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
     }
 
-    //Esta función realiza las opciones de eliminar documento e imagen en función del elemento seleccionado
+    /**
+     * Esta función realiza las opciones de eliminar documento e imagen en función del elemento seleccionado
+     */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getTitle().equals("Eliminar")) {
             documentManager.removeImageFromNote(imagesID, carouselView.getCurrentItem());
             init_carousel();
         } else if (item.getTitle().equals("Eliminar documento")) {
-
             documentManager.removeDocumentFromNote(documentsID, documentAdapter.getDocument(item.getGroupId()));
             documentAdapter.removeDocument(item.getGroupId());
-            if (documentAdapter.getItemCount() == 0) {
-                documentRecycleView.setVisibility(View.GONE);
-            }
+            if (documentAdapter.getItemCount() == 0) documentRecycleView.setVisibility(View.GONE);
         }
         return true;
     }
 
     //TODO funcionalidad de abrir documentos en aplicaciones externas
+
+    /**
+     * Metodo para abrir un Documento de una Nota en una app externa
+     * @param position posicion del Documento
+     */
     @Override
     public void onDocumentClick(int position)  {
         Document d = documentManager.getDocuments(documentsID).get(position);
         //openFile(Uri.fromFile(d.getContent()));
     }
 
+    /**
+     * Metodo para conseguir el MimeType de una Nota con 2 parametros
+     * @param mContext Contexto d ela nota
+     * @param uri Uri del documento
+     * @return mimeType
+     */
     public static String getMimeType(Context mContext, Uri uri) {
         ContentResolver cR = mContext.getContentResolver();
         String mimeType = cR.getType(uri);
-        if (mimeType == null) {
-            mimeType = getMimeType(uri.toString());
-        }
+        if (mimeType == null) mimeType = getMimeType(uri.toString());
+
         return mimeType;
     }
 
+    /**
+     * Metodo para conseguir el MimeType de una Nota con 2 parametros
+     * @param url URL del documento
+     * @return mimeType
+     */
     public static String getMimeType(String url) {
         String type = null;
         String extension = MimeTypeMap.getFileExtensionFromUrl(url);
@@ -576,12 +572,12 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         return type;
     }
 
-
+    /**
+     * Metodo para abrir un file
+     * @param url URL del file
+     */
     private void openFile(Uri url) {
-
         try {
-
-
             Log.d("NotasActivity", "openFile: " + url.toString());
 
             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -612,14 +608,16 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             } else if (url.toString().contains(".gif")) {
                 // GIF file
                 intent.setDataAndType(url, "image/gif");
-            } else if (url.toString().contains(".jpg") || url.toString().contains(".jpeg") || url.toString().contains(".png")) {
+            } else if (url.toString().contains(".jpg") || url.toString().contains(".jpeg") ||
+                       url.toString().contains(".png")) {
                 // JPG file
                 intent.setDataAndType(url, "image/jpeg");
             } else if (url.toString().contains(".txt")) {
                 // Text file
                 intent.setDataAndType(url, "text/plain");
             } else if (url.toString().contains(".3gp") || url.toString().contains(".mpg") ||
-                    url.toString().contains(".mpeg") || url.toString().contains(".mpe") || url.toString().contains(".mp4") || url.toString().contains(".avi")) {
+                       url.toString().contains(".mpeg")|| url.toString().contains(".mpe") ||
+                       url.toString().contains(".mp4") || url.toString().contains(".avi")) {
                 // Video files
                 intent.setDataAndType(url, "video/*");
             } else {
@@ -632,27 +630,32 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         }
     }
 
+    /**
+     * Metodo para conseguir el contenido de un InputStrem
+     * @param inputStream InputStreem entrante para leer
+     * @return Array de Bytes con la informacion
+     * @throws IOException Excepcion debida a un fallo de escritura en el Buffer
+     */
     public byte[] getBytes(InputStream inputStream) throws IOException {
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-        int bufferSize = 1024;
+        int bufferSize = 1024, len;
         byte[] buffer = new byte[bufferSize];
 
-        int len;
         while ((len = inputStream.read(buffer)) != -1) {
             byteBuffer.write(buffer, 0, len);
         }
         return byteBuffer.toByteArray();
     }
 
+    /**
+     * Metodo par añadir un Audio a una Nota
+     */
     private void add_audio() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO_PERMISSION);
         } else {
-
             Button cancel;
             ImageButton record;
-
             recordDialog.setContentView(R.layout.record_pop_up);
 
             cancel = (Button) recordDialog.findViewById(R.id.cancel_button);
@@ -663,7 +666,6 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
                     isRecording = false;
                     stopRecording();
                 }
-
                 recordDialog.dismiss();
             });
 
@@ -673,16 +675,17 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
                     recordDialog.dismiss();
                 } else {
                     record.setImageResource(R.drawable.ic_baseline_stop_24);
-
                     startRecording();
                 }
             });
             recordDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             recordDialog.show();
-
-
         }
     }
+
+    /**
+     * Metodo para empezar a grabar un Audio
+     */
     private void startRecording() {
         Log.d("startRecording", "startRecording");
 
@@ -703,18 +706,19 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         } catch (IOException e) {
             Log.d("startRecording", "prepare() failed");
         }
-
         recorder.start();
         startAudio = System.currentTimeMillis();
         isRecording = true;
     }
 
+    /**
+     * Metodo para dejar de grabar un Audio
+     */
     private void stopRecording() {
-        if(isRecording){
+        if (isRecording) {
             endAudio = System.currentTimeMillis();
             recorder.stop();
             recorder.release();
-
             Audio a = new Audio(singleAudioID,fileName,(endAudio-startAudio));
             audiosID = documentManager.addAudioToCloud(audiosID,a);
             audioAdapter.addAudio(a);
@@ -723,19 +727,19 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         }
     }
 
-
+    /**
+     * Metodo para empezar a reproducir un Audio
+     * @param position Posicion desde la que se empezará a reproducir
+     */
     public void startPlaying(int position) {
         try {
-            if(player != null){
+            if (player != null) {
                 if (!player.isPlaying()) {
                     player = new MediaPlayer();
                     String fileName = audioAdapter.getAudio(position).getAddress();
                     Log.d("startPlaying", fileName);
                     player.setDataSource(fileName);
-
                     player.prepare();
-
-
                 }
                 audioAdapter.setSessionID(player.getAudioSessionId());
                 player.start();
@@ -743,9 +747,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
                     audioAdapter.setSessionID(-1);
                     audioAdapter.setStateReproduction(position);
                     audioAdapter.notifyItemChanged(position);
-
                     Toast.makeText(getApplicationContext(), "Audio finished!", Toast.LENGTH_SHORT).show();
-
                     //playButton.setBackgroundResource(R.drawable.ic_baseline_play_circle_filled_24);
                 });
             }
@@ -754,16 +756,23 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         }
     }
 
+    /**
+     * Metodo para pausar la reproduccion de un Audio
+     * @param position Posicion del Audio
+     */
     @Override
     public void pausePlaying(int position) {
         try {
             player.pause();
-
-        }catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             Toast.makeText(this,"No se está reporduciendo ningún audio",Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * Metodo para eliminar un Audio de una Nota
+     * @param position posicion del Audio
+     */
     @Override
     public void removeAudio(int position) {
         documentManager.removeAudioFromNote(audiosID,audioAdapter.getAudio(position));

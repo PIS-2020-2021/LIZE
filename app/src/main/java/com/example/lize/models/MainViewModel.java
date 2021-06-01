@@ -615,7 +615,9 @@ public class MainViewModel extends ViewModel{
                         for (Note note : ambitoNotes){ // Cargamos las Imágenes y Documentos necesarios de DB en el Map de DocumentManager
                             if (note.getHaveImages() && note.getImagesID() != null) documentManager.getImagesNote(note.getImagesID());
                             if (note.getHaveDocuments() && note.getDocumentsID() != null)  documentManager.getDocuments(note.getDocumentsID());
-                            if (note.getHaveAudios() != null && note.getHaveAudios() && note.getAudiosID() != null) documentManager.getAudios(note.getAudiosID());
+                            if (note.getHaveAudios() != null)
+                                if(note.getHaveAudios() && note.getAudiosID() != null)
+                                    documentManager.getAudios(note.getAudiosID());
                             ambito.addNote(note);
                         }
                         loadingCounter++;

@@ -23,25 +23,33 @@ import java.util.ArrayList;
 /**  Window popup para encapsular la lógica de mover una Nota a un Ámbito y Carpeta de destino. */
 public class MoveWindow extends PopupWindow {
     private final static int WIDTH = 900, HEIGHT = 700;
-
-    private Context mContext;
-    private TextView mText;
-    private RecyclerView moveRecyclerView;
-
+    private final Context mContext;
+    private final TextView mText;
+    private final RecyclerView moveRecyclerView;
     private Ambito ambitoSelected;
-    private MoveWindow.MoveItem itemSelected;
-
+    private final MoveWindow.MoveItem itemSelected;
     private MoveWindowListener mListener;
 
-    public interface MoveWindowListener{
+    /**
+     * Interfaz del MoveWindow
+     */
+    public interface MoveWindowListener {
         void moveNote(String ambitoID, String folderID);
     }
 
-    public void setWindowListener(MoveWindowListener listener){
-        mListener = listener;
-    }
+    /**
+     * Metodo para establecer el Listener del MoveWindow
+     * @param listener Listener del MoveWindow
+     */
+    public void setWindowListener(MoveWindowListener listener) { mListener = listener; }
 
-    public MoveWindow(Context mContext, View popupView, ArrayList<Ambito> mAmbitoData){
+    /**
+     * Constructor de la clase
+     * @param mContext Contexto del MoveWindow
+     * @param popupView View del popup
+     * @param mAmbitoData Lista de Ambitos
+     */
+    public MoveWindow(Context mContext, View popupView, ArrayList<Ambito> mAmbitoData) {
         super(popupView, WIDTH, HEIGHT);
         setFocusable(true);
         setBackgroundDrawable(new ColorDrawable());
@@ -55,12 +63,14 @@ public class MoveWindow extends PopupWindow {
         moveRecyclerView.setAdapter(new MoveAmbitoAdapter(mAmbitoData));
     }
 
-    // Seleccionamos un Ámbito como el destino. Si no contiene Folders, llamamos al Listener.
-    // Si contiene Folders, cambiamos el RecyclerView para pedir la selección de Folder.
+    /**
+     * Seleccionamos un Ámbito como el destino. Si no contiene Folders, llamamos al Listener.
+     * Si contiene Folders, cambiamos el RecyclerView para pedir la selección de Folder.
+     * @param ambito Ambito seleccionado
+     */
     public void selectAmbito(Ambito ambito) {
         this.ambitoSelected = ambito;
-
-        if (ambitoSelected.getFolders().size() == 0 && mListener != null){
+        if (ambitoSelected.getFolders().size() == 0 && mListener != null) {
             mListener.moveNote(ambitoSelected.getSelfID(), null);
             return;
         }
@@ -77,23 +87,26 @@ public class MoveWindow extends PopupWindow {
         folderAdapter.notifyDataSetChanged();
     }
 
-    // Selección de la Folder de destino. Puede ser la Folder general de un Ámbito o no.
+    /**
+     * Selección de la Folder de destino. Puede ser la Folder general de un Ámbito o no.
+     * @param foldername Carpeta seleccionada
+     */
     public void selectFolder(String foldername) {
-        if (mListener != null){
-            if (foldername.equals(ambitoSelected.getName() + " (Root)"))
-                mListener.moveNote(ambitoSelected.getSelfID(), null);
+        if (mListener != null) {
+            if (foldername.equals(ambitoSelected.getName() + " (Root)")) mListener.moveNote(ambitoSelected.getSelfID(), null);
             else mListener.moveNote(ambitoSelected.getSelfID(), foldername);
         }
     }
 
     // Adapter para enlazar los Ámbitos con los MoveItems del RecyclerView.
     private class MoveAmbitoAdapter extends RecyclerView.Adapter<MoveWindow.MoveItem> {
-
         private final ArrayList<Ambito> mAmbitosData;
 
-        public MoveAmbitoAdapter(ArrayList<Ambito> ambitos) {
-            this.mAmbitosData = ambitos;
-        }
+        /**
+         * Constructor de la clase
+         * @param ambitos lista de Ambitos
+         */
+        public MoveAmbitoAdapter(ArrayList<Ambito> ambitos) { this.mAmbitosData = ambitos; }
 
         @NonNull
         @Override
@@ -109,9 +122,7 @@ public class MoveWindow extends PopupWindow {
         }
 
         @Override
-        public int getItemCount() {
-            return mAmbitosData.size();
-        }
+        public int getItemCount() { return mAmbitosData.size(); }
 
     }
 
@@ -119,9 +130,11 @@ public class MoveWindow extends PopupWindow {
     private class MoveFolderAdapter extends RecyclerView.Adapter<MoveWindow.MoveItem> {
         private final ArrayList<Folder> mFoldersData;
 
-        public MoveFolderAdapter(ArrayList<Folder> folders) {
-            this.mFoldersData = folders;
-        }
+        /**
+         * Constructor de la clase
+         * @param folders Lista de Carpetas
+         */
+        public MoveFolderAdapter(ArrayList<Folder> folders) { this.mFoldersData = folders; }
 
         @NonNull
         @Override
@@ -138,25 +151,32 @@ public class MoveWindow extends PopupWindow {
         }
 
         @Override
-        public int getItemCount() {
-            return mFoldersData.size();
-        }
+        public int getItemCount() { return mFoldersData.size(); }
 
     }
 
     // MoveItem. Consta de un simple TextView, un Divisor de color y un icono (visualizable o no)
-    private class MoveItem extends RecyclerView.ViewHolder{
-        private TextView mTitle;
-        private View mDivider;
-        private ImageView mIcon;
+    private class MoveItem extends RecyclerView.ViewHolder {
+        private final TextView mTitle;
+        private final View mDivider;
+        private final ImageView mIcon;
 
-        public MoveItem(@NonNull View itemView){
+        /**
+         * Constructor de la clase
+         * @param itemView View a mover
+         */
+        public MoveItem(@NonNull View itemView) {
             super(itemView);
             mTitle = itemView.findViewById(R.id.item_text);
             mDivider = itemView.findViewById(R.id.item_divider);
             mIcon = itemView.findViewById(R.id.item_icon);
         }
 
+        /**
+         * Metodo para establecer el Item en su nuevo Ambito
+         * @param ambito Ambito de destino
+         * @param color Color del Ambito de destino
+         */
         public void bindToAmbito(Ambito ambito, int color){
             mTitle.setText(ambito.getName());
             mIcon.setVisibility(View.GONE);
@@ -164,6 +184,12 @@ public class MoveWindow extends PopupWindow {
             itemView.setOnClickListener(v -> selectAmbito(ambito));
         }
 
+        /**
+         * Metodo para establecer el Item en su nueva Carpeta
+         * @param folderName Carpeta de destino
+         * @param color Color del Ambito de destino
+         * @param defaultColor Color default
+         */
         public void bindToFolder(String folderName, int color, int defaultColor) {
             mTitle.setText(folderName);
             mIcon.setVisibility(View.VISIBLE);

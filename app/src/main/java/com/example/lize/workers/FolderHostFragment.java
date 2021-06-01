@@ -3,7 +3,6 @@ package com.example.lize.workers;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +14,6 @@ import com.example.lize.data.Ambito;
 import com.example.lize.data.Folder;
 import com.example.lize.models.MainViewModel;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
-
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import androidx.annotation.Nullable;
@@ -34,24 +30,21 @@ import java.util.ArrayList;
  * <li> Definir su lógica mediante un {@link FolderAdapter}, y escucha al ChipFolder seleccionado. </li>
  * <li> Conectar el DataSet de Folders con el adaptador mediante la clase {@link MainViewModel} </li> </ol> */
 
-public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFolderListener{
+public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFolderListener {
 
     private Context mContext;                    // Root context
     private RecyclerView mFoldersRecyclerView;   // Recycle View of folders
     private FolderAdapter mFolderAdapter;        // FolderAdapter for the RecycleView
     private Chip selectedFolder;                 // Selected ChipFolder
-
     private MainViewModel dataViewModel;         // Model Shared Data between Fragments
 
 
     /** Inicializa el Fragment contenedor de Folders */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View root = inflater.inflate(R.layout.folders_host_view, container, false);
         this.mContext = root.getContext();
         this.mFoldersRecyclerView = root.findViewById(R.id.folder_recycler_view);
-        mFoldersRecyclerView.setLayoutManager(new LinearLayoutManager(mContext,
-                LinearLayoutManager.HORIZONTAL, false));
+        mFoldersRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
         return root;
     }
 
@@ -64,15 +57,12 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
 
         // Actualizamos la lista de Carpetas cuando se seleccione un Ámbito
         dataViewModel.getAmbitoSelected().observe(getViewLifecycleOwner(), (@NonNull Ambito ambito) ->{
-            if (dataViewModel.getViewUpdate().getValue()) {
-                mFolderAdapter = new FolderAdapter(mContext, ambito.getFolders(), this);
-                mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
-                mFolderAdapter.notifyDataSetChanged();
-            } else {
-                mFolderAdapter = new FolderAdapter(mContext, new ArrayList<>(), this);
-                mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
-                mFolderAdapter.notifyDataSetChanged();
-            }
+
+            if (dataViewModel.getViewUpdate().getValue()) mFolderAdapter = new FolderAdapter(mContext, ambito.getFolders(), this);
+            else mFolderAdapter = new FolderAdapter(mContext, new ArrayList<>(), this);
+
+            mFoldersRecyclerView.swapAdapter(mFolderAdapter, false);
+            mFolderAdapter.notifyDataSetChanged();
         });
 
         // Cuando deseleccionamos la Carpeta (folder == null), deseleccionamos el ChipFolder anterior.
@@ -88,9 +78,7 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
      * Añadimos una nueva carpeta al DataSet del MainViewModel.
      * @param folderName Nombre de la nueva carpeta a crear
      */
-    public void addFolderChip(String folderName) {
-        dataViewModel.addFolder(folderName);
-    }
+    public void addFolderChip(String folderName) { dataViewModel.addFolder(folderName); }
 
     /**
      * Cuando un folder chip sea clickeado, seleccionamos / deseleccionamos la carpeta de persistencia
@@ -104,7 +92,6 @@ public class FolderHostFragment extends Fragment implements FolderAdapter.ChipFo
             dataViewModel.selectFolder(chipFolder.getText().toString());
             if (selectedFolder != null && selectedFolder != chipFolder) selectedFolder.setChecked(false);
             selectedFolder = chipFolder;
-
         } else {
             dataViewModel.deselectFolder();
             selectedFolder = null;

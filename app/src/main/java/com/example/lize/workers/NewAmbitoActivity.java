@@ -3,10 +3,7 @@ package com.example.lize.workers;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -18,7 +15,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.lize.R;
-import com.example.lize.data.Ambito;
 import com.example.lize.utils.Preferences;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
@@ -26,17 +22,15 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
 
 public class NewAmbitoActivity extends AppCompatActivity {
-
     private EditText nombre;
     private int colorAmbito = 0;
     private TextInputLayout nombreError, colorAmbitoError;
-
     private ArrayList<Integer> colors;
     private CardView red, morado, indigo, azul, teal, verde, amarillo, naranja, marron;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         Preferences.applySelectedTheme(this);
         setContentView(R.layout.activity_new_ambito);
@@ -77,6 +71,10 @@ public class NewAmbitoActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Metodo para validar los Datos introducidos
+     * @return True si pasa todos los filtros, False si no
+     */
     private boolean validarDatos() {
         boolean isNameValid, isColorAmbitoValid;
         //Comprobaciones de Los Nombres
@@ -94,7 +92,7 @@ public class NewAmbitoActivity extends AppCompatActivity {
         }
 
         //Comprobamos que se ha seleccionado algún Color
-        if(colorAmbito == 0){
+        if (colorAmbito == 0) {
             colorAmbitoError.setError(getResources().getString(R.string.errorColorAmbitoNoSelection));
             Toast.makeText(getApplicationContext(), colorAmbitoError.getError(), Toast.LENGTH_SHORT).show();
             isColorAmbitoValid = false;
@@ -110,18 +108,24 @@ public class NewAmbitoActivity extends AppCompatActivity {
         return false;
     }
 
-    private void getColors(){
+    /**
+     * Metodo para conseguir los colores de los Ambitos ya creados
+     */
+    private void getColors() {
         Intent intent = getIntent();
         this.colors = intent.getIntegerArrayListExtra("Ambitos");
     }
 
+    /**
+     * Metodo para establecer el color seleccionado al nuevo Ambito
+     * @param color Color seleccionado
+     */
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void setColorSelected(int color){
-        if(colors.contains(color)){ colorAmbitoError.setError(getResources().getString(R.string.errorColorAmbitoAlredySelected)); }
+        if (colors.contains(color)) colorAmbitoError.setError(getResources().getString(R.string.errorColorAmbitoAlredySelected));
         else {
-            if(colorAmbito == color){
-                colorAmbito = 0;
-            } else {
+            if (colorAmbito == color) colorAmbito = 0;
+            else {
                 CardView cardView = getCardViewByColor(color);
                 Animation animZoomOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.zoom_out);
                 if (cardView != null) cardView.startAnimation(animZoomOut);
@@ -130,9 +134,13 @@ public class NewAmbitoActivity extends AppCompatActivity {
             }
         }
         setColorOfCardViews();
-
     }
 
+    /**
+     * Metodo par conseguir las CardViews segun su color
+     * @param colorAmbito Color del nuevo Ambito
+     * @return CardViews deseadas
+     */
     private CardView getCardViewByColor(int colorAmbito){
         switch (colorAmbito){
             case 1:     return this.red;
@@ -144,11 +152,13 @@ public class NewAmbitoActivity extends AppCompatActivity {
             case 7:     return this.amarillo;
             case 8:     return this.naranja;
             case 9:     return this.marron;
-
-            default: return null;
+            default:    return null;
         }
     }
 
+    /**
+     * Metodo para establecer los posibles colores de las CardViews
+     */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void setColorOfCardViews(){
         red.setCardBackgroundColor(getColor(R.color.Default_Red));
@@ -164,13 +174,13 @@ public class NewAmbitoActivity extends AppCompatActivity {
         try {
             for (int col : colors) {
                 CardView cardView = getCardViewByColor(col);
-                if(cardView != null ) cardView.setCardBackgroundColor(getColor(R.color.Default_Grey));
+                if (cardView != null ) cardView.setCardBackgroundColor(getColor(R.color.Default_Grey));
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Error al cargar la lista de colores ya seleccionados", Toast.LENGTH_SHORT).show();
         }
 
-        switch (colorAmbito){
+        switch (colorAmbito) {
             case 1:     red.setCardBackgroundColor(getColor(R.color.Presseed_Red)); break;
             case 2:     morado.setCardBackgroundColor(getColor(R.color.Presseed_Purple)); break;
             case 3:     indigo.setCardBackgroundColor(getColor(R.color.Presseed_Indigo)); break;
@@ -180,13 +190,14 @@ public class NewAmbitoActivity extends AppCompatActivity {
             case 7:     amarillo.setCardBackgroundColor(getColor(R.color.Presseed_Yellow)); break;
             case 8:     naranja.setCardBackgroundColor(getColor(R.color.Presseed_Orange)); break;
             case 9:     marron.setCardBackgroundColor(getColor(R.color.Presseed_Brown)); break;
-
             default:
         }
-
     }
 
-
+    /**
+     * Metodo para conseguir establecer el color seleccionado segun el View clickeado
+     * @param view View clickeado
+     */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onClick(View view) {
         switch (view.getId()){
@@ -207,14 +218,11 @@ public class NewAmbitoActivity extends AppCompatActivity {
      * @param item item del Toolbar: go back(arrow)
      */
     public boolean onMenuItemClick(MenuItem item) {
-
         if (item.getItemId() == R.id.arrow) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             setResult(RESULT_CANCELED, intent);
             finish();
-        } else {
-            return false;
-        }
+        } else return false;
         return true;
     }
 

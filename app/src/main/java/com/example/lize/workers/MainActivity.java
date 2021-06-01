@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      * Método para modificar el icono del MenuItem de cambiar vista de Notas
      * @param item menú item de cambiar vista de notas (sandwich)
      */
-    private void changeCardNoteType(MenuItem item){
+    private void changeCardNoteType(MenuItem item) {
         cardNoteType = !cardNoteType;
         item.setIcon((cardNoteType) ? R.drawable.ic_baseline_table_rows_24 : R.drawable.ic_baseline_view_module_24);
     }
@@ -234,7 +234,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //assert data != null;
         Bundle bundle = data.getExtras();
         if (bundle != null) {
             Log.d(TAG, "Received new Bundle Data: " + bundle.toString());
@@ -309,15 +308,15 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
      * @param name nombre del User
      * @param eMail email del User
      */
-    private void initHeaderNavigationView(String name, String eMail, String userID){
+    private void initHeaderNavigationView(String name, String eMail, String userID) {
         View header = findViewById(R.id.headerView);
 
         TextView headerName = header.findViewById(R.id.name_header);
         TextView headerEMail = header.findViewById(R.id.email_header);
         CircleImageView headerImgProfile = header.findViewById(R.id.circleImageView_header);
 
-        if(name != null) headerName.setText(name);
-        if(eMail != null)  headerEMail.setText(eMail);
+        if (name != null) headerName.setText(name);
+        if (eMail != null)  headerEMail.setText(eMail);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
         StorageReference profileRef = storageReference.child("/profileUser_" + userID + ".png");
         profileRef.getDownloadUrl().addOnSuccessListener(downloadUrl -> Picasso.get().load(downloadUrl).into(headerImgProfile));
@@ -331,17 +330,12 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         this.addFAB = findViewById(R.id.add_button);
         this.addNoteFAB = findViewById(R.id.add_note_button);
         this.addFolderFAB = findViewById(R.id.add_folder_button);
-        addFAB.setOnClickListener((v)->{
-            if (!isFABGroupExpanded){
-                expandFABGroup();
-            } else{
-                closeFABGroup();
-            }
+        addFAB.setOnClickListener((v)-> {
+            if (!isFABGroupExpanded) expandFABGroup();
+            else closeFABGroup();
             isFABGroupExpanded = !isFABGroupExpanded;
         });
-
         addNoteFAB.setOnClickListener((v)-> startActivityForResult(new Intent(getApplicationContext(), NotasActivity.class), REQUEST_CODE_ADD_NOTE));
-
         addFolderFAB.setOnClickListener(this::showFolderMenu);
     }
 
@@ -354,10 +348,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         addFolderFAB.animate().translationY(- getResources().getDimension(R.dimen.fab_translation_2));
         t.schedule(new TimerTask() {
             @Override
-            public void run() { handler.post(()->{
+            public void run() { handler.post(()-> {
                 addNoteFAB.setVisibility(View.VISIBLE);
                 addFolderFAB.setVisibility(View.VISIBLE);
-            }); }}, 120);
+        }); }}, 120);
     }
 
     /**
@@ -369,10 +363,10 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         addFolderFAB.animate().translationY(0);
         t.schedule(new TimerTask() {
             @Override
-            public void run() { handler.post(()->{
+            public void run() { handler.post(()-> {
                 addNoteFAB.setVisibility(View.INVISIBLE);
                 addFolderFAB.setVisibility(View.INVISIBLE);
-            });}}, 200);
+        });}}, 200);
     }
 
     /**
@@ -421,7 +415,6 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
             @Override
             public void onAnimationRepeat(Animation animation) {}
         });
-
         root.startAnimation(recreate);
     }
 

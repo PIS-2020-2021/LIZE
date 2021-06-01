@@ -122,7 +122,7 @@ public class SignUpActivity extends AppCompatActivity {
             passErrorCheck.setError(getResources().getString(R.string.error_invalid_pwd_Signup));
             isPasswordValid = false;
             Toast.makeText(getApplicationContext(), passErrorCheck.getError(), Toast.LENGTH_SHORT).show();
-        }else  {
+        } else  {
             isPasswordValid = true;
             passError.setErrorEnabled(false);
             passErrorCheck.setErrorEnabled(false);
