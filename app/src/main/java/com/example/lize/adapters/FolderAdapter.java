@@ -1,32 +1,21 @@
 package com.example.lize.adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.lize.R;
 import com.example.lize.data.Folder;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
-
 import java.util.ArrayList;
 
 /**
  * Adaptador del RecyclerView de Carpetas, en la actividad principal. Enlaza los datos del dataSet
  * de Carpetas con el correspondiente ChipFolder (ViewHolder).
  */
-public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder>{
+public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder> {
 
     private final Context mContext;
     private final ArrayList<Folder> mFoldersData;
@@ -81,8 +70,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ChipFolder
     /**
      * ViewHolder class que se corresponde con los Chips de las carpetas
      */
-    public class ChipFolder extends RecyclerView.ViewHolder{
-
+    public class ChipFolder extends RecyclerView.ViewHolder {
         private final Chip folderChip;
 
         /**

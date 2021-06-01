@@ -10,13 +10,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lize.R;
 import com.example.lize.data.Document;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHolder> {
     private final ArrayList<Document> localDataSet;
     private final OnDocumentListener mOnNoteListener;
+
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
@@ -29,7 +29,6 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
         public ViewHolder(View view,OnDocumentListener onDocumentListener) {
             super(view);
             // Define click listener for the ViewHolder's View
-
             textView = (TextView) view.findViewById(R.id.DocumentTitle);
             imageView = (ImageView) view.findViewById(R.id.DocImage);
             imageView.setOnCreateContextMenuListener(this);
@@ -46,14 +45,28 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
             }
         }
 
+        /**
+         * Metodo para conseguir el TextView del tiempo del audio
+         * @return TextView del audio
+         */
         public TextView getTextView() {
             return textView;
         }
 
+        /**
+         * Metodo para conseguir el View de la imagen
+         * @return View de la imagen
+         */
         public ImageView getImageView(){
             return imageView;
         }
 
+        /**
+         * Metodo para crear el submenú para eliminar un documento
+         * @param menu Menu a crear
+         * @param v View
+         * @param menuInfo Info del menu
+         */
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             menu.add(this.getAdapterPosition(), v.getId(), 0, "Eliminar documento");
@@ -61,23 +74,35 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
 
     }
 
+    /**
+     * Constructor de la clase
+     * @param onDocumentListener Listener de los documentos de la nota
+     */
     public DocumentAdapter(OnDocumentListener onDocumentListener){
         localDataSet = new ArrayList<>();
         this.mOnNoteListener = onDocumentListener;
     }
 
-    // Create new views (invoked by the layout manager)
+
+    /**
+     * Metodo para crear nuevos views, invocado por el manager del Layout
+     * @param viewGroup Grupo de Views
+     * @param viewType Tipo de View
+     * @return ViewHolder resultante
+     */
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
-        View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.item_attach, viewGroup, false);
-
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_attach, viewGroup, false);
         return new ViewHolder(view,mOnNoteListener);
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    /**
+     * Metodo para cambiar el contenido de una View, invocado por el manager del Layout
+     * @param viewHolder ViewHolder a cambiar
+     * @param position Posicion del documento
+     */
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         // Get element from your dataset at this position and replace the
@@ -85,27 +110,44 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
         viewHolder.getTextView().setText(localDataSet.get(position).getName());
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
+    /**
+     * Metod para conseguir el tamaño del Dataset
+     * @return Tamaño del dataset
+     */
     @Override
     public int getItemCount() {
         return localDataSet.size();
     }
 
+    /**
+     * Metodo para añadir un documento al Dataset
+     * @param document Documento a añadir
+     */
     public void addDocument(Document document){
         localDataSet.add(document);
         notifyDataSetChanged();
     }
+
+    /**
+     * Metodo para eliminar un documento del Dataset
+     * @param position Posición del documento
+     */
     public void removeDocument(int position) {
         localDataSet.remove(position);
         notifyDataSetChanged();
     }
 
+    /**
+     * Metodo para conseguir un documento del Dataset
+     * @param position Posición del documento
+     */
     public Document getDocument(int position){
         return localDataSet.get(position);
     }
 
-
-
+    /**
+     * Interfaz del Listener de Documentos
+     */
     public interface OnDocumentListener {
         void onDocumentClick(int position) throws FileNotFoundException;
     }

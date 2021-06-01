@@ -1,34 +1,14 @@
 package com.example.lize.adapters;
 
-import android.content.ContentResolver;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
-
-import com.example.lize.data.Document;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.StorageTask;
-import com.google.firebase.storage.UploadTask;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-
 import com.example.lize.data.Ambito;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,19 +16,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,31 +30,44 @@ public class DatabaseAdapter {
     public final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private final StorageReference mStorageRef = storage.getReference();
-
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser user;
 
     private static DatabaseAdapter databaseAdapter;  // Singleton implementation
-
     private LoaderInterface loader;
     private SaverInterface saver;
 
+    /**
+     * Metodo para establecer el Loader Listener
+     * @param loader Loader Listener
+     */
     public void setLoaderListener(LoaderInterface loader) {
         this.loader = loader;
     }
+
+    /**
+     * Metodo para establecer el Saver Listener
+     * @param saver Saver Listener
+     */
     public void setSaverListener(SaverInterface saver) {
         this.saver = saver;
     }
 
+    /**
+     * Constructor de la clase
+     */
     public DatabaseAdapter() {
         FirebaseFirestore.setLoggingEnabled(true);
     }
 
-
+    /**
+     * Singleton de la clase
+     * @return Instancia del Data Base Adapter
+     */
     public static DatabaseAdapter getInstance() {
         if (databaseAdapter == null){
-            synchronized (DatabaseAdapter.class){
-                if (databaseAdapter == null){
+            synchronized (DatabaseAdapter.class) {
+                if (databaseAdapter == null) {
                     databaseAdapter = new DatabaseAdapter();
                 }
             }
@@ -93,10 +75,10 @@ public class DatabaseAdapter {
         return databaseAdapter;
     }
 
-
-
-    // Métodos para reconstruir la jerarquía del modelo.
-    public interface LoaderInterface{
+    /**
+     * Interfaz del Loader para reconstruir la jerarquía del modelo
+     */
+    public interface LoaderInterface {
         void getUserResult(User user);
         void getAmbitoCollectionResult(String userID, ArrayList<Ambito> userAmbitos);
         void getNoteCollectionResult(String ambitoID, ArrayList<Note> ambitoNotes);
@@ -104,7 +86,9 @@ public class DatabaseAdapter {
     }
 
 
-    // Callbacks de operaciones de escritura.
+    /**
+     * Interfaz del Saver para guaradr la jerarquía del modelo
+     */
     public interface SaverInterface {
         void saveUserResult(String userID, boolean result);
         void saveAmbitoResult(String ambitoID, boolean result);
@@ -113,7 +97,9 @@ public class DatabaseAdapter {
     }
 
 
-    /* Firebase sign in */
+    /**
+     * Metodo para inicializar el Firebase
+     */
     public void initFireBase() {
         user = mAuth.getCurrentUser();
         if (user == null) {
@@ -123,25 +109,27 @@ public class DatabaseAdapter {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInAnonymously:success");
-                            if(loader != null) loader.setToast("Authentication successful.");
+                            if (loader != null) loader.setToast("Authentication successful.");
                             user = mAuth.getCurrentUser();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInAnonymously:failure", task.getException());
                             if(loader != null) loader.setToast("Authentication failed.");
-
                         }
                     });
         } else {
-            if(loader != null) loader.setToast("Authentication with current user.");
+            if (loader != null) loader.setToast("Authentication with current user.");
         }
     }
 
 
-    // Method for getting a base User from the 'users' collection
+    /**
+     * Metodo para conseguir un usuario de la Collección Users
+     */
     public void getUser() {
         DocumentReference userRef = db.collection("users").document(user.getUid());
         Log.d(TAG, "Getting current user document...");
+
         userRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -150,19 +138,23 @@ public class DatabaseAdapter {
                         document.getString("first"), document.getString("last"));
                 user.setSelfID(document.getString("selfID"));
 
-                if(loader != null) loader.getUserResult(user);
+                if (loader != null) loader.getUserResult(user);
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
 
 
-    // Method for getting an Ambito from the 'ambitos' collection
+    /**
+     * Metodo para conseguir un ambito de la Collección Ambitos
+     */
     public void getAmbitos() {
         Query ambitosRef = db.collection("ambitos").whereEqualTo("userID", user.getUid());
         Log.d(TAG, "Getting current user ambitos collection...");
+
         ambitosRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ArrayList<Ambito> userAmbitos = new ArrayList<>();
+
                 // Por cada resultado, creamos el ambito a partir de los datos de DB y lo añadimos
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     Log.d(TAG, document.getId() + " => " + document.getData());
@@ -172,21 +164,25 @@ public class DatabaseAdapter {
                     ambito.setPosition(document.getLong("position").intValue());
                     userAmbitos.add(ambito);
                 }
-
                 Collections.sort(userAmbitos, (Ambito a1, Ambito a2) -> a1.getPosition() - a2.getPosition());
-                if(loader != null) loader.getAmbitoCollectionResult(user.getUid(), userAmbitos);
+                if (loader != null) loader.getAmbitoCollectionResult(user.getUid(), userAmbitos);
+
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
 
 
-    // Method for getting a Note from the 'notes' collection
+    /**
+     * Metodo para conseguir una nota de la Collección Notes
+     */
     public void getNotes(String ambitoID){
         Query notasRef = db.collection("notes").whereEqualTo("ambitoID", ambitoID);
         Log.d(TAG, "Getting ambito " + ambitoID + "'s notes collection...");
+
         notasRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ArrayList<Note> ambitoNotes = new ArrayList<>();
+
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     Log.d(TAG, document.getId() + " => " + document.getData());
                     Note note = new Note(document.getString("title"), document.getString("text_plain"), document.getString("text_html"));
@@ -203,6 +199,7 @@ public class DatabaseAdapter {
                     ambitoNotes.add(note);
                 }
                 if (loader != null) loader.getNoteCollectionResult(ambitoID, ambitoNotes);
+
             } else Log.d(TAG, "Error getting documents: ", task.getException());
         });
     }
@@ -321,7 +318,7 @@ public class DatabaseAdapter {
      * Eliminamos una nota de FireBase.
      * @param notaID ID del documento correspondiente a la nota a eliminar
      */
-    public void deleteNote(String notaID){
+    public void deleteNote(String notaID) {
         db.collection("notes").document(notaID).delete()
             .addOnSuccessListener(aVoid -> Log.d(TAG, "Nota Eliminada Correctamente"))
                 .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar la nota", e));
@@ -331,7 +328,7 @@ public class DatabaseAdapter {
      * Eliminamos las imagenes asociadas a una imageID
      * @param imagesID ID del array de imagenes asociada a la DB
      */
-    public void deleteImages(String imagesID){
+    public void deleteImages(String imagesID) {
         DocumentReference imagesRef = db.collection("images").document(imagesID);
         imagesRef.get().addOnCompleteListener(task -> {
             if(task.isSuccessful()) {
@@ -342,24 +339,24 @@ public class DatabaseAdapter {
                         StorageReference singleDoc = mStorageRef.child(stringAux);
                         singleDoc.delete();
                     }
-                } catch (NullPointerException exception){
+                } catch (NullPointerException exception) {
                     Log.w(TAG, "Failed to get Collection of images of  " + imagesID + ": null pointer exception.");
                 }
             } else Log.d(TAG, "Error al eliminar la coleccion de imagenes: ", task.getException());
         });
 
         imagesRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
-                .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + imagesID, e));
+                 .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + imagesID, e));
     }
 
     /**
      * Eliminamos las imagenes asociadas a una imageID
      * @param documentsID ID del array de imagenes asociada a la DB
      */
-    public void deleteDocuments(String documentsID){
+    public void deleteDocuments(String documentsID) {
         DocumentReference documentsRef = db.collection("documents").document(documentsID);
         documentsRef.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()) {
+            if (task.isSuccessful()) {
                 try {
                     DocumentSnapshot document = task.getResult();
                     List<String> group = (List<String>) document.get("files");
@@ -367,20 +364,24 @@ public class DatabaseAdapter {
                         StorageReference singleDoc = mStorageRef.child(stringAux);
                         singleDoc.delete();
                     }
-                } catch (NullPointerException exception){
+                } catch (NullPointerException exception) {
                     Log.w(TAG, "Failed to get Collection of images of  " + documentsID + ": null pointer exception.");
                 }
             } else Log.d(TAG, "Error al eliminar la coleccion de imagenes: ", task.getException());
         });
 
         documentsRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
-                .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + documentsID, e));
+                    .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + documentsID, e));
     }
 
+    /**
+     * Metodo para eliminar Audios de la Colección Audios
+     * @param audiosID
+     */
     public void deleteAudios(String audiosID) {
         DocumentReference documentsRef = db.collection("audios").document(audiosID);
         documentsRef.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()) {
+            if (task.isSuccessful()) {
                 try {
                     DocumentSnapshot document = task.getResult();
                     List<String> group = (List<String>) document.get("files");
@@ -388,14 +389,14 @@ public class DatabaseAdapter {
                         StorageReference singleDoc = mStorageRef.child(stringAux);
                         singleDoc.delete();
                     }
-                } catch (NullPointerException exception){
+                } catch (NullPointerException exception) {
                     Log.w(TAG, "Failed to get Collection of audios of  " + audiosID + ": null pointer exception.");
                 }
             } else Log.d(TAG, "Error al eliminar la coleccion de audios: ", task.getException());
         });
 
         documentsRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
-                .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + audiosID, e));
+                    .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + audiosID, e));
     }
 
     /**
@@ -405,7 +406,6 @@ public class DatabaseAdapter {
      */
     public void deleteFolder(String folderTAG) {
         Query notasRef = db.collection("notes").whereEqualTo("folderTAG", folderTAG);
-
         notasRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 try {
@@ -413,7 +413,7 @@ public class DatabaseAdapter {
                         deleteNote(document.getId());
                     }
                     Log.d(TAG, "Colección de Notas de " + folderTAG + " eliminado correctamente");
-                } catch (NullPointerException exception){
+                } catch (NullPointerException exception) {
                     Log.w(TAG, "Failed to get Collection of notes of  " + folderTAG + ": null pointer exception.");
                 }
             } else Log.d(TAG, "Error al eliminar la coleccion de notas: ", task.getException());
@@ -427,22 +427,19 @@ public class DatabaseAdapter {
      */
     public void deleteAmbito(String ambitoID) {
         Query notasRef = db.collection("notes").whereEqualTo("ambitoID", ambitoID);
-
         notasRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 try {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         deleteNote(document.getId());
-                        boolean hey = (boolean) document.get("images");
-                        String heyy = (String) document.get("imagesID");
-                        if((boolean) document.get("images")) deleteImages((String) document.get("imagesID"));
-                        if((boolean) document.get("documents")) deleteDocuments((String) document.get("documentsID"));
+                        if ((boolean) document.get("images")) deleteImages((String) document.get("imagesID"));
+                        if ((boolean) document.get("documents")) deleteDocuments((String) document.get("documentsID"));
                     }
                     Log.d(TAG, "Colección de Notas de " + ambitoID + " eliminado correctamente");
-                } catch (NullPointerException exception){
+                } catch (NullPointerException exception) {
                     Log.w(TAG, "Failed to get Collection of notes of  " + ambitoID + ": null pointer exception.");
                 }
-            } else{
+            } else {
                 Log.d(TAG, "Error al eliminar la coleccion de notas: ", task.getException());
             }
         });
@@ -463,7 +460,6 @@ public class DatabaseAdapter {
      */
     public void deleteUser() {
         Query ambitosRef = db.collection("ambitos").whereEqualTo("userID", user.getUid());
-
         ambitosRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 try{
@@ -471,7 +467,7 @@ public class DatabaseAdapter {
                         deleteAmbito(document.getId());
                     }
                     Log.d(TAG, "Colección de Ambitos de " + user.getUid() + " eliminado correctamente");
-                } catch (NullPointerException exception){
+                } catch (NullPointerException exception) {
                     Log.w(TAG, "Failed to get Collection of ambitos of  " + user.getDisplayName() + ": null pointer exception.");
                 }
             } else Log.d(TAG, "Error al eliminar la coleccion de ambitos: ", task.getException());
@@ -484,43 +480,5 @@ public class DatabaseAdapter {
         user.delete();
     }
 
-
-
-    public void saveNoteWithFile(String id, String description, String userid, String path) {
-    /*  Uri file = Uri.fromFile(new File(path));
-        StorageReference storageRef = storage.getReference();
-        StorageReference audioRef = storageRef.child("audio"+File.separator+file.getLastPathSegment());
-        UploadTask uploadTask = audioRef.putFile(file);
-
-        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-            @Override
-            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                if (!task.isSuccessful()) {
-                    throw task.getException();
-                }
-
-                // Continue with the task to get the download URL
-                return audioRef.getDownloadUrl();
-            }
-        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                if (task.isSuccessful()) {
-                    Uri downloadUri = task.getResult();
-                    saveDocument(id, description, userid, downloadUri.toString());
-                } else {
-                    // Handle failures
-                    // ...
-                }
-            }
-        });
-        uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                Log.d(TAG, "Upload is " + progress + "% done");
-            }
-        }); */
-    }
 
 }

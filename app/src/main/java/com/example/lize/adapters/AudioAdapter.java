@@ -67,7 +67,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
         public TextView getTextView() { return textView; }
 
         /**
-         * Metodo para conseguir el Layout  del audio
+         * Metodo para conseguir el Layout del audio
          * @return Layout del audio
          */
         public LinearLayout getLayout() { return audioLayout; }
