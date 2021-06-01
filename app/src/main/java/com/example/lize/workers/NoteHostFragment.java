@@ -2,54 +2,26 @@ package com.example.lize.workers;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.widget.PopupWindowCompat;
-import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.fragment.app.Fragment;
-
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.Interpolator;
-import android.view.animation.Transformation;
-import android.widget.Button;
-import android.widget.PopupWindow;
-import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-
 import com.example.lize.R;
 import com.example.lize.adapters.NoteAdapter;
 import com.example.lize.data.Ambito;
 import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
-import com.example.lize.models.DocumentManager;
 import com.example.lize.models.MainViewModel;
-import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.textfield.TextInputLayout;
-
 import java.util.ArrayList;
 
 
@@ -63,11 +35,10 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
     private static final int REQUEST_CODE_EDIT_NOTE = 2;
     private Context mContext;                           // Root context
     private RecyclerView mNotesRecyclerView;            // Recycle View of Card-Notes
-    private StaggeredGridLayoutManager mNotesManager;            // Recycle View Layout Manager
+    private StaggeredGridLayoutManager mNotesManager;   // Recycle View Layout Manager
     private NoteAdapter mNoteAdapter;                   // NoteAdapter for the RecycleView
     private boolean cardNoteType;                       // boolean cardNote type
     private MainViewModel dataViewModel;                // Model Shared Data between Fragments
-
     private NoteAdapter.CardNote lastCardChecked;       // Last CardNote selected
 
     /** Inicializa el fragment contenedor de Notas. */
@@ -80,7 +51,6 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         mNotesRecyclerView.setLayoutManager(mNotesManager);
 
         this.cardNoteType = true;
-
         return root;
     }
 
@@ -116,16 +86,18 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
                     Log.w("NoteHostFragment", "Exception message: " + exception.getMessage());
                 }
             }
-            else{
+            else {
                 mNoteAdapter = new NoteAdapter(root.getContext(), new ArrayList<>(), cardNoteType);
                 mNotesRecyclerView.swapAdapter(mNoteAdapter, false);
                 mNoteAdapter.notifyDataSetChanged();
             }
         });
-
     }
 
-
+    /**
+     * Metodo para buscar notas
+     * @param menuItem menu de busqueda
+     */
     public void searchNote(MenuItem menuItem){
         SearchView searchView = (SearchView) menuItem.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -144,8 +116,8 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
 
     /**
      * Método para cambiar el tipo de los CardNotes:
-     * Si cardNoteType = true; 2 columnas con cards de alto height {@link R.dimen#cardnote_layout_height_high}
-     * Si cardNoteType = false; 1 columna con cards de bajo height {@link R.dimen#cardnote_layout_height_low}
+     * Si cardNoteType = true; 2 columnas con cards de alto height {@link R.dimen# cardnote_layout_height_high}
+     * Si cardNoteType = false; 1 columna con cards de bajo height {@link R.dimen# cardnote_layout_height_low}
      */
     public void changeCardNoteType(){
         this.cardNoteType = !cardNoteType;
@@ -168,6 +140,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         Note selectedNote = dataViewModel.getNoteSelected().getValue();
         Intent intent = new Intent(mContext, NotasActivity.class);
         Bundle nota = new Bundle();
+
         nota.putString("title", selectedNote.getTitle());
         nota.putString("noteText_HTML", selectedNote.getText_html());
         nota.putString("documentsID",selectedNote.getDocumentsID());
@@ -197,6 +170,11 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         return true;
     }
 
+    /**
+     * Cuando un card note sea seleccionado, inicia un mení sobre los CardNotes para mostrar los ambitos
+     * y careptas a los que puede moverse dicho Card note.
+     * @param cardNote cardNote seleccionado.
+     */
     @Override
     public void onCardNoteMoved(NoteAdapter.CardNote cardNote) {
         View moveView = getLayoutInflater().inflate(R.layout.popup_move, null);
@@ -204,12 +182,9 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
                 dataViewModel.getUserSelected().getValue().getAmbitos());
 
         popupWindow.showAtLocation(requireView(), Gravity.CENTER, 0, 0);
-        popupWindow.setWindowListener(new MoveWindow.MoveWindowListener() {
-            @Override
-            public void moveNote(String ambitoID, String folderID) {
-                dataViewModel.moveNote(ambitoID, folderID, cardNote.getNoteID());
-                popupWindow.dismiss();
-            }
+        popupWindow.setWindowListener((ambitoID, folderID) -> {
+            dataViewModel.moveNote(ambitoID, folderID, cardNote.getNoteID());
+            popupWindow.dismiss();
         });
     }
 

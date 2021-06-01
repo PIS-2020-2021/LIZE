@@ -1,10 +1,6 @@
 package com.example.lize.adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -12,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
-import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
@@ -20,16 +15,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.constraintlayout.widget.Group;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.lize.R;
-import com.example.lize.data.Image;
 import com.example.lize.data.Note;
 import com.example.lize.models.DocumentManager;
-import com.example.lize.workers.NoteHostFragment;
 import com.google.android.material.card.MaterialCardView;
 
 import java.text.DateFormat;
@@ -41,8 +32,8 @@ import java.util.Collection;
  * Adaptador del RecyclerView de Notas, en la actividad principal. Enlaza los datos del dataSet
  * de Notas, con el correspondiente CardNote (ViewHolder). Podemos distinguir dos tipos de ViewHolders;
  * <ul>
- *      <li>cardNotes con alto height {@link R.dimen#cardnote_layout_height_high} (cardNoteType = true)</li>
- *      <li>cardNotes con bajo height {@link R.dimen#cardnote_layout_height_high} (cardNoteType = false) </li>
+ *      <li>cardNotes con alto height {@link R.dimen# cardnote_layout_height_high} (cardNoteType = true)</li>
+ *      <li>cardNotes con bajo height {@link R.dimen# cardnote_layout_height_high} (cardNoteType = false) </li>
  * </ul>
  * Puesto que solo el height es modificado, nos basta con un único tipo de ViewHolder {@link CardNote}.
  */
@@ -55,8 +46,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
     private boolean cardNoteType;
 
 
-    /* Custom CardNote onClick Listener */
-    public interface CardNoteListener{
+    /**
+     * Interfaz del Listener del CardNote
+     */
+    public interface CardNoteListener {
         void onCardNoteClicked(NoteAdapter.CardNote cardNote);
         boolean onCardNoteSelected(NoteAdapter.CardNote cardNote);
         void onCardNoteMoved(NoteAdapter.CardNote cardNote);
@@ -68,9 +61,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
      * Method for registering a CardNote onClick listener
      * @param listener Observer which knows when the chip is clicked.
      */
-    public void registerCardNoteListener(NoteAdapter.CardNoteListener listener){
-        customListener = listener;
-    }
+    public void registerCardNoteListener(NoteAdapter.CardNoteListener listener) { customListener = listener; }
 
     /**
      * Constructor que pasa el listado de notas i el contexto.
@@ -86,6 +77,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
 
     /**
      * Modificamos el cardNoteType, y actualizamos el RecicleView llamando a {@link #notifyDataSetChanged()}
+     * @param newCardNoteType Nuevo tipo de CardNote
      */
     public void changeCardNoteType(boolean newCardNoteType){
         if (cardNoteType != newCardNoteType) {
@@ -122,29 +114,28 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
      * @return tamaño DataSet
      */
     @Override
-    public int getItemCount() {
-        return mNotesData.size();
-    }
+    public int getItemCount() { return mNotesData.size(); }
 
 
+    /**
+     * Metodo para recoger el Filter
+     * @return Filter
+     */
     @Override
-    public Filter getFilter() {
-        return filter;
-    }
+    public Filter getFilter() { return filter; }
 
     Filter filter = new Filter() {
         //Runs on background thread
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-
             ArrayList<Note> filteredList = new ArrayList<>();
 
-            if(constraint.toString().isEmpty()){
+            if (constraint.toString().isEmpty()) {
                 filteredList.addAll(mNotesSearch);
-            } else{
-                for(Note note: mNotesSearch){
-                    if(note.getTitle().toLowerCase().contains(constraint.toString().toLowerCase()) |
-                    note.getText_plain().contains(constraint.toString().toLowerCase())){
+            } else {
+                for (Note note: mNotesSearch) {
+                    if (note.getTitle().toLowerCase().contains(constraint.toString().toLowerCase()) |
+                    note.getText_plain().contains(constraint.toString().toLowerCase())) {
                         filteredList.add(note);
                     }
                 }
@@ -167,7 +158,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
     /**
      * ViewHolder class que se corresponde con los Cards de las notas
      */
-    public class CardNote extends RecyclerView.ViewHolder{
+    public class CardNote extends RecyclerView.ViewHolder {
 
         private final MaterialCardView holder;
         private final TextView mMetadataText;
@@ -175,7 +166,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
         private final TextView mTextNote;
         private final ImageView mMediaNote;
         private final View mButtonGroup, mTextGroup;
-
         private String mNoteID;
 
         /**
@@ -199,7 +189,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
             mTextGroup = itemView.findViewById(R.id.text_group);
             mButtonGroup = itemView.findViewById(R.id.button_group);
 
-            if (customListener != null){
+            if (customListener != null) {
                 holder.setOnClickListener((v) -> customListener.onCardNoteClicked(this));
                 holder.setOnLongClickListener((v) -> customListener.onCardNoteSelected(this));
                 mMoveBtn.setOnClickListener((v) -> customListener.onCardNoteMoved(this));
@@ -208,10 +198,14 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
             }
         }
 
+        /**
+         * Metodo para conseguir el ID de la nota
+         * @return ID de la nota
+         */
         public String getNoteID(){ return mNoteID; }
 
         /**
-         * Método para <b>enlazar</b> los datos de la nota con el Card de este objeto ViewHolder.
+         * Método para enlazar los datos de la nota con el Card de este objeto ViewHolder.
          * @param currentNote nota actual
          */
         public void bindTo(Note currentNote, boolean cardNoteType) {
@@ -227,10 +221,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
 
             String metadata = "";
             if (currentNote.getFolderTAG() != null) metadata += currentNote.getFolderTAG();
-            if (0 < metadata.length() && currentNote.getLastUpdate() != null)
-                metadata += " - " + dateFormat.format(currentNote.getLastUpdate());
-            else if(currentNote.getLastUpdate() != null)
-                metadata += dateFormat.format(currentNote.getLastUpdate());
+            if (0 < metadata.length() && currentNote.getLastUpdate() != null) metadata += " - " + dateFormat.format(currentNote.getLastUpdate());
+            else if(currentNote.getLastUpdate() != null) metadata += dateFormat.format(currentNote.getLastUpdate());
 
             mMetadataText.setText(metadata);
             mNoteID = currentNote.getSelfID();
@@ -238,7 +230,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
             ViewGroup.LayoutParams params = mTextGroup.getLayoutParams();
 
             // Grid Layout
-            if (cardNoteType){
+            if (cardNoteType) {
                 params.width = mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_text_width_low);
                 params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                 mTextGroup.setLayoutParams(params);
@@ -246,7 +238,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
                 mMediaNote.setImageDrawable(null);
                 mMediaNote.setVisibility(View.GONE);
 
-            } else{ // Linear Layout
+            } else { // Linear Layout
 
                 if (currentNote.getHaveImages()) {
                     params.width = mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_text_width_high_image);
@@ -259,19 +251,20 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
 
                     Glide.with(mContext).load(DocumentManager.getInstance().selectImageFromArray(
                             currentNote.getImagesID(), 0)).into(mMediaNote);
-
                     mMediaNote.setVisibility(View.VISIBLE);
 
-                }else{
+                } else {
                     params.width = mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_text_width_high_no_image);
                     params.height = mContext.getResources().getDimensionPixelSize(R.dimen.cardnote_text_group_height);
                     mTextGroup.setLayoutParams(params);
-
                     mMediaNote.setVisibility(View.GONE);
                 }
             }
         }
 
+        /**
+         * Metodo para seleccionar el holder
+         */
         public void select() {
             holder.setChecked(!holder.isChecked());
             if ((holder.isChecked())){
@@ -285,8 +278,15 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
             }
         }
 
+        /**
+         * Metodo para saber si el Holder está seleccionado
+         * @return True si está seleccionado, False si no
+         */
         public boolean isSelected() { return holder.isChecked(); }
 
+        /**
+         * Metodo para resetear el Holder
+         */
         public void reset() {
             mButtonGroup.setAlpha(0.0f);
             mButtonGroup.setVisibility(View.GONE);
@@ -295,7 +295,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
             holder.setChecked(false);
         }
 
-        /* CardNote animation for showing the button Group */
+
+        /**
+         * Metodo para enseña rla animación de abrir el Grupo de Botones
+         */
         private void showButtonGroup(){
             int matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec(((View) mButtonGroup.getParent()).getWidth(), View.MeasureSpec.EXACTLY);
             int wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
@@ -327,33 +330,33 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> impl
         }
 
         /* CardNote animation for hidding the button Group */
-        private void hideButtonGroup(){
+
+        /**
+         * Metodo para enseñar la animación de cerrar el grupo de botones
+         */
+        private void hideButtonGroup() {
             final int initialHeight = mButtonGroup.getMeasuredHeight();
 
             Animation a = new Animation() {
                 @Override
                 protected void applyTransformation(float interpolatedTime, Transformation t) {
-                    if(interpolatedTime == 1){
+                    if (interpolatedTime == 1) {
                         mButtonGroup.setAlpha(0.0f);
                         mButtonGroup.setVisibility(View.GONE);
-
-                    }else{
+                    } else {
                         mButtonGroup.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
                         mButtonGroup.setAlpha(1.0f - interpolatedTime);
                         mButtonGroup.requestLayout();
                     }
                 }
-
                 @Override
                 public boolean willChangeBounds() {
                     return true;
                 }
             };
-
             // Collapse speed of 1dp/ms
             a.setDuration(4 * (int)(initialHeight / mButtonGroup.getContext().getResources().getDisplayMetrics().density));
             mButtonGroup.startAnimation(a);
         }
-
     }
 }
