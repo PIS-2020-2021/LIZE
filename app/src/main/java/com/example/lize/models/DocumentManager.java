@@ -13,14 +13,12 @@ import com.example.lize.data.Audio;
 import com.example.lize.data.Document;
 import com.example.lize.data.Image;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -35,7 +33,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.onegravity.rteditor.api.RTApi.getApplicationContext;
 
@@ -58,9 +55,7 @@ public class DocumentManager {
      * Metodo para crear una instancia de la clase
      */
     private synchronized static void createInstance() {
-        if (documentManager == null) {
-            documentManager = new DocumentManager();
-        }
+        if (documentManager == null) documentManager = new DocumentManager();
     }
 
     /**
@@ -85,9 +80,7 @@ public class DocumentManager {
      * Metodo para establecer el conetxto
      * @param context Contexto de la clase
      */
-    public void setContext(Context context){
-        this.context = context;
-    }
+    public void setContext(Context context){ this.context = context; }
 
     /**
      * Metodo para conseguir los documentos
@@ -95,17 +88,13 @@ public class DocumentManager {
      * @return Array con todos los documentos pedidos
      */
     public ArrayList<Document> getDocuments(String documentsID) {
-
-        if (documentsNote.containsKey(documentsID)) {
-            return documentsNote.get(documentsID);
-
-        } else {
+        if (!documentsNote.containsKey(documentsID)) {
             ArrayList<Document> docs = new ArrayList<>();
             documentsNote.put(documentsID, docs);
             DocumentReference notasRef = db.collection("documents").document(documentsID);
-            final long  MEGABYTE = 8192 * 1024;
-            notasRef.get().addOnCompleteListener(task -> {
+            final long MEGABYTE = 8192 * 1024;
 
+            notasRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     List<String> group = (List<String>) document.get("files");
@@ -113,25 +102,20 @@ public class DocumentManager {
 
                     for (String doc : files) {
                         StorageReference singleDoc = mStorageRef.child(doc);
-
                         singleDoc.getBytes(MEGABYTE).addOnSuccessListener(bytes -> {
-                            File file = new File(context.getFilesDir(),doc);
+                            File file = new File(context.getFilesDir(), doc);
                             FileOutputStream outputStream = null;
-
                             try {
-                                outputStream = context.openFileOutput(doc,Context.MODE_PRIVATE);
+                                outputStream = context.openFileOutput(doc, Context.MODE_PRIVATE);
                                 outputStream.write(bytes);
                                 Document f = new Document(Uri.fromFile(file));
                                 f.setName(doc);
                                 f.setId(doc);
                                 documentsNote.get(documentsID).add(f);
-
                             } catch (FileNotFoundException e) {
                                 e.printStackTrace();
-
                             } catch (IOException e) {
                                 e.printStackTrace();
-
                             } finally {
                                 try {
                                     outputStream.close();
@@ -139,18 +123,91 @@ public class DocumentManager {
                                     e.printStackTrace();
                                 }
                             }
-
-                        }).addOnFailureListener(exception -> {
-                            // Handle any errors
-                        });
+                        }).addOnFailureListener(Throwable::printStackTrace);
                     }
                 }
-
             });
-
-            return documentsNote.get(documentsID);
         }
+        return documentsNote.get(documentsID);
     }
+
+    /**
+     * Metodo para recuperar imagenes del Firebase Cloud
+     * @param imagesID ID de las imagenes a recuperar
+     */
+    public void getImagesNote(String imagesID) {
+
+        if (!imagesNote.containsKey(imagesID)) {
+            ArrayList<Image> images = new ArrayList<>();
+            imagesNote.put(imagesID, images);
+            DocumentReference notasRef = db.collection("images").document(imagesID);
+
+            notasRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    List<String> group = (List<String>) document.get("images");
+                    ArrayList<String> imagenes = (ArrayList<String>) group;
+
+                    for (String doc : imagenes) {
+                        StorageReference singleDoc = mStorageRef.child(doc);
+                        Image f = new Image(context.getCacheDir(), doc);
+                        singleDoc.getFile(f).addOnSuccessListener(taskSnapshot -> {
+                            // Local temp file has been created
+                        }).addOnFailureListener(Throwable::printStackTrace);
+                        f.setId(doc);
+                        imagesNote.get(imagesID).add(f);
+                    }
+                }
+            });
+        }
+        imagesNote.get(imagesID);
+    }
+
+    /**
+     * Metodo para conseguir los audios de una Array de audios
+     * @param AudiosID ID del Array de Audios
+     * @return Array con los audios
+     */
+    public ArrayList<Audio> getAudios(String AudiosID) {
+
+        if (!audiosNote.containsKey(AudiosID)) {
+            ArrayList<Audio> audios = new ArrayList<>();
+            DocumentReference notasRef = db.collection("audios").document(AudiosID);
+            notasRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    List<String> group = (List<String>) document.get("files");
+                    ArrayList<String> files = (ArrayList<String>) group;
+
+                    for (String audio : files) {
+                        String filename = context.getExternalCacheDir().getAbsolutePath() + File.separator + audio + ".3gp";
+                        StorageReference singleDoc = mStorageRef.child(audio);
+
+                        File file = new File(filename);
+                        if (!file.exists()) {
+                            singleDoc.getFile(file).addOnSuccessListener(taskSnapshot -> {
+                                // Local temp file has been created
+                            }).addOnFailureListener(Throwable::printStackTrace);
+                        }
+                        MediaPlayer mp = new MediaPlayer();
+                        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                        retriever.setDataSource(context, Uri.parse(Uri.fromFile(file).toString()));
+                        String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                        int millSecond = Integer.parseInt(duration);
+
+                        audios.add(new Audio(audio, filename, millSecond));
+                    }
+                }
+            });
+            audiosNote.put(AudiosID, audios);
+        }
+        return audiosNote.get(AudiosID);
+    }
+
+    //*******************
+    //   ADD TO CLOUD
+    //*******************
+
 
     /**
      * Metodo para añadir una imagen al Firebase Cloud
@@ -164,17 +221,13 @@ public class DocumentManager {
         if (imagesID == null) {
             noteRef = db.collection("images").document();
             imagesID = noteRef.getId();
-        } else {
-            noteRef = db.collection("images").document(imagesID);
-        }
+        } else noteRef = db.collection("images").document(imagesID);
 
-        if (imagesNote.containsKey(imagesID)) {
-            imagesNote.get(imagesID).add(image);
-        } else {
+        if (!imagesNote.containsKey(imagesID)) {
             ArrayList<Image> images = new ArrayList<>();
             imagesNote.put(imagesID, images);
-            imagesNote.get(imagesID).add(image);
         }
+        imagesNote.get(imagesID).add(image);
 
         if (imagesNote.get(imagesID).size() == 1) {
             String ref = image.getId();             // "-img-" + notas.get(DocumentsID).getBitmaps().indexOf(image);
@@ -186,11 +239,9 @@ public class DocumentManager {
             noteDocuments.put("images", imagenes);
             String finalDocumentsID = imagesID;
             noteRef.set(noteDocuments).addOnCompleteListener(task -> {
-                if (task.isSuccessful())
-                    Log.d(TAG, "Note " + finalDocumentsID + "Document correctly saved.");
+                if (task.isSuccessful()) Log.d(TAG, "Note " + finalDocumentsID + "Document correctly saved.");
                 else Log.d(TAG, "Error saving note " + finalDocumentsID, task.getException());
             });
-            return imagesID;
 
         } else {
             DocumentReference notasRef = db.collection("images").document(imagesID);
@@ -210,14 +261,13 @@ public class DocumentManager {
                     noteDocuments.put("images", imagenes);
                     String finalDocumentsID1 = finalDocumentsID2;
                     noteRef.set(noteDocuments).addOnCompleteListener(task1 -> {
-                        if (task1.isSuccessful())
-                            Log.d(TAG, "Note " + finalDocumentsID1 + "Document correctly saved.");
+                        if (task1.isSuccessful()) Log.d(TAG, "Note " + finalDocumentsID1 + "Document correctly saved.");
                         else Log.d(TAG, "Error saving note " + finalDocumentsID1, task1.getException());
                     });
                 }
             });
-            return imagesID;
         }
+        return imagesID;
     }
 
     /**
@@ -232,13 +282,11 @@ public class DocumentManager {
         if (DocumentsID == null) {
             noteRef = db.collection("documents").document();
             DocumentsID = noteRef.getId();
-        } else {
-            noteRef = db.collection("documents").document(DocumentsID);
-        }
+        } else noteRef = db.collection("documents").document(DocumentsID);
 
-        if (documentsNote.containsKey(DocumentsID)) {
-            documentsNote.get(DocumentsID).add(doc);
-        } else {
+
+        if (documentsNote.containsKey(DocumentsID)) documentsNote.get(DocumentsID).add(doc);
+        else {
             ArrayList<Document> docs = new ArrayList<>();
             docs.add(doc);
             documentsNote.put(DocumentsID, docs);
@@ -255,11 +303,9 @@ public class DocumentManager {
             noteDocuments.put("files", files);
             String finalDocumentsID = DocumentsID;
             noteRef.set(noteDocuments).addOnCompleteListener(task -> {
-                if (task.isSuccessful())
-                    Log.d(TAG, "Note " + finalDocumentsID + "Document correctly saved.");
+                if (task.isSuccessful()) Log.d(TAG, "Note " + finalDocumentsID + "Document correctly saved.");
                 else Log.d(TAG, "Error saving note " + finalDocumentsID, task.getException());
             });
-            return DocumentsID;
 
         } else {
             DocumentReference notasRef = db.collection("documents").document(DocumentsID);
@@ -271,96 +317,127 @@ public class DocumentManager {
                     List<String> group = (List<String>) document.get("files");
                     ArrayList<String> files = (ArrayList<String>) group;
                     String ref = doc.getId();               //+ "-img-" + (notas.get(finalDocumentsID2).getBitmaps().indexOf(image)) ;
-
                     files.add(ref);
                     uploadDocument(ref, doc);
                     Map<String, Object> noteDocuments = new HashMap<>();
                     noteDocuments.put("DocumentsID", finalDocumentsID2);
                     noteDocuments.put("files", files);
                     noteRef.set(noteDocuments).addOnCompleteListener(task1 -> {
-                        if (task1.isSuccessful())
-                            Log.d(TAG, "Note " + finalDocumentsID2 + "Document correctly saved.");
+                        if (task1.isSuccessful()) Log.d(TAG, "Note " + finalDocumentsID2 + "Document correctly saved.");
                         else Log.d(TAG, "Error saving note " + finalDocumentsID2, task1.getException());
                     });
                 }
             });
-            return DocumentsID;
         }
-
+        return DocumentsID;
     }
 
     /**
-     * Metodo para recuperar imagenes del Firebase Cloud
-     * @param imagesID ID de las imagenes a recuperar
-     * @return Array con las imagenes
+     * Metodo para añadir un audio al Firebase Cloud
+     * @param AudiosID Id del Array de audios
+     * @param audio Audio a añadir
+     * @return Nuevo ID del Audio
      */
-    public ArrayList<Image> getImagesNote(String imagesID) {
+    public String addAudioToCloud(String AudiosID, Audio audio) {
+        DocumentReference noteRef;
+        if (AudiosID == null) {
+            noteRef = db.collection("audios").document();
+            AudiosID = noteRef.getId();
+        } else noteRef = db.collection("audios").document(AudiosID);
 
-        if (imagesNote.containsKey(imagesID)) {
-            return imagesNote.get(imagesID);
+        if (audiosNote.containsKey(AudiosID)) audiosNote.get(AudiosID).add(audio);
+        else {
+            ArrayList<Audio> audios = new ArrayList<>();
+            audios.add(audio);
+            audiosNote.put(AudiosID, audios);
+        }
+
+        if (audiosNote.get(AudiosID).size() == 1) {
+            String ref = audio.getID();// "-img-" + notas.get(DocumentsID).getBitmaps().indexOf(image);
+            uploadAudio(audio);
+            Map<String, Object> noteAudios = new HashMap<>();
+            ArrayList<String> files = new ArrayList<>();
+            files.add(ref);
+            noteAudios.put("audiosID", AudiosID);
+            noteAudios.put("files", files);
+            String finalDocumentsID = AudiosID;
+            noteRef.set(noteAudios).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) Log.d(TAG, "Note " + finalDocumentsID + "Document correctly saved.");
+                    else Log.d(TAG, "Error saving note " + finalDocumentsID, task.getException());
+                }
+            });
+
         } else {
-            ArrayList<Image> images = new ArrayList<>();
-            imagesNote.put(imagesID, images);
-            DocumentReference notasRef = db.collection("images").document(imagesID);
+            DocumentReference notasRef = db.collection("audios").document(AudiosID);
+            String finalDocumentsID2 = AudiosID;
 
             notasRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    List<String> group = (List<String>) document.get("images");
-                    ArrayList<String> imagenes = (ArrayList<String>) group;
+                    List<String> group = (List<String>) document.get("files");
+                    ArrayList<String> files = (ArrayList<String>) group;
+                    String ref = audio.getID();//+ "-img-" + (notas.get(finalDocumentsID2).getBitmaps().indexOf(image)) ;
 
-                    for (String doc : imagenes) {
-                        StorageReference singleDoc = mStorageRef.child(doc);
-                        Image f = new Image(context.getCacheDir(),doc);
-
-                        singleDoc.getFile(f).addOnSuccessListener(taskSnapshot -> {
-                            // Local temp file has been created
-                        }).addOnFailureListener(exception -> {
-                            // Handle any errors
-                        });
-                        f.setId(doc);
-                        imagesNote.get(imagesID).add(f);
-                    }
+                    files.add(ref);
+                    uploadAudio(audio);
+                    Map<String, Object> noteAudios = new HashMap<>();
+                    noteAudios.put("audiosID", finalDocumentsID2);
+                    noteAudios.put("files", files);
+                    noteRef.set(noteAudios).addOnCompleteListener(task1 -> {
+                        if (task1.isSuccessful()) Log.d(TAG, "Note " + finalDocumentsID2 + "Document correctly saved.");
+                        else Log.d(TAG, "Error saving note " + finalDocumentsID2, task1.getException());
+                    });
                 }
             });
-        return imagesNote.get(imagesID);
         }
+        return AudiosID;
     }
+
+    //*******************
+    //      UPLOADS
+    //*******************
 
     /**
      * Metodo para subir las imagenes al layout de las notas rectangulares
      * @param ref Referencia para subir
      * @param image Imagen
-     * @return True si se ha subido, sino False
      */
-    private Boolean uploadImage(String ref, Image image) {
+    private void uploadImage(String ref, Image image) {
         final Boolean[] success = {false};
-        // Sgeunda forma de subir una imagen
-        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        //image.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-        //byte[] data = baos.toByteArray();
-
         StorageReference file = mStorageRef.child(ref);
         mUploadTask = file.putFile(Uri.fromFile(image)).addOnSuccessListener(taskSnapshot -> success[0] = true);
-
-        return success[0];
     }
 
     /**
      * Metodo para subir un documento al layout de las notas
      * @param ref Referencia a subir
      * @param document Documento
-     * @return True si se ha subido, False si no
      */
-    private Boolean uploadDocument(String ref, Document document) {
+    private void uploadDocument(String ref, Document document) {
         final Boolean[] success = {false};
-
         StorageReference file = mStorageRef.child(ref);
         mUploadTask = file.putFile(document.getUrl()).addOnSuccessListener(taskSnapshot -> success[0] = true);
-
-        return success[0];
     }
 
+    /**
+     * Metodo para subir un audio al layout de las notas
+     * @param audio Audio a subir
+     */
+    private void uploadAudio(Audio audio) {
+        final Boolean[] success = {false};
+        StorageReference file = mStorageRef.child(audio.getID());
+        mUploadTask = file.putFile(Uri.fromFile(new File(audio.getAddress()))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) { success[0] = true; }
+        });
+    }
+
+
+    //*******************
+    //      REMOVES
+    //*******************
 
     /**
      * Metodo para borrar una imegen de una nota
@@ -389,7 +466,6 @@ public class DocumentManager {
                 });
                 StorageReference singleDoc = mStorageRef.child(ref);
                 singleDoc.delete();
-
             }
         });
     }
@@ -426,176 +502,6 @@ public class DocumentManager {
     }
 
     /**
-     * Metodo para saber si un Array de Imagenes contiene imagenes
-     * @param imagesID ID del array de imagenes que queremos saber si esta vacio
-     * @return True si contiene imagenes, False si no
-     */
-    public boolean arrayImagesEmpty(String imagesID) {
-        if (imagesNote.containsKey(imagesID)) return imagesNote.get(imagesID).isEmpty();
-        else return true;
-    }
-
-    /**
-     * Metodo para saber si un Array de Documentos contiene documentos
-     * @param documentsID ID del array de documentos que queremos saber si esta vacio
-     * @return True si contiene documentos, False si no
-     */
-    public boolean arrayDocumentEmpty(String documentsID) {
-        if (documentsNote.containsKey(documentsID))  return documentsNote.get(documentsID).isEmpty();
-        else return true;
-    }
-
-    /**
-     * Metodo para saber si un Array de Audios contiene audios
-     * @param AudiosID ID del array de Audios que queremos saber si esta vacio
-     * @return True si contiene Audios, False si no
-     */
-    public boolean arrayAudiosEmpty(String AudiosID) {
-        if (audiosNote.containsKey(AudiosID)) return audiosNote.get(AudiosID).isEmpty();
-        else return true;
-    }
-
-    /**
-     * Metodo para conseguir una imagen de su Array de imagenes
-     * @param imagesID Id del Array de imagenes
-     * @param position Posicion de la imagen en el Array
-     * @return Path de la imagen
-     */
-    public String selectImageFromArray(String imagesID,int position) { return imagesNote.get(imagesID).get(position).getPath(); }
-
-    /**
-     * Metodo para saber el tamaño de un Array de imagenes
-     * @param imagesID ID del Array de imagenes
-     * @return Tamaño del Array de imagenes
-     */public int imagesArraySize(String imagesID){
-        if(imagesNote.containsKey(imagesID)){
-            return imagesNote.get(imagesID).size();
-        }
-        return 0;
-
-    }
-
-    /**
-     * Metodo para saber el tamaño de un Array de documentos
-     * @param documentsID ID del Array de documentos
-     * @return Tamaño del Array de documentos
-     */
-    public int documentArraySize(String documentsID){
-        return documentsNote.get(documentsID).size();
-    }
-
-    /**
-     * Metodo para transformar un Bitmap en una Imagen
-     * @param bitmap Bitmap a transformar
-     * @return Imagen resultante
-     * @throws IOException Excepción debia a un fallo de lectura del OutputStream
-     */
-    public Image BitmapToImage(Bitmap bitmap) throws IOException {
-        Image f = new Image(getApplicationContext().getCacheDir(), String.valueOf(System.currentTimeMillis()));
-        f.setId(String.valueOf(System.currentTimeMillis()));
-        f.createNewFile();
-
-        //Convert bitmap to byte array
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50 /*ignored for PNG*/, bos);
-        byte[] bitmapdata = bos.toByteArray();
-
-        //write the bytes in file
-        FileOutputStream fos = new FileOutputStream(f);
-        fos.write(bitmapdata);
-        fos.flush();
-        fos.close();
-        return f;
-    }
-
-    /**
-     * Metodo para añadir un audio al Firebase Cloud
-     * @param AudiosID Id del Array de audios
-     * @param a Audio a añadir
-     * @return Nuevo ID del Audio
-     */
-    public String addAudioToCloud(String AudiosID, Audio a) {
-        DocumentReference noteRef;
-        if (AudiosID == null) {
-            noteRef = db.collection("audios").document();
-            AudiosID = noteRef.getId();
-        } else {
-            noteRef = db.collection("audios").document(AudiosID);
-        }
-        if (audiosNote.containsKey(AudiosID)) {
-            audiosNote.get(AudiosID).add(a);
-        } else {
-            ArrayList<Audio> audios = new ArrayList<>();
-            audios.add(a);
-            audiosNote.put(AudiosID, audios);
-        }
-
-        if(audiosNote.get(AudiosID).size() == 1) {
-            String ref = a.getID();// "-img-" + notas.get(DocumentsID).getBitmaps().indexOf(image);
-            uploadAudio(a);
-            Map<String, Object> noteAudios = new HashMap<>();
-            ArrayList<String> files = new ArrayList<>();
-            files.add(ref);
-            noteAudios.put("audiosID", AudiosID);
-            noteAudios.put("files", files);
-            String finalDocumentsID = AudiosID;
-            noteRef.set(noteAudios).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful())
-                        Log.d(TAG, "Note " + finalDocumentsID + "Document correctly saved.");
-                    else Log.d(TAG, "Error saving note " + finalDocumentsID, task.getException());
-                }
-            });
-
-        } else {
-            DocumentReference notasRef = db.collection("audios").document(AudiosID);
-
-            String finalDocumentsID2 = AudiosID;
-
-            notasRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    List<String> group = (List<String>) document.get("files");
-                    ArrayList<String> files = (ArrayList<String>) group;
-                    String ref = a.getID();//+ "-img-" + (notas.get(finalDocumentsID2).getBitmaps().indexOf(image)) ;
-
-                    files.add(ref);
-                    uploadAudio(a);
-                    Map<String, Object> noteAudios = new HashMap<>();
-                    noteAudios.put("audiosID", finalDocumentsID2);
-                    noteAudios.put("files", files);
-                    noteRef.set(noteAudios).addOnCompleteListener(task1 -> {
-                        if (task1.isSuccessful()) Log.d(TAG, "Note " + finalDocumentsID2 + "Document correctly saved.");
-                        else Log.d(TAG, "Error saving note " + finalDocumentsID2, task1.getException());
-                    });
-                }
-            });
-        }
-        return AudiosID;
-
-    }
-
-    /**
-     * Metodo para subri un audio al layout de las notas
-     * @param audio Audio a subir
-     * @return True si se ha subido, False si no
-     */
-    private Boolean uploadAudio(Audio audio) {
-        final Boolean[] success = {false};
-
-        StorageReference file = mStorageRef.child(audio.getID());
-        mUploadTask = file.putFile(Uri.fromFile(new File(audio.getAddress()))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                success[0] = true;
-            }
-        });
-
-        return success[0];
-    }
-
-    /**
      * Metodo para borrar un audio de una nota
      * @param AudiosID ID del Array de audios
      * @param currentItem Item en el que etsamos trabajando
@@ -626,59 +532,92 @@ public class DocumentManager {
         });
     }
 
+
+    //******************
+    //    IS EMPTY
+    //******************
+
+
     /**
-     * Metodo para conseguir los audios de una Array de audios
-     * @param AudiosID ID del Array de Audios
-     * @return Array con los audios
+     * Metodo para saber si un Array de Imagenes contiene imagenes
+     * @param imagesID ID del array de imagenes que queremos saber si esta vacio
+     * @return True si contiene imagenes, False si no
      */
-    public ArrayList<Audio> getAudios(String AudiosID) {
-
-        if (audiosNote.containsKey(AudiosID)) {
-            return audiosNote.get(AudiosID);
-
-        } else {
-            ArrayList<Audio> audios = new ArrayList<>();
-
-            DocumentReference notasRef = db.collection("audios").document(AudiosID);
-            notasRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    List<String> group = (List<String>) document.get("files");
-                    ArrayList<String> files = (ArrayList<String>) group;
-                    for(String audio :files){
-                        String filename = context.getExternalCacheDir().getAbsolutePath() + File.separator + audio + ".3gp";
-                        StorageReference singleDoc = mStorageRef.child(audio);
-
-                        File file = new File(filename);
-                        if(!file.exists()){
-                            singleDoc.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                    // Local temp file has been created
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    // Handle any errors
-                                }
-                            });
-                        }
-
-                        MediaPlayer mp = new MediaPlayer();
-                        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                        retriever.setDataSource(context,Uri.parse(Uri.fromFile(file).toString()));
-                        String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                        int millSecond = Integer.parseInt(duration);
-
-
-
-
-                        audios.add(new Audio(audio,filename,millSecond));
-                    }
-
-                }});
-            audiosNote.put(AudiosID, audios);
-            return audiosNote.get(AudiosID);
-        }
+    public boolean arrayImagesEmpty(String imagesID) {
+        if (imagesNote.containsKey(imagesID)) return imagesNote.get(imagesID).isEmpty();
+        else return true;
     }
+
+    /**
+     * Metodo para saber si un Array de Documentos contiene documentos
+     * @param documentsID ID del array de documentos que queremos saber si esta vacio
+     * @return True si contiene documentos, False si no
+     */
+    public boolean arrayDocumentEmpty(String documentsID) {
+        if (documentsNote.containsKey(documentsID))  return documentsNote.get(documentsID).isEmpty();
+        else return true;
+    }
+
+    /**
+     * Metodo para saber si un Array de Audios contiene audios
+     * @param AudiosID ID del array de Audios que queremos saber si esta vacio
+     * @return True si contiene Audios, False si no
+     */
+    public boolean arrayAudiosEmpty(String AudiosID) {
+        if (audiosNote.containsKey(AudiosID)) return audiosNote.get(AudiosID).isEmpty();
+        else return true;
+    }
+
+    //*****************
+    //     ARRAYS
+    //*****************
+
+    /**
+     * Metodo para conseguir una imagen de su Array de imagenes
+     * @param imagesID Id del Array de imagenes
+     * @param position Posicion de la imagen en el Array
+     * @return Path de la imagen
+     */
+    public String selectImageFromArray(String imagesID,int position) { return imagesNote.get(imagesID).get(position).getPath(); }
+
+    /**
+     * Metodo para saber el tamaño de un Array de imagenes
+     * @param imagesID ID del Array de imagenes
+     * @return Tamaño del Array de imagenes
+     */public int imagesArraySize(String imagesID) {
+        if (imagesNote.containsKey(imagesID)) return imagesNote.get(imagesID).size();
+        return 0;
+    }
+
+    /**
+     * Metodo para saber el tamaño de un Array de documentos
+     * @param documentsID ID del Array de documentos
+     * @return Tamaño del Array de documentos
+     */
+    public int documentArraySize(String documentsID) { return documentsNote.get(documentsID).size(); }
+
+    /**
+     * Metodo para transformar un Bitmap en una Imagen
+     * @param bitmap Bitmap a transformar
+     * @return Imagen resultante
+     * @throws IOException Excepción debia a un fallo de lectura del OutputStream
+     */
+    public Image BitmapToImage(Bitmap bitmap) throws IOException {
+        Image f = new Image(getApplicationContext().getCacheDir(), String.valueOf(System.currentTimeMillis()));
+        f.setId(String.valueOf(System.currentTimeMillis()));
+        f.createNewFile();
+
+        //Convert bitmap to byte array
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50 /*ignored for PNG*/, bos);
+        byte[] bitmapdata = bos.toByteArray();
+
+        //write the bytes in file
+        FileOutputStream fos = new FileOutputStream(f);
+        fos.write(bitmapdata);
+        fos.flush();
+        fos.close();
+        return f;
+    }
+
 }
