@@ -1,37 +1,29 @@
 package com.example.lize.data;
 
-import android.graphics.Bitmap;
-
-import androidx.annotation.NonNull;
-
 import java.io.File;
 
 public class Image extends File {
     private String id;
-    private Bitmap bitmap;
 
-    public Image(@NonNull String pathname) {
-        super(pathname);
-    }
-
+    /**
+     * Constructor de la clase con dos parámetros
+     * @param cacheDir Directorio de la Cache
+     * @param valueOf Valor de la Imagen
+     */
     public Image(File cacheDir, String valueOf) {
         super(cacheDir,valueOf);
     }
 
-    public String getId() {
-        return id;
-    }
+    /**
+     * Metodo para conseguir el ID de la Imagen
+     * @return ID de la Imagen
+     */
+    public String getId() { return id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Bitmap getBitmap() {
-        return bitmap;
-    }
-
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
+    /**
+     * Metodo para establecer el ID de la Imgen
+     * @param id ID de la Imagen
+     */
+    public void setId(String id) { this.id = id; }
 
 }
