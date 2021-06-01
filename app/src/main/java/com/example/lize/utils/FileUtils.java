@@ -22,7 +22,6 @@ import java.io.InputStream;
  */
 public class FileUtils {
 
-
     /**
      * Get a file from a Uri.
      * Framework Documents, as well as the _data field for the MediaStore and
@@ -37,8 +36,7 @@ public class FileUtils {
 
         // DocumentProvider
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (DocumentsContract.isDocumentUri(context, uri)) { // TODO: 2015. 11. 17. KITKAT
-
+            if (DocumentsContract.isDocumentUri(context, uri)) {
 
                 // ExternalStorageProvider
                 if (isExternalStorageDocument(uri)) {
@@ -46,24 +44,18 @@ public class FileUtils {
                     final String[] split = docId.split(":");
                     final String type = split[0];
 
-
                     if ("primary".equalsIgnoreCase(type)) {
                         path = Environment.getExternalStorageDirectory() + "/" + split[1];
                     }
-
-                    // TODO handle non-primary volumes
 
                 } else if (isDownloadsDocument(uri)) { // DownloadsProvider
 
                     final String id = DocumentsContract.getDocumentId(uri);
                     final Uri contentUri = ContentUris.withAppendedId(
                             Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-
                     path = getDataColumn(context, contentUri, null, null);
 
                 } else if (isMediaDocument(uri)) { // MediaProvider
-
-
                     final String docId = DocumentsContract.getDocumentId(uri);
                     final String[] split = docId.split(":");
                     final String type = split[0];

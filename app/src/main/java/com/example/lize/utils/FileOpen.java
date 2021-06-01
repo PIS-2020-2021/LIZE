@@ -5,14 +5,12 @@ import android.content.Intent;
 import android.net.Uri;
 
 import java.io.File;
-import java.io.IOException;
 
 public class FileOpen {
 
-    public static void openFile(Context context, File url) throws IOException {
+    public static void openFile(Context context, File url) {
         // Create URI
-        File file=url;
-        Uri uri = Uri.fromFile(file);
+        Uri uri = Uri.fromFile(url);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         // Check what kind of file you are trying to open, by comparing the url with extensions.
@@ -59,7 +57,6 @@ public class FileOpen {
             //so you can choose which application to use
             intent.setDataAndType(uri, "*/*");
         }
-
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }

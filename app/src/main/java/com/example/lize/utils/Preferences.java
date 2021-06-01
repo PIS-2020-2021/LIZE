@@ -1,12 +1,7 @@
 package com.example.lize.utils;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.Resources.Theme;
 import android.view.ContextThemeWrapper;
-
 import androidx.appcompat.app.AppCompatDelegate;
-
 import com.example.lize.R;
 
 public class Preferences {
@@ -14,7 +9,12 @@ public class Preferences {
     private static int selectedTheme = R.style.Theme_Red;
     private static int selectedColor;
 
-    public static int getTheme(int color){
+    /**
+     * Metodo para conseguir un Theme
+     * @param color Color del Theme que queremos
+     * @return Theme resultante
+     */
+    public static int getTheme(int color) {
         switch (color){
             case 1:     return R.style.Theme_Red;
             case 2:     return R.style.Theme_Purple;
@@ -29,7 +29,11 @@ public class Preferences {
         return selectedTheme;
     }
 
-    public static void setSelectedTheme(int color){
+    /**
+     * Metodo para establecer el Theme
+     * @param color Color del Theme a establecer
+     */
+    public static void setSelectedTheme(int color) {
         selectedColor = color;
         switch (selectedColor){
             case 1:     selectedTheme = R.style.Theme_Red; break;
@@ -44,16 +48,23 @@ public class Preferences {
         }
     }
 
-    public static int getSelectedTheme() {
-        return selectedTheme;
-    }
-
+    /**
+     * Metodo para conseguir el color seleccionado
+     * @return Color seleccionado
+     */
     public static int getSelectedColor() { return selectedColor; }
 
-    public static void applySelectedTheme(ContextThemeWrapper contextThemeWrapper) {
-        contextThemeWrapper.setTheme(selectedTheme);
-    }
+    /**
+     * Metodo para aplicar el Theme seleccionado
+     * @param contextThemeWrapper Theme a aplicar
+     */
+    public static void applySelectedTheme(ContextThemeWrapper contextThemeWrapper) { contextThemeWrapper.setTheme(selectedTheme); }
 
+    /**
+     * Metodo para conseguir el color del Ambito
+     * @param ambitoColor Color del Ambito
+     * @return Theme del color
+     */
     public static int getAmbitoColor(int ambitoColor) {
         if(ambitoColor == selectedColor){
         switch (ambitoColor) {
@@ -66,18 +77,19 @@ public class Preferences {
             case 7:  return R.color.Ambito_Yellow;
             case 8:  return R.color.Ambito_Orange;
             case 9:  return R.color.Ambito_Brown;
-
-                default: return R.color.Ambito_Red;
+            default: return R.color.Ambito_Red;
             }
         } else {
-            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-                return R.color.md_grey_dark;
-            } else {
-                return R.color.md_grey_100;
-            }
+             if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) return R.color.md_grey_dark;
+             else return R.color.md_grey_100;
         }
     }
 
+    /**
+     * Metodo para conseguir el color del Ambito seleccionado
+     * @param ambitoColor Color del Ambito seleccionado
+     * @return Theme del Ambito
+     */
     public static int getAmbitoPressedColor(int ambitoColor){
 
         switch (ambitoColor){
@@ -90,13 +102,13 @@ public class Preferences {
             case 7: return R.color.Presseed_Yellow;
             case 8: return R.color.Presseed_Orange;
             case 9: return R.color.Presseed_Brown;
-
             default: return  R.color.Presseed_Red;
         }
     }
 
-
-    public static int getDefaultAmbitoColor(){
-        return R.color.white;
-    }
+    /**
+     * Metodo para conseguir el color del Ambito Default
+     * @return Color Default
+     */
+    public static int getDefaultAmbitoColor(){ return R.color.white; }
 }
