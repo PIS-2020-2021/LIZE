@@ -141,7 +141,6 @@ public class DocumentManager {
             ArrayList<Image> images = new ArrayList<>();
             imagesNote.put(imagesID, images);
             DocumentReference notasRef = db.collection("images").document(imagesID);
-
             notasRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();

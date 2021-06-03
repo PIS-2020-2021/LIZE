@@ -492,7 +492,8 @@ public class MainViewModel extends ViewModel{
                     duplicated.setHaveDocuments(note.getHaveDocuments());
                     duplicated.setHaveImages(note.getHaveImages());
                     duplicated.setFolderTAG(note.getFolderTAG());
-
+                    duplicated.setHaveAudios(note.getHaveAudios());
+                    duplicated.setAudiosID(note.getAudiosID());
                     mAmbitoSelected.getValue().addNote(duplicated);                 // Añadimos esa Nota al Ámbito seleccionado
                     mFolderSelected.setValue(mFolderSelected.getValue());           // Actualizamos la colección de Notas de la Folder seleccionada
                     databaseAdapter.saveNote(duplicated);                           // Guardamos la Nota en DB

@@ -147,7 +147,7 @@ public class NoteHostFragment extends Fragment implements NoteAdapter.CardNoteLi
         nota.putString("imagesID",selectedNote.getImagesID());
         nota.putBoolean("images",selectedNote.getHaveImages());
         nota.putBoolean("documents",selectedNote.getHaveDocuments());
-        //nota.putBoolean("audios",selectedNote.getHaveAudios());
+        nota.putBoolean("audios",selectedNote.getHaveAudios());
         nota.putString("audiosID",selectedNote.getAudiosID());
         intent.putExtras(nota);
 

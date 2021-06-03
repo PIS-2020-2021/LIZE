@@ -32,6 +32,10 @@ public class Note {
         this.text_plain = text_plain;
         this.text_html = text_html;
         this.lastUpdate = new Date();
+        this.haveAudios = false;
+        this.haveDocuments = false;
+        this.haveImages = false;
+
     }
 
     /**
