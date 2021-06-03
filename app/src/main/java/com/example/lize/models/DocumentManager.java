@@ -475,7 +475,7 @@ public class DocumentManager {
      * @param currentItem Item en el que estamos trabajando
      */
     public void removeDocumentFromNote(String documentsID, Document currentItem) {
-        String ref = currentItem.getId();               //+ "-img-" + (currentItem);
+        String ref = currentItem.getId();
         DocumentReference notasRef = db.collection("documents").document(documentsID);
 
         documentsNote.get(documentsID).remove(currentItem);
@@ -506,7 +506,7 @@ public class DocumentManager {
      * @param currentItem Item en el que etsamos trabajando
      */
     public void removeAudioFromNote(String AudiosID, Audio currentItem) {
-        String ref = currentItem.getID();//+ "-img-" + (currentItem);
+        String ref = currentItem.getID();
         DocumentReference notasRef = db.collection("audios").document(AudiosID);
 
         audiosNote.get(AudiosID).remove(currentItem);
@@ -530,11 +530,6 @@ public class DocumentManager {
             }
         });
     }
-
-
-    //******************
-    //    IS EMPTY
-    //******************
 
 
     /**

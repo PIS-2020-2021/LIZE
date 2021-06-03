@@ -491,16 +491,8 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             myFile.setName(displayName);
             myFile.setId(displayName);
 
-            //myFile.setContent(file);
-
             documentsID = documentManager.addDocumentToCloud(documentsID, myFile);
-            /* if(!initRecycleView){
-                adapter = new DocumentAdapter(documentManager.getDocuments(documentsID), this);
-                recyclerView.setAdapter(adapter);
-                initRecycleView = true;
-            }*/
             documentAdapter.addDocument(myFile);
-            //adapter.notifyDataSetChanged();
             documentRecycleView.setVisibility(View.VISIBLE);
         }
     }
