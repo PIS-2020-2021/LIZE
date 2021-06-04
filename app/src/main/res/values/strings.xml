@@ -9,8 +9,6 @@
     <string name="create_new" />
     <string name="prompt_password">Contraseña</string>
     <string name="prompt_email">Email</string>
-    <string name="log_in">Inicia sesión</string>
-    <string name="Sign_up">Regístrate</string>
     <string name="log_in">Iniciar Sesión</string>
     <string name="Sign_up">Regístrate</string>
     <string name="demasiados_caracteres">Demasiados caracteres introducidos.</string>
