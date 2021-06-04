@@ -94,7 +94,6 @@ dependencies {
     //animation wave audios
     implementation 'com.gauravk.audiovisualizer:audiovisualizer:0.9.2'
 
-
     // Glide for image loading with RecyclerView integration
     implementation ("com.github.bumptech.glide:glide:4.11.0")
 
