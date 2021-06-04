@@ -6,6 +6,7 @@ import androidx.cardview.widget.CardView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -231,4 +232,19 @@ public class EditAmbitoActivity extends AppCompatActivity {
         } else return false;
         return true;
     }
+
+    /**
+     * Método para guardar la nota en caso de que el usuario presione el botón atrás del móvil
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            setResult(RESULT_CANCELED, intent);
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
 }

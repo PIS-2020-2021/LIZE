@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Patterns;
 import com.example.lize.R;
+
+import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -19,7 +21,6 @@ public class LogInActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
 
-    // Variables
     EditText email, password;
     Button login, signup;
     boolean isEmailValid, isPasswordValid;
@@ -31,7 +32,7 @@ public class LogInActivity extends AppCompatActivity {
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
-            if (mAuth.getCurrentUser() != null){
+           if (mAuth.getCurrentUser() != null){
                 Toast.makeText(getApplicationContext(), "¡Bienvenido a LIZE!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
@@ -135,4 +136,18 @@ public class LogInActivity extends AppCompatActivity {
             }
             return isEmailValid && isPasswordValid;
         }
+
+    /**
+     * Método para guardar la nota en caso de que el usuario presione el botón atrás del móvil
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            // Variables
+            Toast toastReference = Toast.makeText(getBaseContext(), "Inicia sesión, por favor.", Toast.LENGTH_SHORT);
+            toastReference.show();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
     }

@@ -13,6 +13,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Bundle;
@@ -417,5 +418,18 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         });
         root.startAnimation(recreate);
     }
+    /**
+     * Método para guardar la nota en caso de que el usuario presione el botón atrás del móvil
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            toastReference = Toast.makeText(getBaseContext(), "Estas en la pantalla principal.", Toast.LENGTH_SHORT);
+            toastReference.show();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
 
 }

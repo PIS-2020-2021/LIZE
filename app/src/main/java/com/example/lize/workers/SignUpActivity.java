@@ -10,6 +10,8 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.TextView;
 import com.example.lize.R;
@@ -146,6 +148,20 @@ public class SignUpActivity extends AppCompatActivity {
         builder.setPositiveButton("Aceptar", null);
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    /**
+     * Método para guardar la nota en caso de que el usuario presione el botón atrás del móvil
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
+            setResult(RESULT_CANCELED, intent);
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 
