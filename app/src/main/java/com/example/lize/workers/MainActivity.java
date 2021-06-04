@@ -116,9 +116,16 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         //Asignamos Boton y Listener a addAmbito
         this.addAmbito = findViewById(R.id.addAmbitoButton);
         addAmbito.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), NewAmbitoActivity.class);
-            intent.putIntegerArrayListExtra("Ambitos", dataViewModel.getUserSelected().getValue().getColorsTaken());
-            startActivityForResult(intent, REQUEST_CODE_ADD_AMBITO);
+            if (dataViewModel.getUserSelected().getValue().getAmbitos().size() == 9) {
+                toastReference = Toast.makeText(getBaseContext(), "Has alcanzado el número máximo de ámbitos.", Toast.LENGTH_SHORT);
+                toastReference.show();
+                toastReference = Toast.makeText(getBaseContext(), "Elimina algún ámbito, por favor.", Toast.LENGTH_SHORT);
+                toastReference.show();
+            } else {
+                Intent intent = new Intent(getApplicationContext(), NewAmbitoActivity.class);
+                intent.putIntegerArrayListExtra("Ambitos", dataViewModel.getUserSelected().getValue().getColorsTaken());
+                startActivityForResult(intent, REQUEST_CODE_ADD_AMBITO);
+            }
         });
 
         //Asignamos Boton y Listener a addAmbito
