@@ -43,6 +43,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -124,7 +125,13 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
 
         Preferences.applySelectedTheme(this);
         setContentView(R.layout.activity_notas);
-        setTheme(R.style.RTE_ThemeLight);
+
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            setTheme(R.style.RTE_ThemeDark);
+         } else {
+            setTheme(R.style.RTE_ThemeLight);
+        }
+
 
         // Componentes
         inputNoteTitulo = findViewById(R.id.inputNoteTitulo);
@@ -550,7 +557,8 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     @Override
     public void onDocumentClick(int position)  {
         Document d = documentManager.getDocuments(documentsID).get(position);
-        openFile(d.getUrl());
+        //openFile(d.getUrl());
+        Toast.makeText(this,"Funcionality not implemented yet :)",Toast.LENGTH_SHORT).show();
     }
 
     /**

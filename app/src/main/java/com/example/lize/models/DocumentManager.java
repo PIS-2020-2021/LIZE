@@ -295,7 +295,7 @@ public class DocumentManager {
         }
 
         if (documentsNote.get(DocumentsID).size() == 1) {
-            String ref = doc.getId();                   // "-img-" + notas.get(DocumentsID).getBitmaps().indexOf(image);
+            String ref = doc.getId();
             uploadDocument(ref, doc);
 
             Map<String, Object> noteDocuments = new HashMap<>();

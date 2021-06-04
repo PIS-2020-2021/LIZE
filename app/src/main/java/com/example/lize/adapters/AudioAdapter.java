@@ -8,6 +8,7 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -155,14 +156,19 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
                 if (sessionID != -1) {
                     try {
                         barVisualizer.show();
-                        barVisualizer.setAudioSessionId(sessionID);
-                    } catch (IllegalStateException e){
+                        barVisualizer.setActivated(true);
+
+                        //barVisualizer.setAudioSessionId(sessionID);
+
+
+                        } catch (IllegalStateException e){
                         e.printStackTrace();
                     }
                 }
             } else if (stateReproduction.get(position) == 1) {
                 stateReproduction.put(position,0);
                 barVisualizer.hide();
+                barVisualizer.setActivated(false);
                 playButton.setBackgroundResource(R.drawable.ic_baseline_play_circle_filled_24);
                 pausePlaying(position);
             }
