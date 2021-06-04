@@ -3,6 +3,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.util.Patterns;
 import com.example.lize.R;
@@ -32,7 +33,6 @@ public class LogInActivity extends AppCompatActivity {
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
-
            if (mAuth.getCurrentUser() != null){
                 Toast.makeText(getApplicationContext(), "¡Bienvenido a LIZE!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, MainActivity.class);
@@ -126,7 +126,7 @@ public class LogInActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), passError.getError(), Toast.LENGTH_SHORT).show();
                 isPasswordValid = false;
 
-            } else if (password.getText().toString().matches(patronPsw)) {
+            } else if (!password.getText().toString().matches(patronPsw)) {
                 passError.setError(getResources().getString(R.string.error_incorrect_pwd));
                 Toast.makeText(getApplicationContext(), passError.getError(), Toast.LENGTH_SHORT).show();
                 isPasswordValid = false;
