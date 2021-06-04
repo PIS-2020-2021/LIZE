@@ -132,8 +132,12 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         this.darkMode = findViewById(R.id.darkModeButton);
         darkMode.setOnClickListener(v -> {
             if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                toastReference = Toast.makeText(getBaseContext(), "Cambiando a Modo Oscuro.", Toast.LENGTH_SHORT);
+                toastReference.show();
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             } else {
+                toastReference = Toast.makeText(getBaseContext(), "Cambiando a Modo Claro.", Toast.LENGTH_SHORT);
+                toastReference.show();
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             }
         });
