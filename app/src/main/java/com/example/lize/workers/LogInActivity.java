@@ -25,6 +25,7 @@ public class LogInActivity extends AppCompatActivity {
     Button login, signup;
     boolean isEmailValid, isPasswordValid;
     TextInputLayout emailError, passError;
+    String patronPsw = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$";
 
     //Relacionado con la Autentificación de FireBase
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -125,8 +126,8 @@ public class LogInActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), passError.getError(), Toast.LENGTH_SHORT).show();
                 isPasswordValid = false;
 
-            } else if (password.getText().length() < 8) {
-                passError.setError(getResources().getString(R.string.error_invalid_pwd_Login));
+            } else if (password.getText().toString().matches(patronPsw)) {
+                passError.setError(getResources().getString(R.string.error_incorrect_pwd));
                 Toast.makeText(getApplicationContext(), passError.getError(), Toast.LENGTH_SHORT).show();
                 isPasswordValid = false;
 

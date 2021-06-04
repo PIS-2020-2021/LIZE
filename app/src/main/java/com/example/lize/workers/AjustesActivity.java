@@ -35,6 +35,7 @@ public class AjustesActivity extends Activity {
     TextInputLayout nameInput, apellidosInput, emailInput, pswInput;
     ImageButton profilePicture;
     StorageReference storageReference;
+    String patronPsw = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$";
 
     /** Ajustes constructor */
     @Override
@@ -252,8 +253,8 @@ public class AjustesActivity extends Activity {
             pswInput.setError(getResources().getString(R.string.error_campo_vacio));
             Toast.makeText(getApplicationContext(), pswInput.getError(), Toast.LENGTH_SHORT).show();
             isPasswordValid = false;
-        } else if (editPsw.getText().length() < 8) {
-            pswInput.setError(getResources().getString(R.string.error_invalid_pwd_Login));
+        } else if (!editPsw.getText().toString().matches(patronPsw)) {
+            pswInput.setError(getResources().getString(R.string.error_invalid_pwd));
             Toast.makeText(getApplicationContext(), pswInput.getError(), Toast.LENGTH_SHORT).show();
             isPasswordValid = false;
         } else  {
