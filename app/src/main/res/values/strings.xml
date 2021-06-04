@@ -2,13 +2,15 @@
     <string name="app_name">Lize</string>
     <string name="error_campo_vacio">Rellene todos los campos.</string>
     <string name="error_invalid_email">Introduzca un email válido.</string>
-    <string name="error_invalid_pwd">La contraseña debe tener 8 caracteres mínimo.</string>
-    <string name="error_invalid_pwd_Login">La contraseña es incorrecta.</string>
+    <string name="error_invalid_pwd">La contraseña debe tener mayúsculas, minúsculas y dígitos.</string>
+    <string name="error_incorrect_pwd">La contraseña es incorrecta.</string>
     <string name="error_invalid_pwd_Signup">Ambas contraseñas deben coincidir.</string>
     <string name="LOGIN">Login</string>
     <string name="create_new" />
     <string name="prompt_password">Contraseña</string>
     <string name="prompt_email">Email</string>
+    <string name="log_in">Inicia sesión</string>
+    <string name="Sign_up">Regístrate</string>
     <string name="log_in">Iniciar Sesión</string>
     <string name="Sign_up">Regístrate</string>
     <string name="demasiados_caracteres">Demasiados caracteres introducidos.</string>
@@ -64,8 +66,8 @@
     <string name="todo">TODO</string>
 
 
-    <string name="openDrawer">Open Drawer </string>
-    <string name="closeDrawer">Close Drawer </string>
+    <string name="openDrawer">Open Drawer</string>
+    <string name="closeDrawer">Close Drawer</string>
     <string name="share">Compartir</string>
     <string name="add_recordatory">Recordatorio</string>
     <string name="insert_document">Adjuntar archivo</string>
@@ -112,12 +114,12 @@
     <string name="numero_total_de_notas">numero total de notas</string>
     <string name="n_de_mbitos">Nº de ámbitos</string>
     <string name="numero_de_ambitos">Numero de ambitos</string>
-    <string name="password">Password</string>
-    <string name="surnames">Surnames</string>
+    <string name="password">Contraseña</string>
+    <string name="surnames">Apellidos</string>
     <string name="lize">LIZE</string>
     <string name="foto_de_perfil">foto de perfil</string>
     <string name="email">Email</string>
-    <string name="name">Name</string>
+    <string name="name">Nombre</string>
     <string name="guardar_cambios">Guardar cambios</string>
     <string name="repetir_la_contrasena">Repetir la contraseña</string>
     <!-- TODO: Remove or change this placeholder text -->
@@ -125,7 +127,7 @@
     <string name="move_note">Mover Nota</string>
 
 
-    <string name="save_audio">Save Audio</string>
+    <string name="save_audio">Guardar Audio</string>
     <string name="cancel">Cancelar</string>
 
 

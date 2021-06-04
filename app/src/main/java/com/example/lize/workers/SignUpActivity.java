@@ -20,13 +20,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import android.widget.Toast;
 import android.widget.EditText;
 
+import java.util.regex.Pattern;
+
 public class SignUpActivity extends AppCompatActivity {
         // Variables
         Button signup;
         TextView login;
         EditText nombre, apellidos, email, psw, pswCheck;
-        boolean isNameValid, isEmailValid, isPasswordValid;
+        boolean isNameValid, isEmailValid, isPasswordValid, isPasswordCheckValid;
         TextInputLayout nameError,surnameError, emailError, passError, passErrorCheck;
+        String patronPsw = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$";
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -116,21 +119,35 @@ public class SignUpActivity extends AppCompatActivity {
             passError.setError(getResources().getString(R.string.error_campo_vacio));
             isPasswordValid = false;
             Toast.makeText(getApplicationContext(), passError.getError(), Toast.LENGTH_SHORT).show();
-        } else if (psw.getText().length() < 8) {
+        } else if (!psw.getText().toString().matches(patronPsw)) {
             passError.setError(getResources().getString(R.string.error_invalid_pwd));
             isPasswordValid = false;
             Toast.makeText(getApplicationContext(), passError.getError(), Toast.LENGTH_SHORT).show();
-        } else if (!psw.getText().toString().equals(pswCheck.getText().toString())) {
-            passErrorCheck.setError(getResources().getString(R.string.error_invalid_pwd_Signup));
-            isPasswordValid = false;
-            Toast.makeText(getApplicationContext(), passErrorCheck.getError(), Toast.LENGTH_SHORT).show();
         } else  {
             isPasswordValid = true;
             passError.setErrorEnabled(false);
             passErrorCheck.setErrorEnabled(false);
         }
 
-        if (isNameValid && isEmailValid && isPasswordValid) {
+        if (pswCheck.getText().toString().isEmpty()) {
+            passErrorCheck.setError(getResources().getString(R.string.error_campo_vacio));
+            isPasswordCheckValid = false;
+            Toast.makeText(getApplicationContext(), passErrorCheck.getError(), Toast.LENGTH_SHORT).show();
+        } else if (!pswCheck.getText().toString().matches(patronPsw)) {
+            passErrorCheck.setError(getResources().getString(R.string.error_invalid_pwd));
+            isPasswordCheckValid = false;
+            Toast.makeText(getApplicationContext(), passErrorCheck.getError(), Toast.LENGTH_SHORT).show();
+        } else if (!psw.getText().toString().equals(pswCheck.getText().toString())) {
+            passErrorCheck.setError(getResources().getString(R.string.error_invalid_pwd_Signup));
+            isPasswordCheckValid = false;
+            Toast.makeText(getApplicationContext(), passErrorCheck.getError(), Toast.LENGTH_SHORT).show();
+        } else  {
+            isPasswordCheckValid = true;
+            passError.setErrorEnabled(false);
+            passErrorCheck.setErrorEnabled(false);
+        }
+
+        if (isNameValid && isEmailValid && isPasswordValid && isPasswordCheckValid) {
             Toast.makeText(getApplicationContext(), "Successfully", Toast.LENGTH_SHORT).show();
             return true;
         }

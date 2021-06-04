@@ -116,17 +116,28 @@ public class MainActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         //Asignamos Boton y Listener a addAmbito
         this.addAmbito = findViewById(R.id.addAmbitoButton);
         addAmbito.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), NewAmbitoActivity.class);
-            intent.putIntegerArrayListExtra("Ambitos", dataViewModel.getUserSelected().getValue().getColorsTaken());
-            startActivityForResult(intent, REQUEST_CODE_ADD_AMBITO);
+            if (dataViewModel.getUserSelected().getValue().getAmbitos().size() == 9) {
+                toastReference = Toast.makeText(getBaseContext(), "Has alcanzado el número máximo de ámbitos.", Toast.LENGTH_SHORT);
+                toastReference.show();
+                toastReference = Toast.makeText(getBaseContext(), "Elimina algún ámbito, por favor.", Toast.LENGTH_SHORT);
+                toastReference.show();
+            } else {
+                Intent intent = new Intent(getApplicationContext(), NewAmbitoActivity.class);
+                intent.putIntegerArrayListExtra("Ambitos", dataViewModel.getUserSelected().getValue().getColorsTaken());
+                startActivityForResult(intent, REQUEST_CODE_ADD_AMBITO);
+            }
         });
 
         //Asignamos Boton y Listener a addAmbito
         this.darkMode = findViewById(R.id.darkModeButton);
         darkMode.setOnClickListener(v -> {
             if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                toastReference = Toast.makeText(getBaseContext(), "Cambiando a Modo Oscuro.", Toast.LENGTH_SHORT);
+                toastReference.show();
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             } else {
+                toastReference = Toast.makeText(getBaseContext(), "Cambiando a Modo Claro.", Toast.LENGTH_SHORT);
+                toastReference.show();
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             }
         });

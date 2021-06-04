@@ -9,6 +9,8 @@ import com.example.lize.data.Folder;
 import com.example.lize.data.Note;
 import com.example.lize.data.User;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -310,9 +312,11 @@ public class MainViewModel extends ViewModel{
     public void editUser(String name, String apellidos, String email, String password) {
         try {
             User selected = mUserSelected.getValue();
+            FirebaseUser authUser = FirebaseAuth.getInstance().getCurrentUser();
 
-            FirebaseAuth.getInstance().getCurrentUser().updateEmail(email);
-            FirebaseAuth.getInstance().getCurrentUser().updatePassword(password);
+            authUser.updateEmail(email);
+            authUser.updatePassword(password);
+            FirebaseAuth.getInstance().updateCurrentUser(authUser);
 
             selected.setFirst(name);
             selected.setLast(apellidos);
@@ -320,7 +324,7 @@ public class MainViewModel extends ViewModel{
             selected.setPassword(password);
 
             DatabaseAdapter.getInstance().saveUser(selected);                                                 // Guardamos el Ambito en DB
-            setToast("User " + name + " correctly edited.");    // Creamos Toast Informativo
+            setToast("User " + email + " correctly edited.");    // Creamos Toast Informativo
 
         } catch (NullPointerException exception) {
             Log.w(TAG, "Failed to edit user " + name + ": null pointer exception.");
