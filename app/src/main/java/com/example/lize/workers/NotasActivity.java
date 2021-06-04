@@ -709,13 +709,18 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     private void stopRecording() {
         if (isRecording) {
             endAudio = System.currentTimeMillis();
-            recorder.stop();
-            recorder.release();
-            Audio a = new Audio(singleAudioID,fileName,(endAudio-startAudio));
-            audiosID = documentManager.addAudioToCloud(audiosID,a);
-            audioAdapter.addAudio(a);
-            recorder = null;
-            isRecording = false;
+            try {
+                recorder.stop();
+                recorder.release();
+                Audio a = new Audio(singleAudioID,fileName,(endAudio-startAudio));
+                audiosID = documentManager.addAudioToCloud(audiosID,a);
+                audioAdapter.addAudio(a);
+                recorder = null;
+                isRecording = false;
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
