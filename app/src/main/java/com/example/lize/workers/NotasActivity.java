@@ -16,6 +16,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.os.PersistableBundle;
@@ -420,6 +421,9 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
      */
     private void selectDocument() {
         Intent pickIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        pickIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION  |
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION |
+                            Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         pickIntent.setType("*/*");
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         Intent chooserIntent = Intent.createChooser(getIntent, "Selecciona un documento");
@@ -474,6 +478,13 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
         } else if (requestCode == REQUEST_DOCUMENT_GET && resultCode == RESULT_OK) {
             assert data != null;
             Uri uri = data.getData();
+
+            // Check for the freshest data.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                getContentResolver().takePersistableUriPermission(uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION  | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            }
+
             String uriString = uri.toString();
             Document myFile = new Document(uri);
 
@@ -489,7 +500,14 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
             } else if (uriString.startsWith("file://")) displayName = myFile.getName();
 
             myFile.setName(displayName);
-            myFile.setId(displayName);
+
+            // Insert @System.currentMillis identifier
+            if (displayName.contains(".")){
+                String id = displayName.substring(0, displayName.lastIndexOf("."));
+                String ext = displayName.substring(displayName.lastIndexOf("."));
+                myFile.setId(id + "@" + System.currentTimeMillis() + ext);
+
+            } else myFile.setId(displayName + "@" + System.currentTimeMillis() + ".");
 
             documentsID = documentManager.addDocumentToCloud(documentsID, myFile);
             documentAdapter.addDocument(myFile);
@@ -532,7 +550,7 @@ public class NotasActivity extends AppCompatActivity implements DocumentAdapter.
     @Override
     public void onDocumentClick(int position)  {
         Document d = documentManager.getDocuments(documentsID).get(position);
-        //openFile(Uri.fromFile(d.getContent()));
+        openFile(d.getUrl());
     }
 
     /**

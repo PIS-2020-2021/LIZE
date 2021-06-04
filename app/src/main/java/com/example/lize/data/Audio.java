@@ -3,7 +3,7 @@ package com.example.lize.data;
 
 public class Audio {
 
-    private final String ID;
+    private String ID;
     private final String address;
     private final long duration;
 
@@ -13,7 +13,7 @@ public class Audio {
      * @param localPath PATH local del Audio
      * @param duration Duracion del Audio
      */
-    public Audio(String id,String localPath, long duration) {
+    public Audio(String id, String localPath, long duration) {
         this.ID = id;
         this.address = localPath;
         this.duration = duration;
@@ -42,5 +42,11 @@ public class Audio {
     public String getID() {
         return ID;
     }
+
+    /**
+     * Método setter del ID de un Audio
+     * @param ID ID del Audio
+     */
+    public void setID(String ID) { this.ID = ID; }
 
 }

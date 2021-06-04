@@ -343,10 +343,11 @@ public class DatabaseAdapter {
                     Log.w(TAG, "Failed to get Collection of images of  " + imagesID + ": null pointer exception.");
                 }
             } else Log.d(TAG, "Error al eliminar la coleccion de imagenes: ", task.getException());
+
+            imagesRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
+                    .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + imagesID, e));
         });
 
-        imagesRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
-                 .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + imagesID, e));
     }
 
     /**
@@ -368,10 +369,11 @@ public class DatabaseAdapter {
                     Log.w(TAG, "Failed to get Collection of images of  " + documentsID + ": null pointer exception.");
                 }
             } else Log.d(TAG, "Error al eliminar la coleccion de imagenes: ", task.getException());
+
+            documentsRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
+                    .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + documentsID, e));
         });
 
-        documentsRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
-                    .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + documentsID, e));
     }
 
     /**
@@ -393,10 +395,11 @@ public class DatabaseAdapter {
                     Log.w(TAG, "Failed to get Collection of audios of  " + audiosID + ": null pointer exception.");
                 }
             } else Log.d(TAG, "Error al eliminar la coleccion de audios: ", task.getException());
+
+            documentsRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
+                    .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + audiosID, e));
         });
 
-        documentsRef.delete().addOnSuccessListener(aVoid -> Log.d(TAG, "Documentos de la Nota Eliminados Correctamente"))
-                    .addOnFailureListener(e -> Log.w(TAG, "Error al Eliminar Documentos de " + audiosID, e));
     }
 
     /**

@@ -487,13 +487,20 @@ public class MainViewModel extends ViewModel{
             for (Note note :mAmbitoSelected.getValue().getNotes()) {
                 if (note.getSelfID().equals(noteID)) {
                     Note duplicated = new Note(note.getTitle(), note.getText_plain(), note.getText_html());
-                    duplicated.setDocumentsID(note.getDocumentsID());
-                    duplicated.setImagesID(note.getImagesID());
-                    duplicated.setHaveDocuments(note.getHaveDocuments());
-                    duplicated.setHaveImages(note.getHaveImages());
                     duplicated.setFolderTAG(note.getFolderTAG());
+
+                    duplicated.setHaveImages(note.getHaveImages());
+                    if (duplicated.getHaveImages())
+                        duplicated.setImagesID(documentManager.copyImages(note.getImagesID()));
+
+                    duplicated.setHaveDocuments(note.getHaveDocuments());
+                    if (duplicated.getHaveDocuments())
+                        duplicated.setDocumentsID(documentManager.copyDocuments(note.getDocumentsID()));
+
                     duplicated.setHaveAudios(note.getHaveAudios());
-                    duplicated.setAudiosID(note.getAudiosID());
+                    if (duplicated.getHaveAudios())
+                        duplicated.setAudiosID(documentManager.copyAudios(note.getAudiosID()));
+
                     mAmbitoSelected.getValue().addNote(duplicated);                 // Añadimos esa Nota al Ámbito seleccionado
                     mFolderSelected.setValue(mFolderSelected.getValue());           // Actualizamos la colección de Notas de la Folder seleccionada
                     databaseAdapter.saveNote(duplicated);                           // Guardamos la Nota en DB

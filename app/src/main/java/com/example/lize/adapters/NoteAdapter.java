@@ -30,13 +30,7 @@ import java.util.Collection;
 
 /**
  * Adaptador del RecyclerView de Notas, en la actividad principal. Enlaza los datos del dataSet
- * de Notas, con el correspondiente CardNote (ViewHolder). Podemos distinguir dos tipos de ViewHolders;
- * <ul>
- *      <li>cardNotes con alto height {@link R.dimen# cardnote_layout_height_high} (cardNoteType = true)</li>
- *      <li>cardNotes con bajo height {@link R.dimen# cardnote_layout_height_high} (cardNoteType = false) </li>
- * </ul>
- * Puesto que solo el height es modificado, nos basta con un único tipo de ViewHolder {@link CardNote}.
- */
+ * de Notas, con el correspondiente CardNote (ViewHolder). */
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.CardNote> implements Filterable {
 
     private final Context mContext;

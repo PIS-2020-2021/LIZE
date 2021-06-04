@@ -2,6 +2,7 @@ package com.example.lize.models;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -18,6 +19,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -29,6 +31,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -109,7 +112,11 @@ public class DocumentManager {
                                 outputStream = context.openFileOutput(doc, Context.MODE_PRIVATE);
                                 outputStream.write(bytes);
                                 Document f = new Document(Uri.fromFile(file));
-                                f.setName(doc);
+                                String base = doc.substring(0, doc.lastIndexOf("@"));
+                                String ext = doc.substring(doc.lastIndexOf("."));
+
+                                // Get Name (without @System.currentTime identifier
+                                f.setName(base + ext);
                                 f.setId(doc);
                                 documentsNote.get(documentsID).add(f);
                             } catch (FileNotFoundException e) {
@@ -183,21 +190,30 @@ public class DocumentManager {
                         StorageReference singleDoc = mStorageRef.child(audio);
 
                         File file = new File(filename);
-                        if (!file.exists()) {
-                            singleDoc.getFile(file).addOnSuccessListener(taskSnapshot -> {
-                                // Local temp file has been created
-                            }).addOnFailureListener(Throwable::printStackTrace);
-                        }
                         MediaPlayer mp = new MediaPlayer();
                         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                        retriever.setDataSource(context, Uri.parse(Uri.fromFile(file).toString()));
-                        String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                        int millSecond = Integer.parseInt(duration);
 
-                        audios.add(new Audio(audio, filename, millSecond));
+                        if (!(file.length() > 0)) {
+                            singleDoc.getFile(file).addOnSuccessListener(taskSnapshot -> {
+                                retriever.setDataSource(context, Uri.parse(Uri.fromFile(file).toString()));
+                                String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                                int millSecond = Integer.parseInt(duration);
+                                Audio newAudio = new Audio(audio, filename, millSecond);
+                                audios.add(newAudio);
+
+                                // Local temp file has been created
+                            }).addOnFailureListener(Throwable::printStackTrace);
+
+                        } else{
+                            retriever.setDataSource(context, Uri.parse(Uri.fromFile(file).toString()));
+                            String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                            int millSecond = Integer.parseInt(duration);
+                            audios.add(new Audio(audio, filename, millSecond));
+                        }
                     }
                 }
             });
+
             audiosNote.put(AudiosID, audios);
         }
         return audiosNote.get(AudiosID);
@@ -243,29 +259,15 @@ public class DocumentManager {
             });
 
         } else {
+            uploadImage(image.getId(), image);
             DocumentReference notasRef = db.collection("images").document(imagesID);
-            String finalDocumentsID2 = imagesID;
-
-            notasRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    List<String> group = (List<String>) document.get("images");
-                    ArrayList<String> imagenes = (ArrayList<String>) group;
-                    String ref = image.getId();             //+ "-img-" + (notas.get(finalDocumentsID2).getBitmaps().indexOf(image)) ;
-
-                    imagenes.add(ref);
-                    uploadImage(ref, image);
-                    Map<String, Object> noteDocuments = new HashMap<>();
-                    noteDocuments.put("imagesID", finalDocumentsID2);
-                    noteDocuments.put("images", imagenes);
-                    String finalDocumentsID1 = finalDocumentsID2;
-                    noteRef.set(noteDocuments).addOnCompleteListener(task1 -> {
-                        if (task1.isSuccessful()) Log.d(TAG, "Note " + finalDocumentsID1 + "Document correctly saved.");
-                        else Log.d(TAG, "Error saving note " + finalDocumentsID1, task1.getException());
-                    });
-                }
+            notasRef.update("files", FieldValue.arrayUnion(image.getId())).addOnCompleteListener(task1 -> {
+                if (task1.isSuccessful())
+                    Log.d(TAG, "Image " + image.getId() + " correctly saved.");
+                else Log.d(TAG, "Error saving image " + image.getId(), task1.getException());
             });
         }
+
         return imagesID;
     }
 
@@ -295,6 +297,7 @@ public class DocumentManager {
         if (documentsNote.get(DocumentsID).size() == 1) {
             String ref = doc.getId();                   // "-img-" + notas.get(DocumentsID).getBitmaps().indexOf(image);
             uploadDocument(ref, doc);
+
             Map<String, Object> noteDocuments = new HashMap<>();
             ArrayList<String> files = new ArrayList<>();
             files.add(ref);
@@ -307,27 +310,14 @@ public class DocumentManager {
             });
 
         } else {
+            uploadDocument(doc.getId(), doc);
             DocumentReference notasRef = db.collection("documents").document(DocumentsID);
-            String finalDocumentsID2 = DocumentsID;
-
-            notasRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    List<String> group = (List<String>) document.get("files");
-                    ArrayList<String> files = (ArrayList<String>) group;
-                    String ref = doc.getId();               //+ "-img-" + (notas.get(finalDocumentsID2).getBitmaps().indexOf(image)) ;
-                    files.add(ref);
-                    uploadDocument(ref, doc);
-                    Map<String, Object> noteDocuments = new HashMap<>();
-                    noteDocuments.put("DocumentsID", finalDocumentsID2);
-                    noteDocuments.put("files", files);
-                    noteRef.set(noteDocuments).addOnCompleteListener(task1 -> {
-                        if (task1.isSuccessful()) Log.d(TAG, "Note " + finalDocumentsID2 + "Document correctly saved.");
-                        else Log.d(TAG, "Error saving note " + finalDocumentsID2, task1.getException());
-                    });
-                }
+            notasRef.update("files", FieldValue.arrayUnion(doc.getId())).addOnCompleteListener(task1 -> {
+                if (task1.isSuccessful()) Log.d(TAG, "Document " + doc.getId() + " correctly saved.");
+                else Log.d(TAG, "Error saving document " + doc.getId(), task1.getException());
             });
         }
+
         return DocumentsID;
     }
 
@@ -369,26 +359,11 @@ public class DocumentManager {
             });
 
         } else {
-            DocumentReference notasRef = db.collection("audios").document(AudiosID);
-            String finalDocumentsID2 = AudiosID;
-
-            notasRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    List<String> group = (List<String>) document.get("files");
-                    ArrayList<String> files = (ArrayList<String>) group;
-                    String ref = audio.getID();//+ "-img-" + (notas.get(finalDocumentsID2).getBitmaps().indexOf(image)) ;
-
-                    files.add(ref);
-                    uploadAudio(audio);
-                    Map<String, Object> noteAudios = new HashMap<>();
-                    noteAudios.put("audiosID", finalDocumentsID2);
-                    noteAudios.put("files", files);
-                    noteRef.set(noteAudios).addOnCompleteListener(task1 -> {
-                        if (task1.isSuccessful()) Log.d(TAG, "Note " + finalDocumentsID2 + "Document correctly saved.");
-                        else Log.d(TAG, "Error saving note " + finalDocumentsID2, task1.getException());
-                    });
-                }
+            uploadAudio(audio);
+            DocumentReference notasRef = db.collection("documents").document(AudiosID);
+            notasRef.update("files", FieldValue.arrayUnion(audio.getID())).addOnCompleteListener(task1 -> {
+                if (task1.isSuccessful()) Log.d(TAG, "Audio " + audio.getID() + " correctly saved.");
+                else Log.d(TAG, "Error saving audio " + audio.getID(), task1.getException());
             });
         }
         return AudiosID;
@@ -433,6 +408,72 @@ public class DocumentManager {
         });
     }
 
+    //*******************
+    //      COPY
+    //*******************
+
+    /**
+     * Método para copiar las imágenes de una Nota (por referencia) y devolver el nuevo imagesID
+     * de la colección "images". Permite hacer un 'deep clone' de una Nota.
+     * @param imagesID ID de las imágenes de la Nota a copiar
+     * @return nuevo imageID de las imágenes de la Nota duplicada.
+     */
+    public String copyImages(String imagesID) {
+        Image copyImage;
+        String newImageID = null;
+        for (int i = 0; i < imagesArraySize(imagesID); i++) {
+            try {
+                copyImage = BitmapToImage(BitmapFactory.decodeFile(selectImageFromArray(imagesID, i)));
+                newImageID = addImageToCloud(newImageID, copyImage);
+            } catch (IOException exc) {
+                Log.e(TAG, "Couldn't copy image...");
+            }
+        }
+        return newImageID;
+    }
+
+    /**
+     * Método para copiar los Documentos de una Nota (por referencia) y devolver el nuevo documentID
+     * de la colección "documents". Permite hacer un 'deep clone' de una Nota.
+     * @param documentsID ID de los docus de la Nota a copiar
+     * @return nuevo documentID de las docus de la Nota duplicada.
+     */
+    public String copyDocuments(String documentsID) {
+        String newDocuID = null;
+
+        for (Document copyDocu : getDocuments(documentsID)) {
+
+            // Change @System.currentMillis identifier
+            String doc = copyDocu.getId();
+            String base = doc.substring(0, doc.lastIndexOf("@"));
+            String ext = doc.substring(doc.lastIndexOf("."));
+            Document newDocument = new Document(copyDocu.getUrl());
+            newDocument.setName(copyDocu.getName());
+            newDocument.setId(base + "@" + System.currentTimeMillis() + ext);
+            newDocuID = addDocumentToCloud(newDocuID, newDocument);
+        }
+        return newDocuID;
+    }
+
+    /**
+     * Método para copiar los Audios de una Nota (por referencia) y devolver el nuevo audiosID
+     * de la colección "audios". Permite hacer un 'deep clone' de una Nota.
+     * @param audiosID ID de las audios de la Nota a copiar
+     * @return nuevo audioID de los audios de la Nota duplicada.
+     */
+    public String copyAudios(String audiosID) {
+        String newAudioID = null;
+
+        for (Audio copyAudio : getAudios(audiosID)) {
+
+            // Change @System.currentMillis identifier
+            Audio newAudioFile = new Audio(String.valueOf(System.currentTimeMillis()),
+                    copyAudio.getAddress(), copyAudio.getDuration());
+
+            newAudioID = addAudioToCloud(newAudioID, newAudioFile);
+        }
+        return newAudioID;
+    }
 
     //*******************
     //      REMOVES
@@ -613,5 +654,4 @@ public class DocumentManager {
         fos.close();
         return f;
     }
-
 }
